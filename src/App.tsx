@@ -3,6 +3,7 @@ import { IonApp, IonRouterOutlet, setupIonicReact } from '@ionic/react';
 import { IonReactRouter } from '@ionic/react-router';
 import Home from './pages/Home';
 
+
 /* Core CSS required for Ionic components to work properly */
 import '@ionic/react/css/core.css';
 
@@ -26,12 +27,16 @@ import '@ionic/react/css/display.css';
  * https://ionicframework.com/docs/theming/dark-mode
  */
 
-/* import '@ionic/react/css/palettes/dark.always.css'; */
+/* import '@ionic/react/css/palettes/dark.always.css';*/
 /* import '@ionic/react/css/palettes/dark.class.css'; */
-import '@ionic/react/css/palettes/dark.system.css';
+/* import '@ionic/react/css/palettes/dark.system.css'; */
 
-/* Theme variables */
+/* Theme configuration */
 import './theme/variables.css';
+import './theme/customFont.css';
+
+import FooterTabBar from './components/FooterTabBar';
+
 
 setupIonicReact();
 
@@ -39,11 +44,10 @@ const App: React.FC = () => (
   <IonApp>
     <IonReactRouter>
       <IonRouterOutlet>
-        <Route exact path="/home">
-          <Home />
-        </Route>
+        <Route path="/app" component={FooterTabBar} />
+        
         <Route exact path="/">
-          <Redirect to="/home" />
+          <Redirect to="/app" />
         </Route>
       </IonRouterOutlet>
     </IonReactRouter>

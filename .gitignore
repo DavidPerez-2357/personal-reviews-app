@@ -1,31 +1,42 @@
-# See https://help.github.com/articles/ignoring-files/ for more about ignoring files.
+# Node.js
+node_modules/
+npm-debug.log
+yarn-error.log
+pnpm-debug.log
 
-# dependencies
-/node_modules
-/.pnp
-.pnp.js
+# Editor de código (VSCode y WebStorm)
+.vscode/
+.idea/
+*.iml
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
 
-# testing
-/coverage
+# Dependencias de Capacitor
+ios/
+android/
+capacitor.config.json
 
-# production
-/dist
+# Build y cache
+build/
+dist/
+out/
+.next/
+.expo/
+.cache/
+.temp/
 
-# misc
+# Archivos de configuración de sistema
 .DS_Store
+Thumbs.db
+
+# SQLite (si se generan archivos locales)
+*.sqlite
+*.sqlite-journal
+
+# Archivos de entorno
+.env
 .env.local
-.env.development.local
-.env.test.local
-.env.production.local
-/.nx
-/.nx/cache
-/.vscode/*
-!/.vscode/extensions.json
-.idea
-
-npm-debug.log*
-yarn-debug.log*
-yarn-error.log*
-
-# Optional eslint cache
-.eslintcache
+.env.*.local
