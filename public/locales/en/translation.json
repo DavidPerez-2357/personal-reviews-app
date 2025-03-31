@@ -12,10 +12,8 @@
         "ok": "OK",
         "close": "Close",
         "more": "More",
-        "less": "Less"
-    },
-    
-    "words": {
+        "less": "Less",
+
         "reviews": "Reviews",
         "review": "Review",
         "items": "Items",

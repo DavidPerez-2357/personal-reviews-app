@@ -9,7 +9,6 @@ i18n
 .use(LanguageDetector)
 .use(initReactI18next)
 .init({
-    debug: true,
     fallbackLng: "en",
     resources: {
         en: {
@@ -23,14 +22,5 @@ i18n
         escapeValue: false,
     },
 });
-
-console.log("i18n initialized with languages:", i18n.options.resources);
-console.log("Current language:", i18n.language);
-console.log("Available languages:", i18n.languages);
-console.log("Language detection:", i18n.services.languageDetector);
-console.log("Language detector:", i18n.services.languageDetector?.detector);
-console.log("Language detector type:", i18n.services.languageDetector?.type);
-console.log("Language detector cache:", i18n.services.languageDetector?.cache);
-
 
 export default i18n;
