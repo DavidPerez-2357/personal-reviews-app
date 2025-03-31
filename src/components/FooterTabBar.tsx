@@ -4,10 +4,10 @@ import { IonReactRouter } from '@ionic/react-router';
 
 import { Route, Redirect, useLocation } from 'react-router';
 
-import Home from '../pages/Home';
+import Home from '@pages/Home';
 import { Box, Ellipsis, Star } from 'lucide-react';
 
-import './../styles/FooterTabBar.css';
+import '@styles/FooterTabBar.css';
 import { useTranslation } from 'react-i18next';
 
 
@@ -29,20 +29,20 @@ function FooterTabBar() {
         
         <IonTabBar slot="bottom" className='tab-bar'>
           <IonTabButton tab="home" href="/app/reviews" onClick={() => setSelectedTab('reviews')} className='ion-activatable ripple-parent circle'>
-            <Star size={selectedTab === 'reviews' ? 30 : 24} />
-            {selectedTab !== 'reviews' && <IonLabel>{t('words.reviews')}</IonLabel>}
+            <Star size={selectedTab === 'reviews' ? 40 : 35} />
+            {selectedTab !== 'reviews' && <IonLabel><h3>{t('words.reviews')}</h3></IonLabel>}
             <IonRippleEffect></IonRippleEffect>
           </IonTabButton>
 
           <IonTabButton tab="items" href="/app/items" onClick={() => setSelectedTab('items')} className='ion-activatable ripple-parent circle'>
-            <Box size={selectedTab === 'items' ? 30 : 24} />
-            {selectedTab !== 'items' && <IonLabel>{t('words.items')}</IonLabel>}
+            <Box size={selectedTab === 'items' ? 40 : 35} />
+            {selectedTab !== 'items' && <IonLabel><h3>{t('words.items')}</h3></IonLabel>}
             <IonRippleEffect></IonRippleEffect>
           </IonTabButton>
 
           <IonTabButton tab="more" href="/app/more" onClick={() => setSelectedTab('more')} className='ion-activatable ripple-parent circle'>
-            <Ellipsis size={selectedTab === 'more' ? 30 : 24} />
-            {selectedTab !== 'more' && <IonLabel>{t('common.more')}</IonLabel>}
+            <Ellipsis size={selectedTab === 'more' ? 40 : 35} />
+            {selectedTab !== 'more' && <IonLabel><h3>{t('common.more')}</h3></IonLabel>}
             <IonRippleEffect></IonRippleEffect>
           </IonTabButton>
         </IonTabBar>
