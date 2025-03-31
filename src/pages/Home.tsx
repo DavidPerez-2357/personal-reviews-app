@@ -4,7 +4,7 @@ import './Home.css';
 
 const Home: React.FC = () => {
   return (
-    <IonPage>
+    <IonPage  className='safe-area-top'>
       <IonContent fullscreen>
         <IonHeader>
           <IonToolbar>
