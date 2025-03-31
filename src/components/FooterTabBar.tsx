@@ -30,19 +30,19 @@ function FooterTabBar() {
         <IonTabBar slot="bottom" className='tab-bar'>
           <IonTabButton tab="home" href="/app/reviews" onClick={() => setSelectedTab('reviews')} className='ion-activatable ripple-parent circle'>
             <Star size={selectedTab === 'reviews' ? 40 : 35} />
-            {selectedTab !== 'reviews' && <IonLabel><h3>{t('words.reviews')}</h3></IonLabel>}
+            {selectedTab !== 'reviews' && <IonLabel>{t('common.reviews')}</IonLabel>}
             <IonRippleEffect></IonRippleEffect>
           </IonTabButton>
 
           <IonTabButton tab="items" href="/app/items" onClick={() => setSelectedTab('items')} className='ion-activatable ripple-parent circle'>
             <Box size={selectedTab === 'items' ? 40 : 35} />
-            {selectedTab !== 'items' && <IonLabel><h3>{t('words.items')}</h3></IonLabel>}
+            {selectedTab !== 'items' && <IonLabel>{t('common.items')}</IonLabel>}
             <IonRippleEffect></IonRippleEffect>
           </IonTabButton>
 
           <IonTabButton tab="more" href="/app/more" onClick={() => setSelectedTab('more')} className='ion-activatable ripple-parent circle'>
             <Ellipsis size={selectedTab === 'more' ? 40 : 35} />
-            {selectedTab !== 'more' && <IonLabel><h3>{t('common.more')}</h3></IonLabel>}
+            {selectedTab !== 'more' && <IonLabel>{t('common.more')}</IonLabel>}
             <IonRippleEffect></IonRippleEffect>
           </IonTabButton>
         </IonTabBar>
