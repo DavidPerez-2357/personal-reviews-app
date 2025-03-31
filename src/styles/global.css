@@ -30,6 +30,9 @@
 @import url('/src/theme/customFont.css');
 @import url('/src/theme/variables.css');
 
+/* Tailwind CSS */
+@import "tailwindcss";
+
 
 .safe-area-top {
     padding-top: var(--safe-area-inset-top);
