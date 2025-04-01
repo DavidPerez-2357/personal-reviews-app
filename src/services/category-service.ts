@@ -184,13 +184,16 @@ export const insertTestCategories = async (): Promise<string> => {
             { id: 3, title: "Hogar", type: 3, color: "#3357FF", parent_id: null, created_at: new Date().toISOString(), updated_at: new Date().toISOString() }
         ];
 
+        const results: string[] = [];
         for (const category of categories) {
             if (await insertCategory(category) !== null) {
-                console.log(`✅ Categoría ${category.title} insertada correctamente.`);
-                return `✅ Categoría ${category.title} insertada correctamente.`;
+                const successMessage = `✅ Categoría ${category.title} insertada correctamente.`;
+                console.log(successMessage);
+                results.push(successMessage);
             } else {
-                console.error(`❌ Error al insertar la categoría ${category.title}.`);
-                    return `❌ Error al insertar la categoría ${category.title}.`;
+                const errorMessage = `❌ Error al insertar la categoría ${category.title}.`;
+                console.error(errorMessage);
+                results.push(errorMessage);
             }
         }
 
