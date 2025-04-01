@@ -149,7 +149,7 @@ export const deleteCategory = async (id: number): Promise<boolean> => {
 };
 
 /**
- * Elimina un categoría de la base de datos.
+ * Elimina todas las categorías de la base de datos.
  */
 export const deleteAllCategories = async (): Promise<boolean> => {
     if (!checkDB()) return false;
