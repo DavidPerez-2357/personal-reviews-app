@@ -61,7 +61,7 @@ export const insertOrigin = async (origin: Origin): Promise<boolean> => {
 };
 
 /**
- * Inseritems de prueba en la base de datos.
+ * Inserta ítems de prueba en la base de datos.
  * @returns Promise<void>
  */
 export const insertTestItems = async (): Promise<string> => {
