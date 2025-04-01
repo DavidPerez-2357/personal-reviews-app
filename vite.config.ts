@@ -1,5 +1,9 @@
 /// <reference types="vitest" />
 
+import legacy from '@vitejs/plugin-legacy';
+import react from '@vitejs/plugin-react';
+import { defineConfig } from 'vite';
+import path from 'path'; // Importa el módulo path para resolver rutas
 import legacy from '@vitejs/plugin-legacy'
 import react from '@vitejs/plugin-react'
 import { defineConfig } from 'vite'
@@ -14,6 +18,12 @@ export default defineConfig({
     legacy(),
     tailwindcss(),
   ],
+  resolve: {
+    alias: {
+      // Configura el alias 'src' para que apunte a la carpeta 'src'
+      src: path.resolve(__dirname, 'src')
+    }
+  },
   test: {
     globals: true,
     environment: 'jsdom',
@@ -29,4 +39,4 @@ export default defineConfig({
       '@assets': path.resolve(__dirname, 'src/assets'),
     },
   },
-})
+});
