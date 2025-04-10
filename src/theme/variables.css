@@ -105,3 +105,9 @@ ion-app {
     --ion-tab-bar-background: var(--ion-background-color);
     --ion-tab-bar-color: var(--ion-color-muted);
 }
+
+ion-input {
+	background: var(--ion-color-secondary);
+	border-radius: 0.5rem;
+	--padding-start: 10px!important;
+}
