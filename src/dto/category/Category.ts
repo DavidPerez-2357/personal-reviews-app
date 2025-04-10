@@ -1,8 +1,9 @@
 export interface Category {
     id: number;
-    title: string;
+    name: string;
     type: number;
     color: string;
+    icon: string;
     parent_id: number | null;
     created_at: string;
     updated_at: string;
