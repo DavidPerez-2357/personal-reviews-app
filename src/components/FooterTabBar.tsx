@@ -9,6 +9,7 @@ import { Box, Ellipsis, Star } from 'lucide-react';
 
 import '@styles/FooterTabBar.css';
 import { useTranslation } from 'react-i18next';
+import ReviewPage from "@pages/reviewPage.tsx";
 
 
 
@@ -21,7 +22,7 @@ function FooterTabBar() {
     <IonReactRouter>
       <IonTabs>
         <IonRouterOutlet>
-          <Route path="/app/reviews" component={Home} exact={true} />
+          <Route path="/app/reviews" component={ReviewPage} exact={true} />
           <Route path="/app/items" component={Home} exact={true} />
           <Route path="/app/more" component={Home} exact={true} />
           <Redirect path="/app" to="/app/reviews" exact={true} />
