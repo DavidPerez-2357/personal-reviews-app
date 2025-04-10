@@ -1,6 +1,6 @@
-import {checkDB, db} from "src/database-service";
-import { Item } from "src/dto/item/Item";
-import { Origin } from "src/dto/item/Origin";
+import {checkDB, db} from "../database-service";
+import { Item } from "../dto/item/Item";
+import { Origin } from "../dto/item/Origin";
 
 /**
  * Inserta un ítem en la base de datos.
@@ -68,11 +68,11 @@ export const insertTestItems = async (): Promise<string> => {
     if (!checkDB()) return "❌ La base de datos no está inicializada.";
     try {
         const items: Item[] = [
-            { name: "Item 1", image: "image1.jpg", rating: 4, category_id: 1 },
-            { name: "Item 2", image: "image2.jpg", rating: 3, category_id: 2 },
-            { name: "Item 3", image: "image3.jpg", rating: 5, category_id: 3 },
-            { name: "Item 4", image: "image4.jpg", rating: 2, category_id: 1 },
-            { name: "Item 5", image: "image5.jpg", rating: 1, category_id: 2 },
+            { id: 1, name: "Item 1", image: "https://example.com/image1.jpg", rating: 4.5, category_id: 1 },
+            { id: 2, name: "Item 2", image: "https://example.com/image2.jpg", rating: 3.8, category_id: 2 },
+            { id: 3, name: "Item 3", image: "https://example.com/image3.jpg", rating: 5.0, category_id: 1 },
+            { id: 4, name: "Item 4", image: "https://example.com/image4.jpg", rating: 2.5, category_id: 3 },
+            { id: 5, name: "Item 5", image: "https://example.com/image5.jpg", rating: 4.0, category_id: 2 },
         ];
 
         for (const item of items) {
