@@ -1,5 +1,5 @@
 
-import { db } from "../database-service";
+import {db} from "../database-service";
 import { checkDB } from "../database-service";
 import { Category } from "../dto/category/Category";
 import {CategoryRating} from "../dto/category/CategoryRating.ts";
@@ -18,7 +18,7 @@ export const getCategories = async (): Promise<Category[]> => {
 
         return result.values?.map(row => ({
             id: row.id,
-            title: row.title,
+            name: row.title,
             type: row.type,
             color: row.color,
             parent_id: row.parent_id as number | null,
@@ -40,8 +40,8 @@ export const insertCategory = async (category: Category): Promise<number | null>
     if (!checkDB()) return null;
 
     try {
-        const query = `INSERT INTO category (title, type, color, parent_id) VALUES (?, ?, ?, ?)`;
-        const values = [category.title, category.type, category.color, category.parent_id];
+        const query = `INSERT INTO category (name, type, color, parent_id) VALUES (?, ?, ?, ?, ?)`;
+        const values = [category.name, category.type, category.color, category.parent_id];
 
         const result = await db!.run(query, values);
         return result.changes?.lastId || null;
@@ -175,23 +175,24 @@ export const insertTestCategories = async (): Promise<string> => {
     try {
         const existingCategories = await getCategories();
         if (existingCategories.length > 0) {
+            await deleteAllCategories()
             return "✅ La base de datos ya contiene categorías.";
         }
 
         const categories: Category[] = [
-            { id: 1, title: "Electrónica", type: 1, color: "#FF5733", parent_id: null, created_at: new Date().toISOString(), updated_at: new Date().toISOString() },
-            { id: 2, title: "Ropa", type: 2, color: "#33FF57", parent_id: null, created_at: new Date().toISOString(), updated_at: new Date().toISOString() },
-            { id: 3, title: "Hogar", type: 3, color: "#3357FF", parent_id: null, created_at: new Date().toISOString(), updated_at: new Date().toISOString() }
+            { id: 1, name: "Electrónica", type: 1, color: "#FF5733", parent_id: null, created_at: new Date().toISOString(), updated_at: new Date().toISOString(), icon: "icon-electronica" },
+            { id: 2, name: "Ropa", type: 2, color: "#33FF57", parent_id: null, created_at: new Date().toISOString(), updated_at: new Date().toISOString(), icon: "icon-ropa" },
+            { id: 3, name: "Hogar", type: 3, color: "#3357FF", parent_id: null, created_at: new Date().toISOString(), updated_at: new Date().toISOString(), icon: "icon-hogar" }
         ];
 
         const results: string[] = [];
         for (const category of categories) {
             if (await insertCategory(category) !== null) {
-                const successMessage = `✅ Categoría ${category.title} insertada correctamente.`;
+                const successMessage = `✅ Categoría ${category.name} insertada correctamente.`;
                 console.log(successMessage);
                 results.push(successMessage);
             } else {
-                const errorMessage = `❌ Error al insertar la categoría ${category.title}.`;
+                const errorMessage = `❌ Error al insertar la categoría ${category.name}.`;
                 console.error(errorMessage);
                 results.push(errorMessage);
             }
