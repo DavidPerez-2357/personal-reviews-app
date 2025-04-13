@@ -10,7 +10,7 @@ export let db: SQLiteDBConnection | null = null;
 export const initDB = async () => {
     try {
         sqliteConnection = new SQLiteConnection(CapacitorSQLite);
-        db = await sqliteConnection.createConnection("personal-reviews", false, "no-encryption", 1, false);
+        db = await sqliteConnection.createConnection("personal-reviews2", false, "no-encryption", 1, false);
 
         if (!db) {
             throw new Error("No se pudo crear la conexión a SQLite.");
@@ -21,9 +21,10 @@ export const initDB = async () => {
         const queries = [
             `CREATE TABLE IF NOT EXISTS category (
                  id INTEGER PRIMARY KEY AUTOINCREMENT,
-                 title TEXT NOT NULL,
+                 name TEXT NOT NULL,
                  "type" INTEGER NOT NULL DEFAULT 0,
                  color CHAR(7) NOT NULL CHECK (color LIKE '#______'),
+                icon TEXT NOT NULL,
                 created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
                 updated_at DATETIME DEFAULT CURRENT_TIMESTAMP,
                 parent_id INTEGER,
