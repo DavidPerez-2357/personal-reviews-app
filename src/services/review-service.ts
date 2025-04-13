@@ -59,7 +59,7 @@ export const getReviewsCards = async (): Promise<ReviewCardDTO[]> => {
                    r.created_at,
                    r.updated_at,
                    i.name                      AS item,
-                   c.title                     AS category,
+                   c.name                     AS category,
                    GROUP_CONCAT(COALESCE(ri.image, '')) AS images
             FROM review r
                      JOIN item i ON r.item_id = i.id
@@ -157,11 +157,39 @@ export const insertTestReviewImages = async (): Promise<string> => {
 export const insertTestReviews = async (): Promise<string> => {
     if (!checkDB()) return "❌ La base de datos no está inicializada.";
 
+    // Verifica si ya existen reseñas en la base de datos
+    const existingReviews = await getReviews();
+    if (existingReviews.length > 0) {
+        console.log("❌ Ya existen reseñas en la base de datos. No se insertan reseñas de prueba.");
+        return "❌ Ya existen reseñas en la base de datos. No se insertan reseñas de prueba.";
+    }
+
     try {
         const reviews = [
-            {rating: 5, comment: "Excelente producto", item_id: 1},
-            {rating: 4, comment: "Muy bueno", item_id: 2},
-            {rating: 3, comment: "Regular", item_id: 3},
+            {
+                id: 1,
+                rating: 5,
+                comment: "Excelente producto!",
+                item_id: 6,
+                created_at: new Date().toISOString(),
+                updated_at: new Date().toISOString(),
+            },
+            {
+                id: 2,
+                rating: 4,
+                comment: "Muy bueno, pero podría mejorar.",
+                item_id: 5,
+                created_at: new Date().toISOString(),
+                updated_at: new Date().toISOString(),
+            },
+            {
+                id: 3,
+                rating: 3,
+                comment: null,
+                item_id: 4,
+                created_at: new Date().toISOString(),
+                updated_at: new Date().toISOString(),
+            },
         ];
 
         for (const review of reviews) {
@@ -171,5 +199,22 @@ export const insertTestReviews = async (): Promise<string> => {
     } catch (error) {
         console.error("❌ Error al insertar reseñas de prueba:", error);
         return "❌ Error al insertar reseñas de prueba.";
+    }
+}
+
+/**
+ * Elimina todas las reseñas de la base de datos.
+ * * @returns Promise<boolean>
+ */
+export const deleteAllReviews = async (): Promise<boolean> => {
+    if (!checkDB()) return false;
+    try {
+        const query = `DELETE FROM review`;
+        await db!.run(query);
+        console.log("✅ Todas las reseñas han sido eliminadas.");
+        return true;
+    } catch (error) {
+        console.error("❌ Error al eliminar reseñas:", error);
+        return false;
     }
 }

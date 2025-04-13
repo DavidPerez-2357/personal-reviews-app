@@ -18,7 +18,7 @@ export const getCategories = async (): Promise<Category[]> => {
 
         return result.values?.map(row => ({
             id: row.id,
-            name: row.title,
+            name: row.name,
             type: row.type,
             color: row.color,
             parent_id: row.parent_id as number | null,
@@ -33,23 +33,38 @@ export const getCategories = async (): Promise<Category[]> => {
 
 /**
  * Inserta una categoría en la base de datos.
- * @param category
+ * @param category Objeto categoría a insertar.
  * @returns Promise<number | null>
  */
 export const insertCategory = async (category: Category): Promise<number | null> => {
     if (!checkDB()) return null;
-
+  
     try {
-        const query = `INSERT INTO category (name, type, color, parent_id) VALUES (?, ?, ?, ?, ?)`;
-        const values = [category.name, category.type, category.color, category.parent_id];
-
-        const result = await db!.run(query, values);
-        return result.changes?.lastId || null;
-    } catch (error) {
-        console.error("❌ Error al insertar categoría:", error);
+      // Validación mínima
+      if (!category.name || !category.color || !category.icon) {
+        console.warn("⚠️ Datos incompletos al insertar categoría:", category);
         return null;
+      }
+  
+      const query = `
+        INSERT INTO category (name, type, icon, color, parent_id)
+        VALUES (?, ?, ?, ?, ?)
+      `;
+      const values = [
+        category.name,
+        category.type,
+        category.icon,
+        category.color,
+        category.parent_id,
+      ];
+  
+      const result = await db!.run(query, values);
+      return result.changes?.lastId || null;
+    } catch (error) {
+      console.error("❌ Error al insertar categoría:", error);
+      return null;
     }
-};
+};  
 
 
 /**
@@ -172,13 +187,13 @@ export const deleteAllCategories = async (): Promise<boolean> => {
 export const insertTestCategories = async (): Promise<string> => {
     if (!checkDB()) return "❌ La base de datos no está inicializada.";
 
-    try {
-        const existingCategories = await getCategories();
-        if (existingCategories.length > 0) {
-            await deleteAllCategories()
-            return "✅ La base de datos ya contiene categorías.";
-        }
+    const categories = await getCategories();
+    if (categories.length > 0) {
+        console.log("⚠️ La base de datos ya contiene categorías. No se insertarán categorías de prueba.");
+        return "⚠️ La base de datos ya contiene categorías. No se insertarán categorías de prueba.";
+    }
 
+    try {
         const categories: Category[] = [
             { id: 1, name: "Electrónica", type: 1, color: "#FF5733", parent_id: null, created_at: new Date().toISOString(), updated_at: new Date().toISOString(), icon: "icon-electronica" },
             { id: 2, name: "Ropa", type: 2, color: "#33FF57", parent_id: null, created_at: new Date().toISOString(), updated_at: new Date().toISOString(), icon: "icon-ropa" },
