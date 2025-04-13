@@ -18,7 +18,7 @@ const ReviewCard = ({review}: { review: ReviewCardDTO }) => {
                     <div className="flex flex-col gap-3">
                         <div className="flex flex-row gap-1">
                             {[...Array(review.rating)].map((_, index) => (
-                                <Star key={index} fill="yellow" strokeWidth={0} size={30}></Star>
+                                <Star key={index} fill="var(--ion-color-primary)" strokeWidth={0} size={30}></Star>
                             ))}
                         </div>
                         <span className="text-primary">{review.comment}</span>
