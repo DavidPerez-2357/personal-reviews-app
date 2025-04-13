@@ -1,0 +1,62 @@
+
+/* Animation timing functions */
+.animation-linear {
+  animation-timing-function: linear;
+}
+
+.animation-ease {
+  animation-timing-function: ease;
+}
+
+.animation-ease-in {
+  animation-timing-function: ease-in;
+}
+
+.animation-ease-out {
+  animation-timing-function: ease-out;
+}
+
+.animation-ease-in-out {
+  animation-timing-function: ease-in-out;
+}
+
+/* Animation iteration count classes */
+.animation-infinite {
+  animation-iteration-count: infinite;
+}
+
+/* Animation delay classes */
+.animation-delay-100ms {
+  animation-delay: 0.1s!important;
+}
+
+.animation-delay-200ms {
+  animation-delay: 0.2s!important;
+}
+
+.animation-delay-300ms {
+  animation-delay: 0.3s!important;
+}
+
+.animation-delay-400ms {
+  animation-delay: 0.4s!important;
+}
+
+/* .animation-delay-5 {
+  animation-delay: 1s!important;
+} */
+
+/* Animation duration classes */
+.rotate-animation-1 {
+    animation: rotate 1s;
+}
+
+/* Animations keyframes */
+@keyframes rotate {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
