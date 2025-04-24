@@ -1,9 +1,8 @@
 
 import {db} from "../database-service";
 import { checkDB } from "../database-service";
-import { Category } from "../dto/category/Category";
-import {CategoryRating} from "../dto/category/CategoryRating.ts";
-import {CategoryRatingValue} from "../dto/category/CategoryRatingValue.ts";
+import { Category, CategoryRating, CategoryRatingValue } from "../dto/Category.ts";
+
 
 /**
  * Obtiene todas las categorías de la base de datos.

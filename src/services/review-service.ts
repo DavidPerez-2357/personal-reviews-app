@@ -1,8 +1,6 @@
 import { db } from "../database-service.ts";
 import { checkDB } from "../database-service";
-import { Review } from "../dto/review/Review";
-import { ReviewCardDTO } from "../dto/review/ReviewCardDTO";
-import { ReviewImage } from "../dto/review/ReviewImage";
+import { Review, ReviewCardDTO, ReviewImage } from "../dto/Review.ts";
 
 /**
  * Inserta una reseña en la base de datos.

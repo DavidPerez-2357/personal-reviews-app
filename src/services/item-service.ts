@@ -1,6 +1,5 @@
 import {checkDB, db} from "@/database-service";
-import { Item } from "@dto/item/Item";
-import { Origin } from "@dto/item/Origin";
+import { Item, Origin } from "@/dto/Item";
 
 /**
  * Inserta un ítem en la base de datos.
