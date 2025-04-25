@@ -98,3 +98,39 @@ export const checkDB = (): boolean => {
     }
     return true;
 };
+
+/**
+ * Reinicia el contador AUTOINCREMENT de una tabla específica.
+ * IMPORTANTE: solo reinicia si la tabla está vacía o los datos no importan.
+ * @param tableName El nombre de la tabla a reiniciar
+ */
+export const resetAutoIncrement = async (tableName: string): Promise<void> => {
+    if (!checkDB()) return;
+
+    try {
+        await db!.execute(`DELETE FROM ${tableName};`);
+        await db!.run(`DELETE FROM sqlite_sequence WHERE name = ?;`, [tableName]);
+
+        console.log(`🔁 Autoincremento reiniciado para la tabla "${tableName}"`);
+    } catch (error) {
+        console.error(`❌ Error al reiniciar el autoincremento para "${tableName}":`, error);
+    }
+};
+
+/**
+ * reinicia el autoincremento de todas las tablas de la base de datos.
+ * @returns Promise<void>
+ */
+export const resetAllAutoIncrement = async (): Promise<void> => {
+    if (!checkDB()) return;
+
+    try {
+        const tables = ["category", "item", "origin_item", "review", "review_image", "category_rating", "category_rating_value"];
+        for (const table of tables) {
+            await resetAutoIncrement(table);
+        }
+        console.log("🔁 Autoincremento reiniciado para todas las tablas.");
+    } catch (error) {
+        console.error("❌ Error al reiniciar el autoincremento para todas las tablas:", error);
+    }
+}
