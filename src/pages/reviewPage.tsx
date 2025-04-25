@@ -18,23 +18,28 @@ import {
   Star,
 } from "lucide-react";
 import ReviewCard from "@components/ReviewCard";
-import { insertTestCategories } from "@services/category-service";
-import { insertTestItems } from "@services/item-service";
 import { getReviewsCards, insertTestReviews } from "@services/review-service";
 import ReviewCardFilterModal from "@components/ReviewCardFilterModal";
-import { initDB } from "@/database-service";
 import { ReviewCardDTO } from "@/dto/Review";
+import { useTranslation } from "react-i18next";
+import { insertTestCategories } from "@/services/category-service";
+import { insertTestItems } from "@/services/item-service";
+import { resetAllAutoIncrement } from "@/database-service";
 
 export const ReviewPage: React.FC = () => {
+
+  const VISIBLE_REVIEWS_LIMIT = 50; // Default limit for visible reviews
+  const VISIBLE_REVIEWS_INCREMENT = 10; // Increment for loading more reviews
+
   const [reviews, setReviews] = useState<ReviewCardDTO[]>([]);
   const [searchTerm, setSearchTerm] = useState<string>("");
   const [sortOrder, setSortOrder] = useState<"asc" | "desc" | "none">("none");
   const [isFilterModalOpen, setFilterModalOpen] = useState(false);
-  const [visibleReviewsCount, setVisibleReviewsCount] = useState(2); // Estado para controlar cuántas reseñas se muestran
 
-  // Estado para guardar los filtros personalizados del modal. Se incluye 'category'
+  const [visibleReviewsCount, setVisibleReviewsCount] = useState(VISIBLE_REVIEWS_LIMIT);
+
   const [customFilters, setCustomFilters] = useState<{
-    rating?: { lower: number; upper: number }; // Cambiar a un objeto con lower y upper
+    rating?: { lower: number; upper: number };
     category?: string[];
     keyword?: string;
   }>({
@@ -43,341 +48,60 @@ export const ReviewPage: React.FC = () => {
     keyword: "",
   });
 
-  // Estado para manejo de errores
-  const [error, setError] = useState<string | null>(null);
+  const { t } = useTranslation();
 
   useEffect(() => {
     async function initializeData() {
       try {
-        // await insertTestCategories(); // Inserta categorías de prueba
-        // await insertTestItems(); // Inserta ítems de prueba
-        // await insertTestReviews(); // Inserta reseñas de prueba
-        // const reviewsFromDB = await getReviewsCards();
-        const reviewsFromDB: ReviewCardDTO[] = [
-          {
-            id: 1,
-            item: "Pizza Margherita",
-            comment: "Excelente producto, lo recomiendo.",
-            rating: 5,
-            created_at: "2023-10-01T10:00:00Z",
-            updated_at: "2023-10-01T10:00:00Z",
-            category: "Comida",
-            images: [
-              "https://pix4free.org/assets/library/2024-11-05/originals/psychometric-test.jpg",
-              "https://pix4free.org/assets/library/2024-11-05/originals/psychometric-test.jpg",
-              "https://pix4free.org/assets/library/2024-11-05/originals/psychometric-test.jpg",
-              "https://pix4free.org/assets/library/2024-11-05/originals/psychometric-test.jpg",
-              "https://pix4free.org/assets/library/2024-11-05/originals/psychometric-test.jpg",
-              "https://pix4free.org/assets/library/2024-11-05/originals/psychometric-test.jpg",
-              "https://pix4free.org/assets/library/2024-11-05/originals/psychometric-test.jpg",
-              "https://pix4free.org/assets/library/2024-11-05/originals/psychometric-test.jpg",
-              "https://pix4free.org/assets/library/2024-11-05/originals/psychometric-test.jpg",
-            ],
-          },
-          {
-            id: 2,
-            item: "Auriculares Bluetooth",
-            comment: "No cumplió mis expectativas.",
-            rating: 2,
-            created_at: "2023-10-01T10:00:00Z",
-            updated_at: "2023-10-01T10:00:00Z",
-            category: "Electrónica",
-            images: [
-              "https://pix4free.org/assets/library/2024-11-05/originals/psychometric-test.jpg",
-              "https://pix4free.org/assets/library/2024-11-05/originals/psychometric-test.jpg",
-            ],
-          },
-          {
-            id: 3,
-            item: "Planta Decorativa",
-            comment: "Muy bueno, pero un poco caro.",
-            rating: 4,
-            created_at: "2023-10-02T12:00:00Z",
-            updated_at: "2023-10-02T12:00:00Z",
-            category: "Ambiente",
-            images: [],
-          },
-          {
-            id: 4,
-            item: "Camiseta Deportiva",
-            comment: "No está mal, pero podría mejorar.",
-            rating: 3,
-            created_at: "2023-10-03T15:00:00Z",
-            updated_at: "2023-10-03T15:00:00Z",
-            category: "Precio",
-            images: ["https://example.com/image4.jpg"],
-          },
-          {
-            id: 5,
-            item: "Robot Aspirador",
-            comment: "Increíble calidad, lo volvería a comprar.",
-            rating: 5,
-            created_at: "2023-10-04T18:00:00Z",
-            updated_at: "2023-10-04T18:00:00Z",
-            category: "Limpieza",
-            images: ["https://example.com/image5.jpg"],
-          },
-          {
-            id: 6,
-            item: "Helado de Vainilla",
-            comment: "Delicioso y cremoso, perfecto para el verano.",
-            rating: 5,
-            created_at: "2023-10-05T10:00:00Z",
-            updated_at: "2023-10-05T10:00:00Z",
-            category: "Postres",
-            images: ["https://example.com/icecream.jpg"],
-          },
-          {
-            id: 7,
-            item: "Tarta de Chocolate",
-            comment: "Muy rica, pero un poco empalagosa.",
-            rating: 4,
-            created_at: "2023-10-06T12:00:00Z",
-            updated_at: "2023-10-06T12:00:00Z",
-            category: "Postres",
-            images: ["https://example.com/chocolatecake.jpg"],
-          },
-          {
-            id: 8,
-            item: "Cerveza Artesanal",
-            comment: "Buen sabor, pero algo cara.",
-            rating: 4,
-            created_at: "2023-10-07T15:00:00Z",
-            updated_at: "2023-10-07T15:00:00Z",
-            category: "Bebidas",
-            images: [],
-          },
-          {
-            id: 9,
-            item: "Zumo de Naranja",
-            comment: "Fresco y natural, muy recomendable.",
-            rating: 5,
-            created_at: "2023-10-08T09:00:00Z",
-            updated_at: "2023-10-08T09:00:00Z",
-            category: "Bebidas",
-            images: [],
-          },
-          {
-            id: 10,
-            item: "Smartphone Galaxy",
-            comment: "Excelente rendimiento, pero la batería podría durar más.",
-            rating: 4,
-            created_at: "2023-10-09T14:00:00Z",
-            updated_at: "2023-10-09T14:00:00Z",
-            category: "Móviles",
-            images: [],
-          },
-          {
-            id: 11,
-            item: "iPhone 14",
-            comment: "Muy caro, pero la calidad es innegable.",
-            rating: 5,
-            created_at: "2023-10-10T16:00:00Z",
-            updated_at: "2023-10-10T16:00:00Z",
-            category: "Móviles",
-            images: [],
-          },
-          {
-            id: 12,
-            item: "Laptop Gaming",
-            comment: "Perfecta para juegos, aunque algo pesada.",
-            rating: 4,
-            created_at: "2023-10-11T18:00:00Z",
-            updated_at: "2023-10-11T18:00:00Z",
-            category: "Ordenadores",
-            images: [],
-          },
-          {
-            id: 13,
-            item: "MacBook Pro",
-            comment: "Ideal para trabajo, pero el precio es elevado.",
-            rating: 5,
-            created_at: "2023-10-12T20:00:00Z",
-            updated_at: "2023-10-12T20:00:00Z",
-            category: "Ordenadores",
-            images: [],
-          },
-          {
-            id: 14,
-            item: "Cámara DSLR",
-            comment: "Gran calidad de imagen, pero un poco complicada de usar.",
-            rating: 4,
-            created_at: "2023-10-13T11:00:00Z",
-            updated_at: "2023-10-13T11:00:00Z",
-            category: "Fotografía",
-            images: [],
-          },
-          {
-            id: 15,
-            item: "Cámara Instantánea",
-            comment: "Divertida y fácil de usar, pero las fotos son pequeñas.",
-            rating: 3,
-            created_at: "2023-10-14T13:00:00Z",
-            updated_at: "2023-10-14T13:00:00Z",
-            category: "Fotografía",
-            images: [],
-          },
-          {
-            id: 16,
-            item: "Reloj Inteligente",
-            comment: "Muy útil, pero la batería dura poco.",
-            rating: 4,
-            created_at: "2023-10-15T15:00:00Z",
-            updated_at: "2023-10-15T15:00:00Z",
-            category: "Tecnología",
-            images: [],
-          },
-          {
-            id: 17,
-            item: "Gafas de Sol",
-            comment: "Estilo y protección, pero un poco caras.",
-            rating: 4,
-            created_at: "2023-10-16T17:00:00Z",
-            updated_at: "2023-10-16T17:00:00Z",
-            category: "Moda",
-            images: [],
-          },
-          {
-            id: 18,
-            item: "Zapatos de Correr",
-            comment: "Cómodos y ligeros, pero la suela se desgasta rápido.",
-            rating: 3,
-            created_at: "2023-10-17T19:00:00Z",
-            updated_at: "2023-10-17T19:00:00Z",
-            category: "Deportes",
-            images: [],
-          },
-          {
-            id: 19,
-            item: "Bicicleta de Montaña",
-            comment: "Excelente para senderismo, pero pesada.",
-            rating: 4,
-            created_at: "2023-10-18T21:00:00Z",
-            updated_at: "2023-10-18T21:00:00Z",
-            category: "Deportes",
-            images: [],
-          },
-          {
-            id: 20,
-            item: "Cargador Solar",
-            comment: "Muy útil para viajes, pero lento.",
-            rating: 3,
-            created_at: "2023-10-19T22:00:00Z",
-            updated_at: "2023-10-19T22:00:00Z",
-            category: "Tecnología",
-            images: [],
-          },
-          {
-            id: 21,
-            item: "Cámara de Seguridad",
-            comment: "Buena calidad, pero la instalación es complicada.",
-            rating: 4,
-            created_at: "2023-10-20T23:00:00Z",
-            updated_at: "2023-10-20T23:00:00Z",
-            category: "Hogar",
-            images: [],
-          },
-          {
-            id: 22,
-            item: "Silla de Oficina",
-            comment: "Cómoda y ergonómica, pero cara.",
-            rating: 5,
-            created_at: "2023-10-21T12:00:00Z",
-            updated_at: "2023-10-21T12:00:00Z",
-            category: "Oficina",
-            images: [],
-          },
-          {
-            id: 23,
-            item: "Mesa de Comedor",
-            comment: "Bonita y funcional, pero difícil de montar.",
-            rating: 4,
-            created_at: "2023-10-22T14:00:00Z",
-            updated_at: "2023-10-22T14:00:00Z",
-            category: "Muebles",
-            images: [],
-          },
-          {
-            id: 24,
-            item: "Cama King Size",
-            comment: "Increíble comodidad, pero ocupa mucho espacio.",
-            rating: 5,
-            created_at: "2023-10-23T16:00:00Z",
-            updated_at: "2023-10-23T16:00:00Z",
-            category: "Muebles",
-            images: [],
-          },
-          {
-            id: 25,
-            item: "Cafetera Espresso",
-            comment: "Café delicioso, pero un poco ruidosa.",
-            rating: 4,
-            created_at: "2023-10-24T18:00:00Z",
-            updated_at: "2023-10-24T18:00:00Z",
-            category: "Cocina",
-            images: [],
-          },
-        ];
+        const reviewsFromDB = await getReviewsCards();
+
         setReviews(reviewsFromDB);
       } catch (err) {
-        console.error("Error al inicializar datos:", err);
-        setError("Error al inicializar los datos.");
+        console.error("Error initializing data:", err);
       }
     }
     initializeData();
   }, []);
 
-  // Uso de useMemo para optimizar el filtrado
   const filteredReviews = useMemo(() => {
-    // Aseguramos que los valores sean cadenas válidas para aplicar .toLowerCase()
     const lowerSearchTerm = (searchTerm ?? "").toLowerCase().trim();
-    const lowerModalKeyword = (customFilters.keyword ?? "")
-      .toLowerCase()
-      .trim();
     const lowerFilterCategory = (customFilters.category ?? []).map((category) =>
       category.toLowerCase().trim()
     );
 
     return reviews.filter((review) => {
-      // Usamos valores por defecto para evitar null values
+
       const comment = (review.comment ?? "").toLowerCase();
       const item = (review.item ?? "").toLowerCase();
       const category = (review.category ?? []).toString().toLowerCase();
       const rating = review.rating;
 
-      // Buscamos coincidencias con el término de búsqueda
+      // Search filter: finds the search term in the comment, item, or rating
       const reviewTextMatch =
         comment.includes(lowerSearchTerm) ||
         item.includes(lowerSearchTerm) ||
         rating.toString() === lowerSearchTerm;
 
-      // Filtro del modal: palabra clave sobre el comentario o el ítem
-      const modalTextMatch =
-        !lowerModalKeyword ||
-        comment.includes(lowerModalKeyword) ||
-        item.includes(lowerModalKeyword);
-
-      // Filtro del modal: rango de calificaciones
+      // Filter for the modal: rating
       const modalRatingMatch =
-        !customFilters.rating || // Si no hay filtro de calificación, pasa
-        (rating >= customFilters.rating.lower && // Verifica el rango
+        !customFilters.rating || // If there's no rating filter, pass
+        (rating >= customFilters.rating.lower && // Check the range
           rating <= customFilters.rating.upper);
 
-      // Filtro del modal: categoría
+      // Filter for the modal: category
       const modalCategoryMatch =
         !lowerFilterCategory.length ||
         lowerFilterCategory.some((cat) => category.includes(cat));
 
       return (
         reviewTextMatch &&
-        modalTextMatch &&
         modalRatingMatch &&
         modalCategoryMatch
       );
     });
   }, [reviews, searchTerm, customFilters]);
 
-  // Ordena las reseñas según el orden seleccionado
+  // It is used to sort the reviews based on the selected order
   const sortedReviews: ReviewCardDTO[] = useMemo(() => {
     if (sortOrder === "none") {
       return filteredReviews;
@@ -387,12 +111,12 @@ export const ReviewPage: React.FC = () => {
     );
   }, [filteredReviews, sortOrder]);
 
-  // Obtener las reseñas visibles según el estado
+  // Get visible reviews based on the state
   const visibleReviews = useMemo(() => {
     return sortedReviews.slice(0, visibleReviewsCount);
   }, [sortedReviews, visibleReviewsCount]);
 
-  // Agrupar reseñas visibles por fecha si no se aplica ordenación (para mejorar la visualización)
+  // Group visible reviews by date if no sorting is applied
   const reviewCardsByDate = useMemo(() => {
     if (sortOrder !== "none") return {};
     if (visibleReviews.length === 0) return {};
@@ -417,25 +141,25 @@ export const ReviewPage: React.FC = () => {
     }, {} as Record<string, ReviewCardDTO[]>);
   }, [visibleReviews, sortOrder]);
 
-  // Función para alternar el orden de clasificación
+  // Function to toggle the sort order
   const toggleSortOrder = () => {
     setSortOrder((prev) => {
       const newSortOrder =
         prev === "asc" ? "desc" : prev === "desc" ? "none" : "asc";
 
-      // Restablecer el límite de reseñas visibles si se aplica ordenación
+      // Reset the visible reviews limit if sorting is applied
       if (newSortOrder !== "none") {
-        setVisibleReviewsCount(2);
+        setVisibleReviewsCount(VISIBLE_REVIEWS_LIMIT);
       } else {
-        // Si se vuelve al estado predeterminado, restablecer el límite
-        setVisibleReviewsCount(2);
+        // If returning to the default state, reset the limit
+        setVisibleReviewsCount(VISIBLE_REVIEWS_LIMIT);
       }
 
       return newSortOrder;
     });
   };
 
-  // Función para aplicar filtros desde el modal
+  // Function to apply filters from the modal
   const handleApplyFilters = (filters: {
     rating?: { lower: number; upper: number };
     category?: string[] | null;
@@ -450,49 +174,51 @@ export const ReviewPage: React.FC = () => {
       category: filters.category ?? [],
     });
 
-    // Restablecer el límite de reseñas visibles si los filtros no son los predeterminados
+    // Reset the visible reviews limit if the filters are not the default ones
     if (!isDefaultFilters) {
-      setVisibleReviewsCount(2);
+      setVisibleReviewsCount(VISIBLE_REVIEWS_LIMIT);
     } else {
-      // Si se vuelve al estado predeterminado, restablecer el límite
-      setVisibleReviewsCount(2);
+      // If returning to the default state, reset the limit
+      setVisibleReviewsCount(VISIBLE_REVIEWS_LIMIT);
     }
   };
 
-  // Función para cargar más reseñas
+  // Function to load more reviews
   const loadMoreReviews = () => {
-    setVisibleReviewsCount((prevCount) => prevCount + 10);
+    setVisibleReviewsCount((prevCount) => prevCount + VISIBLE_REVIEWS_INCREMENT);
   };
 
   return (
     <IonPage className="safe-area-top">
       <IonContent>
         <IonGrid className="p-5 pb-10 flex flex-col gap-12">
-          {/* Sección: Información general y botón para nueva reseña */}
+          {/* Section: General information and button for new review */}
           <IonRow>
             <IonCol className="gap-5 flex flex-col">
               <div className="flex flex-col items-center justify-center text-center text-[var(--ion-text-color)] p-3 border border-[var(--ion-text-color)] rounded-lg">
                 <IonLabel className="text-4xl font-bold">
                   {reviews.length}
                 </IonLabel>
-                <IonLabel className="text-lg font-semibold">reseñas</IonLabel>
+                <IonLabel className="text-lg font-semibold">
+                  {reviews.length === 1 ? t('common.review') : t('common.reviews')}
+                </IonLabel>
               </div>
               <IonButton color="tertiary" expand="block" className="bg-primary">
-                Hacer una nueva reseña
+                {t('review-page.add-review')}
               </IonButton>
             </IonCol>
           </IonRow>
 
-          {/* Sección: Buscador y botones de ordenación/filtro */}
+          {/* Section: Search bar and sort/filter buttons */}
           <IonRow>
             <IonCol className="flex flex-col gap-2">
-              <IonLabel className="section-title">Buscar</IonLabel>
+              <IonLabel className="section-title">{t('review-page.search')}</IonLabel>
               <IonGrid>
                 <IonRow className="ion-align-items-center gap-3">
                   <IonCol>
                     <IonInput
                       type="text"
-                      placeholder="Buscar reseñas"
+                      placeholder={t('review-page.search-placeholder')}
                       value={searchTerm}
                       onIonInput={(e) => setSearchTerm(e.detail.value ?? "")}
                       fill="solid"
@@ -531,9 +257,9 @@ export const ReviewPage: React.FC = () => {
                       color={
                         (customFilters.rating &&
                           (customFilters.rating.lower !== 0 ||
-                            customFilters.rating.upper !== 5)) || // Verifica si el rango de calificación no es el predeterminado
+                            customFilters.rating.upper !== 5)) ||
                         (customFilters.category &&
-                          customFilters.category.length > 0) // Verifica si hay categorías seleccionadas
+                          customFilters.category.length > 0)
                           ? "tertiary"
                           : "secondary"
                       }
@@ -545,18 +271,18 @@ export const ReviewPage: React.FC = () => {
                         color={
                           (customFilters.rating &&
                             (customFilters.rating.lower !== 0 ||
-                              customFilters.rating.upper !== 5)) || // Verifica si el rango de calificación no es el predeterminado
+                              customFilters.rating.upper !== 5)) || 
                           (customFilters.category &&
-                            customFilters.category.length > 0) // Verifica si hay categorías seleccionadas
+                            customFilters.category.length > 0) 
                             ? "var(--ion-color-secondary)"
                             : "var(--ion-color-tertiary)"
                         }
                         fill={
                           (customFilters.rating &&
                             (customFilters.rating.lower !== 0 ||
-                              customFilters.rating.upper !== 5)) || // Verifica si el rango de calificación no es el predeterminado
+                              customFilters.rating.upper !== 5)) ||
                           (customFilters.category &&
-                            customFilters.category.length > 0) // Verifica si hay categorías seleccionadas
+                            customFilters.category.length > 0)
                             ? "var(--ion-color-tertiary-contrast)"
                             : "var(--ion-color-secondary)"
                         }
@@ -568,25 +294,25 @@ export const ReviewPage: React.FC = () => {
             </IonCol>
           </IonRow>
 
-          {/* Sección: Listado de reseñas */}
+          {/* Section: List of reviews */}
           <IonRow>
             <IonCol>
               <div className="h-full flex flex-col gap-9">
                 {reviews.length === 0 || sortedReviews.length === 0 ? (
                   <div className="text-center flex flex-col items-center justify-center gap-2 text-[var(--ion-color-secondary-step-300)]">
                     <Star size={100} />
-                    <IonLabel>No hay reseñas disponibles</IonLabel>
+                    <IonLabel>{t('review-page.no-reviews')}</IonLabel>
                   </div>
                 ) : sortOrder !== "none" ||
                   customFilters.rating?.lower !== 0 ||
                   customFilters.rating?.upper !== 5 ||
                   customFilters.category?.length !== 0 ? (
-                  // Mostrar las reseñas ordenadas o filtradas directamente
+                  // Display sorted or filtered reviews directly
                   visibleReviews.map((review) => (
                     <ReviewCard key={review.id} review={review} />
                   ))
                 ) : (
-                  // Mostrar las reseñas agrupadas por fecha si no hay ordenación ni filtros
+                  // Display reviews grouped by date if there is no sorting or filtering
                   Object.entries(reviewCardsByDate ?? {}).map(
                     ([date, reviews]) => (
                       <div className="flex flex-col gap-3" key={date}>
@@ -606,7 +332,7 @@ export const ReviewPage: React.FC = () => {
             </IonCol>
           </IonRow>
 
-          {/* Botón para cargar más reseñas */}
+          {/* Button to load more reviews */}
           {visibleReviewsCount < sortedReviews.length && (
             <IonRow>
               <IonCol className="text-center">
@@ -614,14 +340,14 @@ export const ReviewPage: React.FC = () => {
                 onClick={loadMoreReviews}
                 className="cursor-pointer text-tertiary hover:underline"
               >
-                Cargar más reseñas
+                {t('review-page.load-more')}
               </span>
               </IonCol>
             </IonRow>
           )}
         </IonGrid>
 
-        {/* Modal de filtros personalizados */}
+        {/* Custom filters modal */}
         <ReviewCardFilterModal
           isOpen={isFilterModalOpen}
           onDismiss={() => setFilterModalOpen(false)}
