@@ -11,11 +11,11 @@ import {
   IonIcon,
   IonRange,
 } from "@ionic/react";
-import { initDB } from "@/database-service";
 import { Category } from "@/dto/Category";
 import "@pages/reviewPage.css";
 import { Ban, Boxes } from "lucide-react";
 import { getCategories } from "@/services/category-service";
+import { useTranslation } from "react-i18next";
 
 interface FilterModalProps {
   isOpen: boolean;
@@ -43,22 +43,12 @@ const ReviewCardFilterModal: React.FC<FilterModalProps> = ({
   const [subcatMode, setSubcatMode] = useState<SubcatMode>("auto");
   const [specificSubs, setSpecificSubs] = useState<Category[]>([]);
 
+  const { t } = useTranslation();
+
   useEffect(() => {
     const fetchCategories = async () => {
       try {
-        // const cats = await getCategories();
-        const cats: Category[] = [
-          { id: 1, name: "Comida", type: 1, color: "#FF0000", icon: "accessibility-outline", parent_id: null, created_at: "2023-01-01T10:00:00Z", updated_at: "2023-01-01T10:00:00Z" },
-          { id: 2, name: "Electrónica", type: 2, color: "#0000FF", icon: "people", parent_id: null, created_at: "2023-02-01T11:00:00Z", updated_at: "2023-02-01T11:00:00Z" },
-          { id: 3, name: "Ambiente", type: 3, color: "#008000", icon: "leaf", parent_id: null, created_at: "2023-03-01T12:00:00Z", updated_at: "2023-03-01T12:00:00Z" },
-          { id: 4, name: "Precio", type: 4, color: "#FFFF00", icon: "cash", parent_id: null, created_at: "2023-04-01T13:00:00Z", updated_at: "2023-04-01T13:00:00Z" },
-          { id: 5, name: "Limpieza", type: 5, color: "#800080", icon: "water", parent_id: null, created_at: "2023-05-01T14:00:00Z", updated_at: "2023-05-01T14:00:00Z" },
-          { id: 6, name: "Atención", type: 6, color: "#FFA500", icon: "hand", parent_id: null, created_at: "2023-06-01T15:00:00Z", updated_at: "2023-06-01T15:00:00Z" },
-          { id: 8, name: "Postres", type: 1, color: "#FFB6C1", icon: "ice-cream", parent_id: 1, created_at: "2023-08-01T10:00:00Z", updated_at: "2023-08-01T10:00:00Z" },
-          { id: 9, name: "Bebidas", type: 1, color: "#ADD8E6", icon: "wine", parent_id: 1, created_at: "2023-08-02T10:00:00Z", updated_at: "2023-08-02T10:00:00Z" },
-          { id: 10, name: "Móviles", type: 2, color: "#87CEEB", icon: "phone-portrait", parent_id: 2, created_at: "2023-08-03T10:00:00Z", updated_at: "2023-08-03T10:00:00Z" },
-          { id: 11, name: "Ordenadores", type: 2, color: "#4682B4", icon: "laptop", parent_id: 2, created_at: "2023-08-04T10:00:00Z", updated_at: "2023-08-04T10:00:00Z" },
-        ];
+        const cats = await getCategories();
         setAllCategories(cats);
       } catch (err) {
         console.error("Error fetching categories:", err);
@@ -86,29 +76,29 @@ const ReviewCardFilterModal: React.FC<FilterModalProps> = ({
     let categoryFilter: string[] | null;
 
     if (!parent) {
-      // Caso 2: todas las categorías
+      // Case 2: no parent selected
       categoryFilter = null;
     } else {
       const children = childList;
       if (children.length === 0) {
-        // Caso 1: categoría sin subcategorías
+        // Case 1: parent with no children
         categoryFilter = [parent.name];
       } else {
         switch (subcatMode) {
           case "auto":
-            // Caso 3: padre + todas las subcategorías
+            // Case 3: parent + automatic subcategories
             categoryFilter = [parent.name, ...children.map((c) => c.name)];
             break;
           case "all":
-            // Caso 5: padre + todas las subcategorías
+            // Case 5: parent + all subcategories
             categoryFilter = [parent.name, ...children.map((c) => c.name)];
             break;
           case "none":
-            // Caso 6: sólo padre
+            // Case 6: parent + no subcategories
             categoryFilter = [parent.name];
             break;
           case "specific":
-            // Caso 4: subcategoría específica
+            // Case 4: parent + specific subcategories
             categoryFilter = specificSubs.map((c) => c.name);
             break;
         }
@@ -132,7 +122,7 @@ const ReviewCardFilterModal: React.FC<FilterModalProps> = ({
     setParent(null);
     setSubcatMode("auto");
     setSpecificSubs([]);
-    onApply(resetFilters); // Asegúrate de pasar los valores reseteados
+    onApply(resetFilters);
     onDismiss();
   };
 
@@ -148,7 +138,7 @@ const ReviewCardFilterModal: React.FC<FilterModalProps> = ({
       <IonHeader className="ion-no-border ion-padding-top">
         <IonToolbar>
           <IonTitle className="text-2xl font-bold text-start ion-padding">
-            Filtros
+            {t("review-page.filter")}
           </IonTitle>
         </IonToolbar>
       </IonHeader>
@@ -166,7 +156,7 @@ const ReviewCardFilterModal: React.FC<FilterModalProps> = ({
               >
                 <Boxes size={40}></Boxes>
               </div>
-              <IonLabel className="truncate max-w-full text-xs">Todos</IonLabel>
+              <IonLabel className="truncate max-w-full text-xs">{t('review-page.all')}</IonLabel>
             </div>
             {allCategories
               .filter((c) => !c.parent_id)
@@ -215,7 +205,7 @@ const ReviewCardFilterModal: React.FC<FilterModalProps> = ({
                     <Boxes size={40}></Boxes>
                   </div>
                   <IonLabel className="truncate max-w-full text-xs">
-                    Todas
+                  {t('review-page.all')}
                   </IonLabel>
                 </div>
 
@@ -232,7 +222,7 @@ const ReviewCardFilterModal: React.FC<FilterModalProps> = ({
                     <Ban size={40}></Ban>
                   </div>
                   <IonLabel className="truncate max-w-full text-xs">
-                    Solo {parent?.name}
+                    {t('review-page.none')}
                   </IonLabel>
                 </div>
               </>
@@ -263,10 +253,10 @@ const ReviewCardFilterModal: React.FC<FilterModalProps> = ({
         </div>
 
         <div>
-          <IonLabel position="stacked">Calificación</IonLabel>
+          <IonLabel position="stacked">{t('review-page.rating')}</IonLabel>
           <div className="px-4">
             <IonRange
-              aria-label="Calificación"
+              aria-label={t("review-page.rating")}
               dualKnobs={true}
               ticks={true}
               snaps={true}
@@ -290,7 +280,7 @@ const ReviewCardFilterModal: React.FC<FilterModalProps> = ({
             size="large"
             className="flex-1"
           >
-            Reiniciar
+            {t('review-page.reset')}
           </IonButton>
           <IonButton
             onClick={handleApply}
@@ -299,7 +289,7 @@ const ReviewCardFilterModal: React.FC<FilterModalProps> = ({
             size="large"
             className="flex-1"
           >
-            Aplicar
+            {t('review-page.apply')}
           </IonButton>
         </div>
       </IonContent>
