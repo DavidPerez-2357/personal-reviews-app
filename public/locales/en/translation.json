@@ -18,5 +18,19 @@
         "review": "Review",
         "items": "Items",
         "item": "Item"
+    },
+
+    "review-page": {
+        "search": "Search",
+        "search-placeholder": "Search reviews...",
+        "add-review": "Create a new review",
+        "load-more": "See more reviews",
+        "filter": "Filter",
+        "all": "All",
+        "none": "None",
+        "rating": "Rating",
+        "reset": "Reset",
+        "apply": "Apply",
+        "no-reviews": "No reviews available"
     }
 }
