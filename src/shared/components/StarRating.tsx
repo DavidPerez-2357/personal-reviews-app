@@ -1,4 +1,4 @@
-import StarCheckbox from "@/components/StarCheckbox";
+import StarCheckbox from "@/shared/components/StarCheckbox";
 
 type StarRatingProps = {
     size: number;

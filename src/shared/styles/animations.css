@@ -51,6 +51,10 @@
     animation: rotate 1s;
 }
 
+.downToNormal-animation-1 {
+    animation: downToNormal 0.5s;
+}
+
 /* Animations keyframes */
 @keyframes rotate {
   0% {
@@ -58,5 +62,16 @@
   }
   100% {
     transform: rotate(360deg);
+  }
+}
+
+@keyframes downToNormal {
+  0% {
+    transform: translateY(100%);
+    opacity: 0;
+  }
+  100% {
+    transform: translateY(0px);
+    opacity: 1;
   }
 }

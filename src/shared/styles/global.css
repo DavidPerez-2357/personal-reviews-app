@@ -31,7 +31,7 @@
 @import url('/src/theme/variables.css');
 
 /* Other global styles */
-@import url('/src/styles/animations.css');
+@import url('/src/shared/styles/animations.css');
 
 /* Tailwind CSS */
 @import "tailwindcss";

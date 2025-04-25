@@ -3,6 +3,7 @@ import {useEffect, useState} from "react";
 
 type StarCheckboxProps = {
     index: number;
+    rating: number;
     checked: boolean;
     size: number;
     setRating: (rating: number) => void;
@@ -22,10 +23,10 @@ const StarCheckbox = ({ index, checked, size, rating, setRating }: StarCheckboxP
     // Adjust the icon size based on the window width
     useEffect(() => {
         const updateSize = () => {
-            if (window.innerWidth < 350 && size > 40) {
-                setIconSize(40);
-            } else if (window.innerWidth < 400 && size > 50) {
-                setIconSize(50);
+            if (window.innerWidth < 340 && size > 40) {
+                setIconSize(47);
+            } else if (window.innerWidth < 390 && size > 50) {
+                setIconSize(55);
             } else {
                 setIconSize(size);
             }

@@ -1,18 +1,16 @@
-import React, { use } from 'react';
-import { IonTabs, IonTabBar, IonTabButton, IonIcon, IonLabel, IonRouterOutlet, IonRippleEffect, IonFooter, IonContent, IonToolbar } from '@ionic/react';
+import React from 'react';
+import { IonTabs, IonTabBar, IonTabButton, IonLabel, IonRouterOutlet, IonRippleEffect } from '@ionic/react';
 import { IonReactRouter } from '@ionic/react-router';
 
 import { Route, Redirect, useLocation } from 'react-router';
 
-import Home from '@pages/Home';
 import { Box, Ellipsis, Star } from 'lucide-react';
 
 import '@styles/FooterTabBar.css';
 import { useTranslation } from 'react-i18next';
+import ManageItemReview from '@/app/manage-review/ManageItemReview';
 
-
-
-function FooterTabBar() {
+const FooterTabBar = () => {
   const { t } = useTranslation();
 
   const [selectedTab, setSelectedTab] = React.useState(useLocation().pathname.split('/')[2] || 'reviews');
@@ -20,11 +18,13 @@ function FooterTabBar() {
   return (
     <IonReactRouter>
       <IonTabs>
-        <IonRouterOutlet>
-          <Route path="/app/reviews" component={Home} exact={true} />
-          <Route path="/app/items" component={Home} exact={true} />
-          <Route path="/app/more" component={Home} exact={true} />
-          <Redirect path="/app" to="/app/reviews" exact={true} />
+        <IonRouterOutlet id="main">
+          <Route path="/app/reviews" exact={true} />
+          <Route path="/app/reviews/create" component={ManageItemReview} exact={true} />
+
+          <Route path="/app/items" exact={true} />
+          <Route path="/app/more" exact={true} />
+          <Redirect path="/app" to="/app/reviews/create" exact={true} />
         </IonRouterOutlet>
         
         <IonTabBar slot="bottom" className='tab-bar'>
