@@ -1,7 +1,7 @@
 import * as React from 'react';
 import { createRoot } from 'react-dom/client';
-import App from './App';
-import '../i18n.ts';
+import App from '@/app/App';
+import '/i18n.ts';
 
 const container = document.getElementById('root');
 const root = createRoot(container!);
