@@ -7,25 +7,46 @@ import '@styles/global.css';
 import FooterTabBar from './components/FooterTabBar';
 
 import { SafeArea } from '@capacitor-community/safe-area';
-import React, { useEffect } from 'react';
-import {initDB} from "@/database-service.ts";
+import { useEffect, useState } from 'react';
 
+import { initDB } from '@/database-service';
 
 setupIonicReact();
 
 const App: React.FC = () => {
+  const [dbReady, setDbReady] = useState(false);
+
   useEffect(() => {
-    SafeArea.enable({
-      config: {
-        customColorsForSystemBars: true,
-        statusBarColor: '#00000000', // transparent
-        statusBarContent: 'light',
-        navigationBarColor: '#00000000', // transparent
-        navigationBarContent: 'light',
-      },
-    });
-    initDB()
+    const init = async () => {
+      try {
+        await SafeArea.enable({
+          config: {
+            customColorsForSystemBars: true,
+            statusBarColor: '#00000000',
+            statusBarContent: 'light',
+            navigationBarColor: '#00000000',
+            navigationBarContent: 'light',
+          },
+        });
+
+        await initDB(); // Esperamos a que termine de inicializar la DB
+      } catch (error) {
+        console.error('Error during app init', error);
+      } finally {
+        setDbReady(true);
+      }
+    };
+
+    init();
   }, []);
+
+  if (!dbReady) {
+    return (
+      <IonApp>
+        <div style={{ padding: '2rem', textAlign: 'center' }}>Inicializando base de datos...</div>
+      </IonApp>
+    );
+  }
 
   return (
     <IonApp>
@@ -39,7 +60,6 @@ const App: React.FC = () => {
       </IonReactRouter>
     </IonApp>
   );
-  
 };
 
 export default App;
