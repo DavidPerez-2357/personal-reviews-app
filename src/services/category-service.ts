@@ -1,5 +1,5 @@
 
-import {db} from "../database-service";
+import {db, resetAutoIncrement} from "../database-service";
 import { checkDB } from "../database-service";
 import { Category, CategoryRating, CategoryRatingValue } from "../dto/Category.ts";
 
@@ -193,12 +193,31 @@ export const insertTestCategories = async (): Promise<string> => {
     }
 
     try {
+        
         const categories: Category[] = [
-            { id: 1, name: "Electrónica", type: 1, color: "#FF5733", parent_id: null, created_at: new Date().toISOString(), updated_at: new Date().toISOString(), icon: "icon-electronica" },
-            { id: 2, name: "Ropa", type: 2, color: "#33FF57", parent_id: null, created_at: new Date().toISOString(), updated_at: new Date().toISOString(), icon: "icon-ropa" },
-            { id: 3, name: "Hogar", type: 3, color: "#3357FF", parent_id: null, created_at: new Date().toISOString(), updated_at: new Date().toISOString(), icon: "icon-hogar" }
-        ];
-
+            { id: 1, name: "Electrónica", type: 1, color: "#FF5733", icon: "icon-electronica", parent_id: null, created_at: "2025-04-01T10:00:00Z", updated_at: "2025-04-01T10:00:00Z" },
+            { id: 2, name: "Ropa", type: 2, color: "#33FF57", icon: "icon-ropa", parent_id: null, created_at: "2025-04-01T10:10:00Z", updated_at: "2025-04-01T10:10:00Z" },
+            { id: 3, name: "Hogar", type: 3, color: "#3357FF", icon: "icon-hogar", parent_id: null, created_at: "2025-04-01T10:20:00Z", updated_at: "2025-04-01T10:20:00Z" },
+            { id: 4, name: "Juguetes", type: 4, color: "#FF33A1", icon: "icon-juguetes", parent_id: null, created_at: "2025-04-01T10:30:00Z", updated_at: "2025-04-01T10:30:00Z" },
+            { id: 5, name: "Deportes", type: 5, color: "#FF8C33", icon: "icon-deportes", parent_id: null, created_at: "2025-04-01T10:40:00Z", updated_at: "2025-04-01T10:40:00Z" },
+            { id: 6, name: "Libros", type: 6, color: "#33FFF5", icon: "icon-libros", parent_id: null, created_at: "2025-04-01T10:50:00Z", updated_at: "2025-04-01T10:50:00Z" },
+            { id: 7, name: "Salud", type: 7, color: "#FF33FF", icon: "icon-salud", parent_id: null, created_at: "2025-04-01T11:00:00Z", updated_at: "2025-04-01T11:00:00Z" },
+            { id: 8, name: "Belleza", type: 8, color: "#FF5733", icon: "icon-belleza", parent_id: null, created_at: "2025-04-01T11:10:00Z", updated_at: "2025-04-01T11:10:00Z" },
+            { id: 9, name: "Automóviles", type: 9, color: "#33FF57", icon: "icon-automoviles", parent_id: null, created_at: "2025-04-01T11:20:00Z", updated_at: "2025-04-01T11:20:00Z" },
+            { id: 10, name: "Oficina", type: 10, color: "#3377FF", icon: "icon-oficina", parent_id: null, created_at: "2025-04-01T11:30:00Z", updated_at: "2025-04-01T11:30:00Z" },
+            // Subcategorías
+            { id: 11, name: "Smartphones", type: 1, color: "#AA5733", icon: "icon-smartphones", parent_id: 1, created_at: "2025-04-01T11:40:00Z", updated_at: "2025-04-01T11:40:00Z" },
+            { id: 12, name: "Portátiles", type: 1, color: "#BB5733", icon: "icon-portatiles", parent_id: 1, created_at: "2025-04-01T11:50:00Z", updated_at: "2025-04-01T11:50:00Z" },
+            { id: 13, name: "Zapatillas", type: 2, color: "#33AA57", icon: "icon-zapatillas", parent_id: 2, created_at: "2025-04-01T12:00:00Z", updated_at: "2025-04-01T12:00:00Z" },
+            { id: 14, name: "Vestidos", type: 2, color: "#33BB57", icon: "icon-vestidos", parent_id: 2, created_at: "2025-04-01T12:10:00Z", updated_at: "2025-04-01T12:10:00Z" },
+            { id: 15, name: "Muebles", type: 3, color: "#3344FF", icon: "icon-muebles", parent_id: 3, created_at: "2025-04-01T12:20:00Z", updated_at: "2025-04-01T12:20:00Z" },
+            { id: 16, name: "Cocina", type: 3, color: "#3344AA", icon: "icon-cocina", parent_id: 3, created_at: "2025-04-01T12:30:00Z", updated_at: "2025-04-01T12:30:00Z" },
+            { id: 17, name: "Libros Infantiles", type: 6, color: "#33BBF5", icon: "icon-libros-infantiles", parent_id: 6, created_at: "2025-04-01T12:40:00Z", updated_at: "2025-04-01T12:40:00Z" },
+            { id: 18, name: "Maquillaje", type: 8, color: "#FF77FF", icon: "icon-maquillaje", parent_id: 8, created_at: "2025-04-01T12:50:00Z", updated_at: "2025-04-01T12:50:00Z" },
+            { id: 19, name: "Suplementos", type: 7, color: "#FF99FF", icon: "icon-suplementos", parent_id: 7, created_at: "2025-04-01T13:00:00Z", updated_at: "2025-04-01T13:00:00Z" },
+            { id: 20, name: "Sillas", type: 3, color: "#3344BB", icon: "icon-sillas", parent_id: 3, created_at: "2025-04-01T13:10:00Z", updated_at: "2025-04-01T13:10:00Z" },
+          ];
+                 
         const results: string[] = [];
         for (const category of categories) {
             if (await insertCategory(category) !== null) {
