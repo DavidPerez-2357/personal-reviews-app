@@ -21,10 +21,11 @@ const FooterTabBar = () => {
         <IonRouterOutlet id="main">
           <Route path="/app/reviews" component={ReviewPage} exact={true} />
           <Route path="/app/reviews/create" component={ManageItemReview} exact={true} />
+          <Route path="/app/reviews/edit/:id" component={ManageItemReview} exact={true} />
 
           <Route path="/app/items" exact={true} />
           <Route path="/app/more" exact={true} />
-          <Redirect path="/app" to="/app/reviews/create" exact={true} />
+          <Redirect path="/app" to="/app/reviews" exact={true} />
         </IonRouterOutlet>
         
         <IonTabBar slot="bottom" className='tab-bar'>
