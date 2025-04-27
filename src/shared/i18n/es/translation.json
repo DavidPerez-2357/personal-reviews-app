@@ -53,5 +53,19 @@
             "error-saving-review-images": "Error al guardar las imágenes de la reseña",
             "error-updating-item": "Error al actualizar el elemento"
         }
+    },
+
+    "review-page": {
+        "search": "Buscar",
+        "search-placeholder": "Buscar reseñas...",
+        "add-review": "Crear una nueva reseña",
+        "load-more": "Ver más reseñas",
+        "filter": "Filtrar",
+        "all": "Todos",
+        "none": "Ninguno",
+        "rating": "Calificación",
+        "reset": "Reiniciar",
+        "apply": "Aplicar",
+        "no-reviews": "No hay reseñas disponibles"
     }
 }
