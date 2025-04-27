@@ -15,7 +15,7 @@ import "@styles/ManageItemReview.css";
 import { usePhotoGallery } from "@hooks/usePhotoGallery";
 import { Item, ItemOption } from "@dto/item/Item";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { insertItem, updateItem } from "@services/item-service";
+import { getItemById, insertItem, updateItem } from "@services/item-service";
 import { IconName } from "@fortawesome/fontawesome-svg-core";
 import { getCategoryById, getCategoryRatingsByCategoryId, getChildrenCategories, getParentCategory, insertCategoryRatingValue } from "@services/category-service";
 import { Category } from "@dto/category/Category";
@@ -26,7 +26,7 @@ import SubcategoriesBadgeSelector from "@/app/manage-review/components/Subcatego
 import { CategoryColors } from "@shared/enums/colors";
 import { useTranslation } from "react-i18next";
 import { Review } from "@dto/review/Review";
-import { getReviews, insertReview, insertReviewImage, updateReview } from "@shared/services/review-service";
+import { getReviewById, getReviews, insertReview, insertReviewImage, updateReview } from "@shared/services/review-service";
 import { CategoryRatingValue } from "@shared/dto/category/CategoryRatingValue";
 import { useHistory, useParams } from "react-router-dom";
 import ItemSelector from "./components/ItemSelector";
@@ -94,6 +94,35 @@ const ManageItemReview = () => {
       value: 0, // Valor inicial
     }));
   }
+
+  const setEditData = async (reviewId: number) => {
+    const review = await getReviewById(reviewId);
+    if (!review) throw new Error(t('manage-item-review.error-message.review-not-found'));
+
+    const item = await getItemById(review.item_id);
+    if (!item) throw new Error(t('manage-item-review.error-message.item-not-found'));
+
+    const category = await getCategoryById(item.category_id);
+    if (!category) throw new Error(t('manage-item-review.error-message.category-not-found'));
+
+    const parentCategory = await getParentCategory(item.category_id);
+    if (!parentCategory) throw new Error(t('manage-item-review.error-message.category-not-found'));
+
+    setItemName(item.name);
+    setRating(review.rating);
+    setComment(review.comment || "");
+    setParentCategory(parentCategory);
+    setSelectedOption({ id: item.id, name: item.name, category_id: item.category_id, parent_category_id: parentCategory.id, parent_category_icon: parentCategory.icon });
+  }
+
+  useEffect(() => {
+      if (editMode) {
+        const reviewId = parseInt(id);
+        setEditData(reviewId).catch((error) => {
+          history.push("/app/reviews", { toast: t('manage-item-review.error-message.review-not-found') });
+        });
+      }
+  }, [id, editMode]);
 
   // Funcion que se ejecuta cada vez que cambia la opción seleccionada
   useEffect(() => {
