@@ -216,3 +216,15 @@ export const getReviewById = async (id: number): Promise<Review | null> => {
         return null;
     }
 }
+
+export const deleteReviewImages = async (reviewId: number): Promise<boolean> => {
+    if (!checkDB()) return false;
+    try {
+        const query = `DELETE FROM review_image WHERE review_id = ?`;
+        const result = await db!.run(query, [reviewId]);
+        return (result.changes?.changes ?? 0) > 0;
+    } catch (error) {
+        console.error("❌ Error al eliminar imágenes de reseña", error);
+        return false;
+    }
+}
