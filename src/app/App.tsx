@@ -4,12 +4,18 @@ import { IonReactRouter } from '@ionic/react-router';
 
 import '@styles/global.css';
 
-import FooterTabBar from './components/FooterTabBar';
+import FooterTabBar from './FooterTabBar';
 
 import { SafeArea } from '@capacitor-community/safe-area';
 import { useEffect, useState } from 'react';
 
+import { library } from '@fortawesome/fontawesome-svg-core'
+import { fas } from '@fortawesome/free-solid-svg-icons';
 import { initDB } from '@/database-service';
+import { insertTestCategories, insertTestCategoryRating } from '../shared/services/category-service';
+import { insertTestItems } from '../shared/services/item-service';
+
+library.add(fas);
 
 setupIonicReact();
 
@@ -30,8 +36,12 @@ const App: React.FC = () => {
         });
 
         await initDB(); // Esperamos a que termine de inicializar la DB
+        /* await insertTestCategories(); // Insertamos categorías de prueba
+        await insertTestCategoryRating(); // Insertamos ratings de prueba
+        await insertTestItems(); // Insertamos ítems de prueba */
+        console.log('Base de datos inicializada y datos de prueba insertados');
       } catch (error) {
-        console.error('Error during app init', error);
+        console.error('Error during app init');
       } finally {
         setDbReady(true);
       }

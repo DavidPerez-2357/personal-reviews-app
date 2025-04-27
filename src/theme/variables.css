@@ -9,26 +9,50 @@ http://ionicframework.com/docs/theming/ */
     --ion-color-primary-contrast: #EEEEEE;
   
     --ion-color-secondary: #D0D0D0;
-    --ion-color-secondary-contrast: #222831;
+	--ion-color-secondary-contrast: #222831;
 
-    --ion-color-secondary-step-50:  #D0D0D0;
-    --ion-color-secondary-step-100: #C1C1C4;
-    --ion-color-secondary-step-200: #B1B2B8;
-    --ion-color-secondary-step-300: #A1A3AC;
-    --ion-color-secondary-step-400: #9194A0;
-    --ion-color-secondary-step-500: #818594;
-    --ion-color-secondary-step-600: #6B717F;
-    --ion-color-secondary-step-700: #555D6A;
-    --ion-color-secondary-step-800: #404955;
-    --ion-color-secondary-step-900: #393E46;
-    --ion-color-secondary-step-950: #393E46;
+	--ion-color-secondary-step-50:  #D0D0D0;
+	--ion-color-secondary-step-100: #C1C1C4;
+	--ion-color-secondary-step-200: #B1B2B8;
+	--ion-color-secondary-step-300: #A1A3AC;
+	--ion-color-secondary-step-400: #9194A0;
+	--ion-color-secondary-step-500: #818594;
+	--ion-color-secondary-step-600: #6B717F;
+	--ion-color-secondary-step-700: #555D6A;
+	--ion-color-secondary-step-800: #404955;
+	--ion-color-secondary-step-900: #393E46;
+	--ion-color-secondary-step-950: #393E46;
 
-    --ion-color-tertiary: #222831;
-    --ion-color-tertiary-contrast: #EEEEEE;
+	--ion-color-tertiary: #222831;
+	--ion-color-tertiary-contrast: #EEEEEE;
 
     --ion-color-muted: #393E46;
 
     --ion-color-primary-step-50: #29F6FF;
+    --ion-color-primary-step-100: #1CF5FF;
+    --ion-color-primary-step-200: #02F4FF;
+    --ion-color-primary-step-300: #00DEE8;
+    --ion-color-primary-step-400: #00C5CF;
+    --ion-color-primary-step-500: #00ADB5;
+    --ion-color-primary-step-600: #00959C;
+    --ion-color-primary-step-700: #007C82;
+    --ion-color-primary-step-800: #006469;
+    --ion-color-primary-step-900: #004C4F;
+    --ion-color-primary-step-950: #003F42;
+
+	--ion-color-primary-step-50: #29F6FF;
+    --ion-color-primary-step-100: #1CF5FF;
+    --ion-color-primary-step-200: #02F4FF;
+    --ion-color-primary-step-300: #00DEE8;
+    --ion-color-primary-step-400: #00C5CF;
+    --ion-color-primary-step-500: #00ADB5;
+    --ion-color-primary-step-600: #00959C;
+    --ion-color-primary-step-700: #007C82;
+    --ion-color-primary-step-800: #006469;
+    --ion-color-primary-step-900: #004C4F;
+    --ion-color-primary-step-950: #003F42;
+
+	--ion-color-primary-step-50: #29F6FF;
     --ion-color-primary-step-100: #1CF5FF;
     --ion-color-primary-step-200: #02F4FF;
     --ion-color-primary-step-300: #00DEE8;
@@ -86,22 +110,22 @@ http://ionicframework.com/docs/theming/ */
     --ion-text-color: #EEEEEE;  
   
     --ion-color-secondary: #393E46;
-    --ion-color-secondary-contrast: #EEEEEE;
+	--ion-color-secondary-contrast: #EEEEEE;
 
-    --ion-color-secondary-step-50:  #393E46;
-    --ion-color-secondary-step-100: #404955;
-    --ion-color-secondary-step-200: #555D6A;
-    --ion-color-secondary-step-300: #6B717F;
-    --ion-color-secondary-step-400: #818594;
-    --ion-color-secondary-step-500: #9194A0;
-    --ion-color-secondary-step-600: #A1A3AC;
-    --ion-color-secondary-step-700: #B1B2B8;
-    --ion-color-secondary-step-800: #C1C1C4;
-    --ion-color-secondary-step-900: #D0D0D0;
-    --ion-color-secondary-step-950: #D0D0D0;
+	--ion-color-secondary-step-50:  #393E46;
+	--ion-color-secondary-step-100: #404955;
+	--ion-color-secondary-step-200: #555D6A;
+	--ion-color-secondary-step-300: #6B717F;
+	--ion-color-secondary-step-400: #818594;
+	--ion-color-secondary-step-500: #a09196;
+	--ion-color-secondary-step-600: #A1A3AC;
+	--ion-color-secondary-step-700: #B1B2B8;
+	--ion-color-secondary-step-800: #C1C1C4;
+	--ion-color-secondary-step-900: #D0D0D0;
+	--ion-color-secondary-step-950: #D0D0D0;
 
-    --ion-color-tertiary: #EEEEEE;
-    --ion-color-tertiary-contrast: #222831;
+	--ion-color-tertiary: #EEEEEE;
+	--ion-color-tertiary-contrast: #222831;
 
     --ion-color-muted: #D0D0D0;
 
@@ -151,5 +175,5 @@ ion-app {
     --ion-card-background: var(--ion-background-color);
     --ion-tab-bar-background: var(--ion-background-color-step-50);
     --ion-tab-bar-color: var(--ion-color-muted);
-    --ion-tab-bar-border-color: var(--ion-color-muted);
+	--ion-tab-bar-border-color: var(--ion-color-muted);
 }

@@ -29,6 +29,9 @@
 @import url('/src/theme/customFont.css');
 @import url('/src/theme/variables.css');
 
+/* Other global styles */
+@import url('/src/shared/styles/animations.css');
+
 /* Tailwind CSS */
 @import "tailwindcss";
 
@@ -43,47 +46,51 @@
     padding-top: var(--safe-area-inset-top);
 }
 
+.safe-area-bottom {
+	padding-bottom: var(--safe-area-inset-bottom);
+}
+
 ion-button {
-    text-transform: none;
-    letter-spacing: normal;
+	text-transform: none;
+	letter-spacing: normal;
     --box-shadow: none;
 }
 
 ion-input {
-    border-radius: 0.5rem;
-    --padding-start: 0.5rem!important;
-    transition-duration: 0.2s!important;
-    height: 100%;
+	border-radius: 0.5rem;
+	--padding-start: 0.5rem!important;
+	transition-duration: 0.2s!important;
+	height: 100%;
 }
 
 ion-textarea {
-    --padding-bottom: var(--padding-top, 0.5rem)!important;
-    transition-duration: 0.2s!important;
+	--padding-bottom: var(--padding-top, 0.5rem)!important;
+	transition-duration: 0.2s!important;
 }
 
 ion-input.has-focus {
-    background: var(--ion-color-secondary-step-100);
+	background: var(--ion-color-secondary-step-100);
 }
 
 ion-input::part(label) {
-    height: 100%!important;
+	height: 100%!important;
 }
 
 ion-input::part(input-wrapper) {
-    /* display: flex;
-    align-items: center; */
-    height: 100%;
+	/* display: flex;
+	align-items: center; */
+	height: 100%;
 }
 
 ion-input.large {
-    font-size: 1.3rem;
-    --padding-top: 0.8rem;
-    --padding-bottom: 0.8rem;
+	font-size: 1.3rem;
+	--padding-top: 0.8rem;
+	--padding-bottom: 0.8rem;
 }
 
 ion-list {
-    background: var(--ion-background-color)!important;
-    border: 1px solid var(--ion-background-color-step-200)!important;
+	background: var(--ion-background-color)!important;
+	border: 1px solid var(--ion-background-color-step-200)!important;
 }
 
 ion-card {

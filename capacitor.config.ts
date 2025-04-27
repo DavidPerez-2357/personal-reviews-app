@@ -9,7 +9,7 @@ const config: CapacitorConfig = {
             androidDatabaseLocation: "default",
         },
         SplashScreen: {
-            launchShowDuration: 3000,
+            launchShowDuration: 1000,
             launchAutoHide: true,
             launchFadeOutDuration: 300,
             backgroundColor: "#222831FF",
