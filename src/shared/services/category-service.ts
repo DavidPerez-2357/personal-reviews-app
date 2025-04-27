@@ -1,8 +1,6 @@
-import { Category } from '@/shared/dto/category/Category';
 import { db } from "@/database-service";
 import { checkDB } from "@/database-service";
-import {CategoryRating} from "@/shared/dto/category/CategoryRating";
-import {CategoryRatingValue} from "@/shared/dto/category/CategoryRatingValue";
+import { Category, CategoryRating, CategoryRatingValue } from "@dto/Category";
 
 /**
  * Obtiene todas las categorías de la base de datos.
@@ -72,8 +70,8 @@ export const insertCategoryRatingValue = async (categoryRatingValue: CategoryRat
     }
 
     try {
-        const query = `INSERT INTO category_rating_value (value, item_id, category_rating_id) VALUES (?, ?, ?)`;
-        const values = [categoryRatingValue.value, categoryRatingValue.item_id, categoryRatingValue.category_rating_id];
+        const query = `INSERT INTO category_rating_value (value, review_id, category_rating_id) VALUES (?, ?, ?)`;
+        const values = [categoryRatingValue.value, categoryRatingValue.review_id, categoryRatingValue.category_rating_id];
 
         const result = await db!.run(query, values);
         return result.changes?.lastId || null;
@@ -182,10 +180,28 @@ export const insertTestCategories = async (): Promise<string> => {
         }
 
         const categories: Category[] = [
-            { id: 1, name: "Electrónica", type: 1, color: "red", icon: "star", parent_id: null },
-            { id: 2, name: "Ropa", type: 2, color: "green", icon: "heart", parent_id: null },
-            { id: 3, name: "Hogar", type: 3, color: "turquoise", icon: "poo", parent_id: 1 }
-        ];
+            { id: 1, name: "Electrónica", type: 1, color: "#FF5733", icon: "icon-electronica", parent_id: null },
+            { id: 2, name: "Ropa", type: 2, color: "#33FF57", icon: "icon-ropa", parent_id: null},
+            { id: 3, name: "Hogar", type: 3, color: "#3357FF", icon: "icon-hogar", parent_id: null},
+            { id: 4, name: "Juguetes", type: 4, color: "#FF33A1", icon: "icon-juguetes", parent_id: null},
+            { id: 5, name: "Deportes", type: 5, color: "#FF8C33", icon: "icon-deportes", parent_id: null},
+            { id: 6, name: "Libros", type: 6, color: "#33FFF5", icon: "icon-libros", parent_id: null},
+            { id: 7, name: "Salud", type: 7, color: "#FF33FF", icon: "icon-salud", parent_id: null},
+            { id: 8, name: "Belleza", type: 8, color: "#FF5733", icon: "icon-belleza", parent_id: null},
+            { id: 9, name: "Automóviles", type: 9, color: "#33FF57", icon: "icon-automoviles", parent_id: null},
+            { id: 10, name: "Oficina", type: 10, color: "#3377FF", icon: "icon-oficina", parent_id: null},
+            // Subcategorías
+            { id: 11, name: "Smartphones", type: 1, color: "#AA5733", icon: "icon-smartphones", parent_id: 1},
+            { id: 12, name: "Portátiles", type: 1, color: "#BB5733", icon: "icon-portatiles", parent_id: 1},
+            { id: 13, name: "Zapatillas", type: 2, color: "#33AA57", icon: "icon-zapatillas", parent_id: 2},
+            { id: 14, name: "Vestidos", type: 2, color: "#33BB57", icon: "icon-vestidos", parent_id: 2},
+            { id: 15, name: "Muebles", type: 3, color: "#3344FF", icon: "icon-muebles", parent_id: 3},
+            { id: 16, name: "Cocina", type: 3, color: "#3344AA", icon: "icon-cocina", parent_id: 3},
+            { id: 17, name: "Libros Infantiles", type: 6, color: "#33BBF5", icon: "icon-libros-infantiles", parent_id: 6},
+            { id: 18, name: "Maquillaje", type: 8, color: "#FF77FF", icon: "icon-maquillaje", parent_id: 8},
+            { id: 19, name: "Suplementos", type: 7, color: "#FF99FF", icon: "icon-suplementos", parent_id: 7},
+            { id: 20, name: "Sillas", type: 3, color: "#3344BB", icon: "icon-sillas", parent_id: 3},
+          ];
 
         const insertPromises = categories.map((category) => insertCategory(category));
         await Promise.all(insertPromises);
