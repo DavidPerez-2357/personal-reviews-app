@@ -13,6 +13,7 @@ export interface ReviewFull {
     updated_at: string;
     images: string[];
     category: string;
+    icon: string;
     item: string;
 }
 
