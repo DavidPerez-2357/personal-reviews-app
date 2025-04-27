@@ -204,3 +204,15 @@ export const updateReview = async (review: Review): Promise<boolean> => {
         return false;
     }
 }
+
+export const getReviewById = async (id: number): Promise<Review | null> => {
+    if (!checkDB()) return null;
+    try {
+        const query = `SELECT * FROM review WHERE id = ?`;
+        const result = await db!.query(query, [id]);
+        return result.values && result.values[0] as Review || null;
+    } catch (error) {
+        console.error("❌ Error al obtener reseña por ID");
+        return null;
+    }
+}
