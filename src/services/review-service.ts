@@ -146,16 +146,30 @@ export const insertReviewImage = async (reviewImage: ReviewImage): Promise<numbe
 export const insertTestReviewImages = async (): Promise<string> => {
     if (!checkDB()) return "❌ La base de datos no está inicializada.";
 
+    const existingImages = await getReviewImages();
+    if (existingImages.length > 0) {
+        console.log("❌ Ya existen imágenes de reseñas en la base de datos. No se insertan imágenes de prueba.");
+        return "❌ Ya existen imágenes de reseñas en la base de datos. No se insertan imágenes de prueba.";
+    }
+
     try {
-        const images = [
-            "https://example.com/image1.jpg",
-            "https://example.com/image2.jpg",
-            "https://example.com/image3.jpg",
+        const images: ReviewImage[] = [
+            { image: "https://www.abrirllave.com/html/images/dos-parrafos-bloc-de-notas.gif", review_id: 1 },
+            { image: "https://www.lluiscodina.com/wp-content/uploads/2019/05/html-5-ejemplo-de-marcado.png", review_id: 1 },
+            { image: "https://www.loading.es/blog/wp-content/uploads/ejemplo-html-codigo-editor.jpg", review_id: 2 },
+            { image: "https://iessantabarbara.es/departamentos/fisica/tecnologia/formacion/www/html01.png", review_id: 3 },
+            { image: "https://www.ampersoundmedia.com/wp-content/uploads/2020/07/html-scaled.jpg", review_id: 4 },
+            { image: "https://www.abrirllave.com/html/images/dos-parrafos-bloc-de-notas.gif", review_id: 5 },
+            { image: "https://www.lluiscodina.com/wp-content/uploads/2019/05/html-5-ejemplo-de-marcado.png", review_id: 6 },
+            { image: "https://www.loading.es/blog/wp-content/uploads/ejemplo-html-codigo-editor.jpg", review_id: 7 },
+            { image: "https://iessantabarbara.es/departamentos/fisica/tecnologia/formacion/www/html01.png", review_id: 8 },
+            { image: "https://www.ampersoundmedia.com/wp-content/uploads/2020/07/html-scaled.jpg", review_id: 9 },
         ];
 
         for (const image of images) {
-            await insertReviewImage({image, review_id: 1});
+            await insertReviewImage(image);
         }
+        console.log("✅ Imágenes de prueba insertadas correctamente.");
         return "✅ Imágenes de prueba insertadas correctamente.";
     } catch (error) {
         console.error("❌ Error al insertar imágenes de prueba:", error);
