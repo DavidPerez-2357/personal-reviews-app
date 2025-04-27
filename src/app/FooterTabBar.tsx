@@ -1,15 +1,14 @@
 import React from 'react';
 import { IonTabs, IonTabBar, IonTabButton, IonLabel, IonRouterOutlet, IonRippleEffect } from '@ionic/react';
 import { IonReactRouter } from '@ionic/react-router';
-
 import { Route, Redirect, useLocation } from 'react-router';
 
 import { Box, Ellipsis, Star } from 'lucide-react';
 
 import '@styles/FooterTabBar.css';
 import { useTranslation } from 'react-i18next';
-import ReviewPage from "@pages/reviewPage.tsx";
-import ManageItemReview from '@/app/manage-review/ManageItemReview';
+import ManageItemReview from '@/app/manage-review/ManageItemReview'; 
+import ReviewPage from '@/app/view-reviews/reviewPage';
 
 const FooterTabBar = () => {
   const { t } = useTranslation();
