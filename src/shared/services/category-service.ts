@@ -72,13 +72,13 @@ export const insertCategoryRatingValue = async (categoryRatingValue: CategoryRat
     }
 
     try {
-        const query = `INSERT INTO category_rating_value (value, item_id, category_rating_id) VALUES (?, ?, ?)`;
-        const values = [categoryRatingValue.value, categoryRatingValue.item_id, categoryRatingValue.category_rating_id];
+        const query = `INSERT INTO category_rating_value (value, review_id, category_rating_id) VALUES (?, ?, ?)`;
+        const values = [categoryRatingValue.value, categoryRatingValue.review_id, categoryRatingValue.category_rating_id];
 
         const result = await db!.run(query, values);
         return result.changes?.lastId || null;
     } catch (error) {
-        console.error("❌ Error al insertar valor de puntuación de categoría:");
+        console.error("❌ Error al insertar valor de puntuación de categoría:" + error);
         return null;
     }
 };
