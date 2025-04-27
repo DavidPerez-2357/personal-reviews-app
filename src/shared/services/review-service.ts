@@ -174,3 +174,33 @@ export const insertTestReviews = async (): Promise<string> => {
         return "❌ Error al insertar reseñas de prueba.";
     }
 }
+
+/**
+ * Actualiza una reseña en la base de datos.
+ * 
+ * @param review 
+ * @returns 
+ */
+export const updateReview = async (review: Review): Promise<boolean> => {
+    if (!checkDB()) return false;
+    if (review.rating < 0 || review.rating > 5) {
+        console.error("❌ La calificación debe estar entre 0 y 5.");
+        return false;
+    }
+
+    try {
+        const query = `UPDATE review
+                       SET rating = ?,
+                           comment = ?,
+                           item_id = ?
+                       WHERE id = ?`;
+        const values = [review.rating, review.comment ?? null, review.item_id, review.id];
+
+        const result = await db!.run(query, values);
+        return (result.changes?.changes ?? 0) > 0;
+
+    } catch (error) {
+        console.error("❌ Error al actualizar reseña");
+        return false;
+    }
+}
