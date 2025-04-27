@@ -2,6 +2,9 @@ import { Ham, SquarePen, Star } from "lucide-react";
 import { IonButton, IonCard } from "@ionic/react";
 import { ReviewFull} from "@dto/Review";
 import "../styles/reviewPage.css";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { IconName } from "@fortawesome/fontawesome-svg-core";
+
 const ReviewCard = ({ review }: { review: ReviewFull }) => {
   return (
     <div className="flex flex-col gap-3 border-2 border-[var(--ion-color-secondary)] rounded-md p-2">
@@ -9,12 +12,13 @@ const ReviewCard = ({ review }: { review: ReviewFull }) => {
         <div className="flex flex-col px-3 gap-4">
             <div className="grid grid-cols-[1fr_auto] items-center">
             <div className="flex flex-row items-center gap-3">
-              <Ham size={20}></Ham>
+            <FontAwesomeIcon icon={review.icon as IconName} className="fa-xl"/>
               <span className="font-semibold text-md">{review.item}</span>
             </div>
             <IonButton
               color={"tertiary"}
               className="aspect-square edit-button"
+              routerLink={`/app/reviews/edit/${review.id}`}
             >
               <SquarePen size={20}></SquarePen>
             </IonButton>
