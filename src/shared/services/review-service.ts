@@ -51,7 +51,10 @@ export const getReviews = async (): Promise<Review[]> => {
  */
 export const getReviewsCards = async (): Promise<ReviewFull[]> => {
     try {
-        if (!checkDB()) return [{ id: -1, comment: "❌ La base de datos no está inicializada.", rating: 0, created_at: "", updated_at: "", images: [], category: "", item: "" }];
+        if (!checkDB()) {
+            console.error("❌ Error: La base de datos no está inicializada.");
+            return [];
+        };
         const query = `
             SELECT r.id,
                    r.comment,
@@ -60,6 +63,7 @@ export const getReviewsCards = async (): Promise<ReviewFull[]> => {
                    r.updated_at,
                    i.name                      AS item,
                    c.name                     AS category,
+                   c.icon                     AS icon,
                    GROUP_CONCAT(COALESCE(ri.image, '')) AS images
             FROM review r
                      JOIN item i ON r.item_id = i.id
@@ -77,15 +81,16 @@ export const getReviewsCards = async (): Promise<ReviewFull[]> => {
                 updated_at: row.updated_at,
                 images: row.images ? row.images.split(',') : [],
                 category: row.category,
+                icon: row.icon,
                 item: row.item,
             }));
         } else {
             console.error("❌ Error al obtener reseñas:", result);
-            return [{ id: -1, comment: "❌ Error al obtener reseñas.", rating: 0, created_at: "", updated_at: "", images: [], category: "", item: "" }];
+            return [];
         }
     } catch (error) {
         console.error("❌ Error al obtener reseñas");
-        return [{ id: -1, comment: "❌ Error al obtener reseñas.", rating: 0, created_at: "", updated_at: "", images: [], category: "", item: "" }];
+        return [];
     }
 };
 
