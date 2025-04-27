@@ -16,6 +16,9 @@ import { Ban, Boxes } from "lucide-react";
 import { getCategories } from "@services/category-service";
 import { useTranslation } from "react-i18next";
 import "../styles/reviewPage.css";
+import { IconName } from "@fortawesome/fontawesome-svg-core";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { CategoryColors } from "@/shared/enums/colors";
 
 interface FilterModalProps {
   isOpen: boolean;
@@ -49,31 +52,31 @@ const ReviewCardFilterModal: React.FC<FilterModalProps> = ({
     const fetchCategories = async () => {
       try {
         
-        // const cats = await getCategories();
+        const cats = await getCategories();
 
-        const cats: Category[] = [
-          { id: 1, name: "Electrónica", type: 1, color: "#FF5733", icon: "icon-electronica", parent_id: null },
-          { id: 2, name: "Ropa", type: 2, color: "#33FF57", icon: "icon-ropa", parent_id: null},
-          { id: 3, name: "Hogar", type: 3, color: "#3357FF", icon: "icon-hogar", parent_id: null},
-          { id: 4, name: "Juguetes", type: 4, color: "#FF33A1", icon: "icon-juguetes", parent_id: null},
-          { id: 5, name: "Deportes", type: 5, color: "#FF8C33", icon: "icon-deportes", parent_id: null},
-          { id: 6, name: "Libros", type: 6, color: "#33FFF5", icon: "icon-libros", parent_id: null},
-          { id: 7, name: "Salud", type: 7, color: "#FF33FF", icon: "icon-salud", parent_id: null},
-          { id: 8, name: "Belleza", type: 8, color: "#FF5733", icon: "icon-belleza", parent_id: null},
-          { id: 9, name: "Automóviles", type: 9, color: "#33FF57", icon: "icon-automoviles", parent_id: null},
-          { id: 10, name: "Oficina", type: 10, color: "#3377FF", icon: "icon-oficina", parent_id: null},
-          // Subcategorías
-          { id: 11, name: "Smartphones", type: 1, color: "#AA5733", icon: "icon-smartphones", parent_id: 1},
-          { id: 12, name: "Portátiles", type: 1, color: "#BB5733", icon: "icon-portatiles", parent_id: 1},
-          { id: 13, name: "Zapatillas", type: 2, color: "#33AA57", icon: "icon-zapatillas", parent_id: 2},
-          { id: 14, name: "Vestidos", type: 2, color: "#33BB57", icon: "icon-vestidos", parent_id: 2},
-          { id: 15, name: "Muebles", type: 3, color: "#3344FF", icon: "icon-muebles", parent_id: 3},
-          { id: 16, name: "Cocina", type: 3, color: "#3344AA", icon: "icon-cocina", parent_id: 3},
-          { id: 17, name: "Libros Infantiles", type: 6, color: "#33BBF5", icon: "icon-libros-infantiles", parent_id: 6},
-          { id: 18, name: "Maquillaje", type: 8, color: "#FF77FF", icon: "icon-maquillaje", parent_id: 8},
-          { id: 19, name: "Suplementos", type: 7, color: "#FF99FF", icon: "icon-suplementos", parent_id: 7},
-          { id: 20, name: "Sillas", type: 3, color: "#3344BB", icon: "icon-sillas", parent_id: 3},
-        ];
+        // const categories: Category[] = [
+        //   { id: 1, name: "Electrónica", type: 1, color: "#FF5733", icon: "computer", parent_id: null },
+        //   { id: 2, name: "Ropa", type: 2, color: "#33FF57", icon: "shirt", parent_id: null},
+        //   { id: 3, name: "Hogar", type: 3, color: "#3357FF", icon: "house", parent_id: null},
+        //   { id: 4, name: "Juguetes", type: 4, color: "#FF33A1", icon: "child-toy", parent_id: null},
+        //   { id: 5, name: "Deportes", type: 5, color: "#FF8C33", icon: "ball", parent_id: null},
+        //   { id: 6, name: "Libros", type: 6, color: "#33FFF5", icon: "book", parent_id: null},
+        //   { id: 7, name: "Salud", type: 7, color: "#FF33FF", icon: "health", parent_id: null},
+        //   { id: 8, name: "Belleza", type: 8, color: "#FF5733", icon: "lip-gloss", parent_id: null},
+        //   { id: 9, name: "Automóviles", type: 9, color: "#33FF57", icon: "car", parent_id: null},
+        //   { id: 10, name: "Oficina", type: 10, color: "#3377FF", icon: "file", parent_id: null},
+        //   // Subcategorías
+        //   { id: 11, name: "Smartphones", type: 1, color: "#AA5733", icon: "mobile", parent_id: 1},
+        //   { id: 12, name: "Portátiles", type: 1, color: "#BB5733", icon: "laptop", parent_id: 1},
+        //   { id: 13, name: "Zapatillas", type: 2, color: "#33AA57", icon: "shoe-prints", parent_id: 2},
+        //   { id: 14, name: "Vestidos", type: 2, color: "#33BB57", icon: "person-dress", parent_id: 2},
+        //   { id: 15, name: "Muebles", type: 3, color: "#3344FF", icon: "couch", parent_id: 3},
+        //   { id: 16, name: "Cocina", type: 3, color: "#3344AA", icon: "kitchen-set", parent_id: 3},
+        //   { id: 17, name: "Libros Infantiles", type: 6, color: "#33BBF5", icon: "book-skull", parent_id: 6},
+        //   { id: 18, name: "Maquillaje", type: 8, color: "#FF77FF", icon: "soap", parent_id: 8},
+        //   { id: 19, name: "Suplementos", type: 7, color: "#FF99FF", icon: "prescription-bottle", parent_id: 7},
+        //   { id: 20, name: "Sillas", type: 3, color: "#3344BB", icon: "chair", parent_id: 3},
+        // ];
         
 
         setAllCategories(cats);
@@ -199,7 +202,7 @@ const ReviewCardFilterModal: React.FC<FilterModalProps> = ({
                     }`}
                     style={{ backgroundColor: cat.color }}
                   >
-                    <IonIcon name={cat.icon}></IonIcon>
+                    <FontAwesomeIcon icon={cat.icon as IconName} className="fa-xl"/>
                   </div>
                   <IonLabel className="truncate max-w-full text-xs">
                     {cat.name}
@@ -267,9 +270,9 @@ const ReviewCardFilterModal: React.FC<FilterModalProps> = ({
                       ? "selected"
                       : ""
                   }`}
-                  style={{ backgroundColor: sub.color }}
+                  style={{ backgroundColor: CategoryColors[sub.color] }}
                 >
-                  <IonIcon name={sub.icon}></IonIcon>
+                  <FontAwesomeIcon icon={sub.icon as IconName} className="fa-xl"/>
                 </div>
                 <IonLabel className="truncate max-w-full text-xs">
                   {sub.name}
