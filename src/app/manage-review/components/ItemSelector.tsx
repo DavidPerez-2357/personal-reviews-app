@@ -1,4 +1,4 @@
-import { ItemOption } from "@/shared/dto/item/Item";
+import { ItemOption } from "@dto/Item";
 import { getItemOptions } from "@/shared/services/item-service";
 import { IconName } from "@fortawesome/fontawesome-svg-core";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";

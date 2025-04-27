@@ -1,8 +1,6 @@
 import { db } from "@/database-service.ts";
 import { checkDB } from "@/database-service";
-import { Review } from "@/shared/dto/review/Review";
-import { ReviewCardDTO } from "@/shared/dto/review/ReviewCardDTO";
-import { ReviewImage } from "@/shared/dto/review/ReviewImage";
+import { Review, ReviewFull, ReviewImage } from "@dto/Review";
 
 /**
  * Inserta una reseña en la base de datos.
@@ -51,7 +49,7 @@ export const getReviews = async (): Promise<Review[]> => {
  * Obtiene todas las reseñas de la base de datos en formato DTO.
  * @returns Promise<ReviewCardDTO[]>
  */
-export const getReviewsCards = async (): Promise<ReviewCardDTO[]> => {
+export const getReviewsCards = async (): Promise<ReviewFull[]> => {
     try {
         if (!checkDB()) return [{ id: -1, comment: "❌ La base de datos no está inicializada.", rating: 0, created_at: "", updated_at: "", images: [], category: "", item: "" }];
         const query = `

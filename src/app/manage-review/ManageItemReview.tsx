@@ -13,26 +13,23 @@ import StarRating from "@components/StarRating";
 import { useEffect, useRef, useState } from "react";
 import "@styles/ManageItemReview.css";
 import { usePhotoGallery } from "@hooks/usePhotoGallery";
-import { Item, ItemOption } from "@dto/item/Item";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { insertItem, updateItem } from "@services/item-service";
 import { IconName } from "@fortawesome/fontawesome-svg-core";
 import { getCategoryById, getCategoryRatingsByCategoryId, getChildrenCategories, getParentCategory, insertCategoryRatingValue } from "@services/category-service";
-import { Category } from "@dto/category/Category";
 import CategorySelectorModal from "@components/CategorySelectorModal";
-import { CategoryRating, CategoryRatingMix } from "@dto/category/CategoryRating";
 import PreviewPhotoModal from "@components/PreviewPhotoModal";
-import SubcategoriesBadgeSelector from "@/app/manage-review/components/SubcategoriesBadgeSelector";
+import SubcategoriesBadgeSelector from "./components/SubcategoriesBadgeSelector";
 import { CategoryColors } from "@shared/enums/colors";
 import { useTranslation } from "react-i18next";
-import { Review } from "@dto/review/Review";
 import { insertReview, insertReviewImage } from "@shared/services/review-service";
-import { CategoryRatingValue } from "@shared/dto/category/CategoryRatingValue";
 import { useHistory } from "react-router-dom";
 import ItemSelector from "./components/ItemSelector";
 import CategoryRatingRange from "./components/CategoryRatingRange";
-import ErrorAlert from "@/shared/components/ErrorAlert";
-import { ReviewImage } from "@/shared/dto/review/ReviewImage";
+import ErrorAlert from "@components/ErrorAlert";
+import { Category, CategoryRating, CategoryRatingMix, CategoryRatingValue } from "@dto/Category";
+import { Item, ItemOption } from "@dto/Item";
+import { Review, ReviewImage } from "@dto/Review";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
 
 const ManageItemReview = () => {
