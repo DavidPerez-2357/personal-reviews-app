@@ -18,13 +18,12 @@ import {
   Star,
 } from "lucide-react";
 import ReviewCard from "@components/ReviewCard";
-import { getReviewsCards, insertTestReviews } from "@services/review-service";
+import { getReviewsCards } from "@services/review-service";
 import ReviewCardFilterModal from "@components/ReviewCardFilterModal";
-import { ReviewCardDTO } from "@/dto/Review";
+import { Review, ReviewCardDTO, ReviewImage } from "@/dto/Review";
 import { useTranslation } from "react-i18next";
-import { insertTestCategories } from "@/services/category-service";
-import { insertTestItems } from "@/services/item-service";
-import { resetAllAutoIncrement } from "@/database-service";
+import { Category } from "@/dto/Category";
+import { Item } from "@/dto/Item";
 
 export const ReviewPage: React.FC = () => {
 
@@ -53,8 +52,130 @@ export const ReviewPage: React.FC = () => {
   useEffect(() => {
     async function initializeData() {
       try {
-        const reviewsFromDB = await getReviewsCards();
+        // const reviewsFromDB = await getReviewsCards();
 
+        const categories: Category[] = [
+            { id: 1, name: "Electrónica", type: 1, color: "#FF5733", icon: "icon-electronica", parent_id: null, created_at: "2025-04-01T10:00:00Z", updated_at: "2025-04-01T10:00:00Z" },
+            { id: 2, name: "Ropa", type: 2, color: "#33FF57", icon: "icon-ropa", parent_id: null, created_at: "2025-04-01T10:10:00Z", updated_at: "2025-04-01T10:10:00Z" },
+            { id: 3, name: "Hogar", type: 3, color: "#3357FF", icon: "icon-hogar", parent_id: null, created_at: "2025-04-01T10:20:00Z", updated_at: "2025-04-01T10:20:00Z" },
+            { id: 4, name: "Juguetes", type: 4, color: "#FF33A1", icon: "icon-juguetes", parent_id: null, created_at: "2025-04-01T10:30:00Z", updated_at: "2025-04-01T10:30:00Z" },
+            { id: 5, name: "Deportes", type: 5, color: "#FF8C33", icon: "icon-deportes", parent_id: null, created_at: "2025-04-01T10:40:00Z", updated_at: "2025-04-01T10:40:00Z" },
+            { id: 6, name: "Libros", type: 6, color: "#33FFF5", icon: "icon-libros", parent_id: null, created_at: "2025-04-01T10:50:00Z", updated_at: "2025-04-01T10:50:00Z" },
+            { id: 7, name: "Salud", type: 7, color: "#FF33FF", icon: "icon-salud", parent_id: null, created_at: "2025-04-01T11:00:00Z", updated_at: "2025-04-01T11:00:00Z" },
+            { id: 8, name: "Belleza", type: 8, color: "#FF5733", icon: "icon-belleza", parent_id: null, created_at: "2025-04-01T11:10:00Z", updated_at: "2025-04-01T11:10:00Z" },
+            { id: 9, name: "Automóviles", type: 9, color: "#33FF57", icon: "icon-automoviles", parent_id: null, created_at: "2025-04-01T11:20:00Z", updated_at: "2025-04-01T11:20:00Z" },
+            { id: 10, name: "Oficina", type: 10, color: "#3377FF", icon: "icon-oficina", parent_id: null, created_at: "2025-04-01T11:30:00Z", updated_at: "2025-04-01T11:30:00Z" },
+            // Subcategorías
+            { id: 11, name: "Smartphones", type: 1, color: "#AA5733", icon: "icon-smartphones", parent_id: 1, created_at: "2025-04-01T11:40:00Z", updated_at: "2025-04-01T11:40:00Z" },
+            { id: 12, name: "Portátiles", type: 1, color: "#BB5733", icon: "icon-portatiles", parent_id: 1, created_at: "2025-04-01T11:50:00Z", updated_at: "2025-04-01T11:50:00Z" },
+            { id: 13, name: "Zapatillas", type: 2, color: "#33AA57", icon: "icon-zapatillas", parent_id: 2, created_at: "2025-04-01T12:00:00Z", updated_at: "2025-04-01T12:00:00Z" },
+            { id: 14, name: "Vestidos", type: 2, color: "#33BB57", icon: "icon-vestidos", parent_id: 2, created_at: "2025-04-01T12:10:00Z", updated_at: "2025-04-01T12:10:00Z" },
+            { id: 15, name: "Muebles", type: 3, color: "#3344FF", icon: "icon-muebles", parent_id: 3, created_at: "2025-04-01T12:20:00Z", updated_at: "2025-04-01T12:20:00Z" },
+            { id: 16, name: "Cocina", type: 3, color: "#3344AA", icon: "icon-cocina", parent_id: 3, created_at: "2025-04-01T12:30:00Z", updated_at: "2025-04-01T12:30:00Z" },
+            { id: 17, name: "Libros Infantiles", type: 6, color: "#33BBF5", icon: "icon-libros-infantiles", parent_id: 6, created_at: "2025-04-01T12:40:00Z", updated_at: "2025-04-01T12:40:00Z" },
+            { id: 18, name: "Maquillaje", type: 8, color: "#FF77FF", icon: "icon-maquillaje", parent_id: 8, created_at: "2025-04-01T12:50:00Z", updated_at: "2025-04-01T12:50:00Z" },
+            { id: 19, name: "Suplementos", type: 7, color: "#FF99FF", icon: "icon-suplementos", parent_id: 7, created_at: "2025-04-01T13:00:00Z", updated_at: "2025-04-01T13:00:00Z" },
+            { id: 20, name: "Sillas", type: 3, color: "#3344BB", icon: "icon-sillas", parent_id: 3, created_at: "2025-04-01T13:10:00Z", updated_at: "2025-04-01T13:10:00Z" },
+          ];
+
+        const items: Item[] = [
+            { id: 1, name: "iPhone 13", image: "iphone-13.jpg", rating: 5, category_id: 11 },
+            { id: 2, name: "MacBook Air M1", image: "macbook-air.jpg", rating: 4, category_id: 12 },
+            { id: 3, name: "Nike Air Force 1", image: "nike-airforce.jpg", rating: 3, category_id: 13 },
+            { id: 4, name: "Zapatillas Adidas Ultraboost", image: "adidas-ultraboost.jpg", rating: 4, category_id: 13 },
+            { id: 5, name: "Silla de oficina ergonómica", image: "silla-oficina.jpg", rating: 2, category_id: 10 },
+            { id: 6, name: "Cafetera Nespresso", image: "cafetera-nespresso.jpg", rating: 4, category_id: 15 },
+            { id: 7, name: "Kindle Paperwhite", image: "kindle-paperwhite.jpg", rating: 5, category_id: 6 },
+            { id: 8, name: "Mochila para portátil", image: "mochila-portatil.jpg", rating: 4, category_id: 10 },
+            { id: 9, name: "Reloj Garmin Forerunner", image: "garmin-forerunner.jpg", rating: 4, category_id: 5 },
+            { id: 10, name: "Sony WH-1000XM4", image: "sony-headphones.jpg", rating: 5, category_id: 1 },
+            { id: 11, name: "Teclado mecánico Logitech", image: "logitech-teclado.jpg", rating: 3, category_id: 1 },
+            { id: 12, name: "Guitarra Fender Stratocaster", image: "fender-guitarra.jpg", rating: 5, category_id: 4 },
+            { id: 13, name: "Mueble modular para oficina", image: "mueble-oficina.jpg", rating: 2, category_id: 15 },
+            { id: 14, name: "Silla gaming DXRacer", image: "dxracer-silla.jpg", rating: 4, category_id: 10 },
+            { id: 15, name: "Suplemento Omega-3", image: "suplemento-omega3.jpg", rating: 4, category_id: 19 },
+            { id: 16, name: "Lámpara de escritorio LED", image: "lampara-escritorio.jpg", rating: 5, category_id: 10 },
+            { id: 17, name: "Smartwatch Samsung Galaxy", image: "samsung-smartwatch.jpg", rating: 3, category_id: 9 },
+            { id: 18, name: "Juego de platos Corelle", image: "platos-corelle.jpg", rating: 4, category_id: 3 },
+            { id: 19, name: "Silla ergonómica para oficina", image: "silla-ergonomica.jpg", rating: 2, category_id: 15 },
+            { id: 20, name: "Altavoces Bose SoundLink", image: "bose-altavoces.jpg", rating: 4, category_id: 1 },
+            { id: 21, name: "Auriculares Beats Studio", image: "beats-audifonos.jpg", rating: 3, category_id: 1 },
+            { id: 22, name: "Sofá 3 plazas", image: "sofa-3-plazas.jpg", rating: 5, category_id: 15 },
+            { id: 23, name: "Plancha de vapor Philips", image: "plancha-philips.jpg", rating: 4, category_id: 14 },
+            { id: 24, name: "Cámara GoPro Hero 10", image: "gopro-hero10.jpg", rating: 4, category_id: 1 },
+            { id: 25, name: "Pantalla LED 4K LG", image: "pantalla-lg.jpg", rating: 5, category_id: 1 }
+          ];  
+
+        const reviews: Review[] = [
+            { id: 1, rating: 5, comment: "Excelente rendimiento y calidad de cámara. Muy recomendable", item_id: 1, created_at: "2025-04-02T10:00:00Z", updated_at: "2025-04-02T10:00:00Z" },
+            { id: 2, rating: 4, comment: "Buen equipo, aunque la batería podría ser mejor", item_id: 1, created_at: "2025-04-02T10:15:00Z", updated_at: "2025-04-02T10:15:00Z" },
+            { id: 3, rating: 3, comment: "La pantalla es buena, pero algo frágil", item_id: 2, created_at: "2025-04-02T11:00:00Z", updated_at: "2025-04-02T11:00:00Z" },
+            { id: 4, rating: 5, comment: "Rápido y ligero, perfecto para trabajar", item_id: 2, created_at: "2025-04-02T11:10:00Z", updated_at: "2025-04-02T11:10:00Z" },
+            { id: 5, rating: 4, comment: "Muy cómodas, pero el ajuste no es perfecto", item_id: 3, created_at: "2025-04-02T12:00:00Z", updated_at: "2025-04-02T12:00:00Z" },
+            { id: 6, rating: 5, comment: "Me encantan, son super cómodas y van con todo", item_id: 4, created_at: "2025-04-02T12:15:00Z", updated_at: "2025-04-02T12:15:00Z" },
+            { id: 7, rating: 2, comment: "No muy cómoda para usarla durante muchas horas", item_id: 5, created_at: "2025-04-02T13:00:00Z", updated_at: "2025-04-02T13:00:00Z" },
+            { id: 8, rating: 5, comment: "Excelente café, la uso todos los días", item_id: 6, created_at: "2025-04-02T13:45:00Z", updated_at: "2025-04-02T13:45:00Z" },
+            { id: 9, rating: 4, comment: "Buen dispositivo, aunque me gustaría que tuviera más almacenamiento", item_id: 7, created_at: "2025-04-02T14:30:00Z", updated_at: "2025-04-02T14:30:00Z" },
+            { id: 10, rating: 4, comment: "Ideal para viajes, no ocupa mucho espacio", item_id: 8, created_at: "2025-04-02T15:00:00Z", updated_at: "2025-04-02T15:00:00Z" },
+            { id: 11, rating: 5, comment: "Muy buenos para entrenar, gran aislamiento del ruido", item_id: 9, created_at: "2025-04-02T16:00:00Z", updated_at: "2025-04-02T16:00:00Z" },
+            { id: 12, rating: 5, comment: "Increíble calidad de sonido, se nota la diferencia", item_id: 10, created_at: "2025-04-02T16:30:00Z", updated_at: "2025-04-02T16:30:00Z" },
+            { id: 13, rating: 4, comment: "Es cómodo, pero el teclado es un poco ruidoso", item_id: 11, created_at: "2025-04-02T17:00:00Z", updated_at: "2025-04-02T17:00:00Z" },
+            { id: 14, rating: 5, comment: "Ideal para tocar en casa o fuera", item_id: 12, created_at: "2025-04-02T18:00:00Z", updated_at: "2025-04-02T18:00:00Z" },
+            { id: 15, rating: 3, comment: "Buena relación calidad-precio, pero la estructura no es tan duradera", item_id: 13, created_at: "2025-04-02T19:00:00Z", updated_at: "2025-04-02T19:00:00Z" },
+            { id: 16, rating: 4, comment: "Muy buena, pero el asiento podría ser más cómodo", item_id: 14, created_at: "2025-04-02T19:30:00Z", updated_at: "2025-04-02T19:30:00Z" },
+            { id: 17, rating: 4, comment: "Bien, pero me gustaría que tuviera más opciones de ajuste", item_id: 15, created_at: "2025-04-02T20:00:00Z", updated_at: "2025-04-02T20:00:00Z" },
+            { id: 18, rating: 5, comment: "Es una de las mejores sillas que he probado", item_id: 16, created_at: "2025-04-02T20:30:00Z", updated_at: "2025-04-02T20:30:00Z" },
+            { id: 19, rating: 2, comment: "No me gustó mucho, el funcionamiento no es lo esperado", item_id: 17, created_at: "2025-04-02T21:00:00Z", updated_at: "2025-04-02T21:00:00Z" },
+            { id: 20, rating: 4, comment: "Buen smartwatch, aunque la pantalla podría ser más grande", item_id: 18, created_at: "2025-04-02T21:30:00Z", updated_at: "2025-04-02T21:30:00Z" },
+            { id: 21, rating: 5, comment: "Excelente calidad, me ayudó a mejorar mi postura", item_id: 19, created_at: "2025-04-02T22:00:00Z", updated_at: "2025-04-02T22:00:00Z" },
+            { id: 22, rating: 3, comment: "Buena, pero esperaba un mejor sonido", item_id: 20, created_at: "2025-04-02T22:30:00Z", updated_at: "2025-04-02T22:30:00Z" },
+            { id: 23, rating: 4, comment: "Excelente calidad, pero un poco cara", item_id: 21, created_at: "2025-04-02T23:00:00Z", updated_at: "2025-04-02T23:00:00Z" },
+            { id: 24, rating: 5, comment: "Ideal para ver películas y jugar", item_id: 22, created_at: "2025-04-02T23:30:00Z", updated_at: "2025-04-02T23:30:00Z" },
+            { id: 25, rating: 4, comment: "Muy buena calidad, pero algo frágil", item_id: 23, created_at: "2025-04-03T00:00:00Z", updated_at: "2025-04-03T00:00:00Z" },
+            { id: 26, rating: 5, comment: "Increíble para deportes de aventura, la recomiendo", item_id: 24, created_at: "2025-04-03T00:30:00Z", updated_at: "2025-04-03T00:30:00Z" },
+            { id: 27, rating: 5, comment: "Es genial para todos los detalles que muestra", item_id: 25, created_at: "2025-04-03T01:00:00Z", updated_at: "2025-04-03T01:00:00Z" },
+            { id: 28, rating: 4, comment: "Buena guitarra, aunque la caja es un poco pequeña", item_id: 12, created_at: "2025-04-03T01:30:00Z", updated_at: "2025-04-03T01:30:00Z" },
+            { id: 29, rating: 5, comment: "Una maravilla, no me arrepiento de comprarlo", item_id: 1, created_at: "2025-04-03T02:00:00Z", updated_at: "2025-04-03T02:00:00Z" },
+            { id: 30, rating: 3, comment: "Lo tengo hace poco, y no me termina de convencer", item_id: 5, created_at: "2025-04-03T02:30:00Z", updated_at: "2025-04-03T02:30:00Z" } 
+        ];
+
+        const images: ReviewImage[] = [
+            { image: "https://www.abrirllave.com/html/images/dos-parrafos-bloc-de-notas.gif", review_id: 1 },
+            { image: "https://www.lluiscodina.com/wp-content/uploads/2019/05/html-5-ejemplo-de-marcado.png", review_id: 1 },
+            { image: "https://www.loading.es/blog/wp-content/uploads/ejemplo-html-codigo-editor.jpg", review_id: 2 },
+            { image: "https://iessantabarbara.es/departamentos/fisica/tecnologia/formacion/www/html01.png", review_id: 3 },
+            { image: "https://www.ampersoundmedia.com/wp-content/uploads/2020/07/html-scaled.jpg", review_id: 4 },
+            { image: "https://www.abrirllave.com/html/images/dos-parrafos-bloc-de-notas.gif", review_id: 5 },
+            { image: "https://www.lluiscodina.com/wp-content/uploads/2019/05/html-5-ejemplo-de-marcado.png", review_id: 6 },
+            { image: "https://www.loading.es/blog/wp-content/uploads/ejemplo-html-codigo-editor.jpg", review_id: 7 },
+            { image: "https://iessantabarbara.es/departamentos/fisica/tecnologia/formacion/www/html01.png", review_id: 8 },
+            { image: "https://www.ampersoundmedia.com/wp-content/uploads/2020/07/html-scaled.jpg", review_id: 9 },
+        ];
+
+        const reviewsFromDB: ReviewCardDTO[] = [];
+
+        for (const review of reviews) {
+          const item = items.find(i => i.id === review.item_id);
+          if (!item) continue;
+
+          const reviewImages = images.filter(img => img.review_id === review.id).map(img => img.image);
+      
+          const category = categories.find(c => c.id === item.category_id);
+          const parentCategory = category?.parent_id
+            ? categories.find(c => c.id === category.parent_id)
+            : null;
+      
+            reviewsFromDB.push({
+            id: review.id,
+            comment: review.comment ?? "",
+            rating: review.rating,
+            created_at: review.created_at,
+            updated_at: review.updated_at,
+            images: reviewImages,
+            category: parentCategory ? parentCategory.name : category?.name || "Desconocida",
+            item: item.name,
+            });
+        }
         setReviews(reviewsFromDB);
       } catch (err) {
         console.error("Error initializing data:", err);
