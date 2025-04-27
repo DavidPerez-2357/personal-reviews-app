@@ -76,7 +76,7 @@ export const insertCategoryRatingValue = async (categoryRatingValue: CategoryRat
         const result = await db!.run(query, values);
         return result.changes?.lastId || null;
     } catch (error) {
-        console.error("❌ Error al insertar valor de puntuación de categoría:");
+        console.error("❌ Error al insertar valor de puntuación de categoría:" + error);
         return null;
     }
 };

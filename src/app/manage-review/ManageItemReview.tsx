@@ -21,8 +21,8 @@ import PreviewPhotoModal from "@components/PreviewPhotoModal";
 import SubcategoriesBadgeSelector from "./components/SubcategoriesBadgeSelector";
 import { CategoryColors } from "@shared/enums/colors";
 import { useTranslation } from "react-i18next";
-import { insertReview, insertReviewImage } from "@shared/services/review-service";
-import { useHistory } from "react-router-dom";
+import { getReviews, insertReview, insertReviewImage, updateReview } from "@shared/services/review-service";
+import { useHistory, useParams } from "react-router-dom";
 import ItemSelector from "./components/ItemSelector";
 import CategoryRatingRange from "./components/CategoryRatingRange";
 import ErrorAlert from "@components/ErrorAlert";
@@ -34,6 +34,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
 const ManageItemReview = () => {
   const { photos, takePhoto, importPhoto } = usePhotoGallery();
+  const { id } = useParams<{ id: string }>();
   const history = useHistory();
   const { t } = useTranslation();
 
@@ -50,7 +51,6 @@ const ManageItemReview = () => {
   // Variables de previsualizacion de fotos
   const [previewPhoto, setPreviewPhoto] = useState<string | null>(null);
   const [isPreviewOpen, setIsPreviewOpen] = useState(false);
-  const previewPhotoModal = useRef<HTMLIonModalElement>(null);
   const handlePreviewClose = () => {
     setIsPreviewOpen(false);
     setPreviewPhoto(null);
@@ -65,6 +65,7 @@ const ManageItemReview = () => {
   const [errorMessage, setErrorMessage] = useState("");
 
   // Variables del fomulario
+  const editMode = id !== undefined;
   const [parentCategory, setParentCategory] = useState<Category | null>(null);
   const [childrenCategories, setChildrenCategories] = useState<Category[]>([]);
   const [selectedSubcategory, setSelectedSubcategory] = useState<Category | null>(null);
@@ -72,6 +73,7 @@ const ManageItemReview = () => {
   const [rating, setRating] = useState(0);
   const [categoryRatings, setCategoryRatings] = useState<CategoryRatingMix[]>([]);
   const [selectedOption, setSelectedOption] = useState<ItemOption | null>(null);
+  const [comment, setComment] = useState("");
 
   const getSelectedCategory = () => {
     if (selectedSubcategory) {
@@ -108,6 +110,7 @@ const ManageItemReview = () => {
         }
       });
     }
+    
   }, [selectedOption]);
 
   useEffect(() => {
@@ -192,115 +195,137 @@ const ManageItemReview = () => {
 
   const validateForm = () => {
     if (itemName.trim() === "") {
-      showErrorAlert(t("manage-item-review.error-message.empty-title"));
+      showError(t("manage-item-review.error-message.empty-title"));
       return false;
     }
 
     if (parentCategory == null || parentCategory.id === 0) {
-      showErrorAlert(t("manage-item-review.error-message.empty-category"));
+      showError(t("manage-item-review.error-message.empty-category"));
       return false;
     }
 
     return true;
   }
 
-  const showErrorAlert = (message: string) => {
+  const showError = (message: string) => {
     setErrorMessage(message);
     setErrorAlert(true);
   }
 
-  const  handleSaveButtonClick = async () => {
+  /** Guarda un nuevo ítem o actualiza uno existente */
+  const saveOrUpdateItem = async (item: Item): Promise<number | null> => {
+    try {
+      if (!selectedOption) {
+        const itemId = await insertItem(item);
+        if (!itemId) throw new Error(t('manage-item-review.error-message.error-creating-item'));
+        return itemId;
+      } else {
+        const success = await updateItem(item);
+        if (!success) throw new Error(t('manage-item-review.error-message.error-updating-item'));
+        return selectedOption.id;
+      }
+    } catch (error) {
+      showError((error as Error).message);
+      return null;
+    }
+  };
+
+  /** Guarda o actualiza la review */
+  const saveOrUpdateReview = async (review: Review): Promise<number | null> => {
+    try {
+      if (editMode) {
+        review.id = parseInt(id);
+        const success = await updateReview(review);
+        if (!success) throw new Error(t('manage-item-review.error-message.error-updating-review'));
+        return review.id;
+      } else {
+        const reviewId = await insertReview(review);
+        if (!reviewId) throw new Error(t('manage-item-review.error-message.error-creating-review'));
+        return reviewId;
+      }
+    } catch (error) {
+      showError((error as Error).message);
+      return null;
+    }
+  };
+
+  /** Guarda los ratings de las categorías asociadas */
+  const saveCategoryRatings = async (reviewId: number) => {
+    try {
+      for (const rating of categoryRatings) {
+        const categoryRatingValue: CategoryRatingValue = {
+          id: 0,
+          review_id: reviewId,
+          category_rating_id: rating.id,
+          value: rating.value,
+        };
+        const success = await insertCategoryRatingValue(categoryRatingValue);
+        if (!success) throw new Error(t('manage-item-review.error-message.error-saving-review-ratings'));
+      }
+    } catch (error) {
+      showError((error as Error).message);
+    }
+  };
+
+  /** Guarda las imágenes asociadas a la review */
+  const saveReviewImages = async (reviewId: number) => {
+    try {
+      for (const photo of photos) {
+        const reviewImage: ReviewImage = {
+          review_id: reviewId,
+          image: photo.webviewPath!,
+        };
+        const success = await insertReviewImage(reviewImage);
+        if (!success) throw new Error(t('manage-item-review.error-message.error-saving-review-images'));
+      }
+    } catch (error) {
+      showError((error as Error).message);
+    }
+  };
+
+
+  /** Acción al hacer clic en Guardar */
+  const handleSaveReview = async () => {
+    if (!validateForm()) return;
+
+    setIsButtonDisabled(true);
+    setSaveButtonText(t('manage-item-review.saving-review'));
+
     const item: Item = {
       id: 0,
       name: itemName,
       image: null,
       category_id: getSelectedCategory()?.id || 0,
+    };
+
+    const itemId = await saveOrUpdateItem(item);
+    if (!itemId) {
+      setIsButtonDisabled(false);
+      return;
     }
 
     const review: Review = {
       id: 0,
-      item_id: item.id,
-      rating: rating,
-      comment: "",
-    }
-    
-    const isValid = validateForm();
-    
-    if (!isValid) return;
+      item_id: itemId,
+      rating,
+      comment,
+    };
 
-    setIsButtonDisabled(true);
-    setSaveButtonText(t("manage-item-review.saving-review"));
-
-    if (!selectedOption) {
-      await insertItem(item).then((itemId) => {
-        if (!itemId){
-          showErrorAlert(t("manage-item-review.error-message.error-creating-item"));
-          return;
-        }
-
-        item.id = itemId;
-        review.item_id = itemId;
-        setIsButtonDisabled(true);
-      });
-    }else {
-      item.id = selectedOption.id;
-      review.item_id = selectedOption.id;
-
-      await updateItem(item).then((success) => {
-        if (!success) {
-          showErrorAlert(t("manage-item-review.error-message.error-updating-item"));
-          return;
-        }
-        setIsButtonDisabled(true);
-      });
+    const reviewId = await saveOrUpdateReview(review);
+    if (!reviewId) {
+      setIsButtonDisabled(false);
+      return;
     }
 
-    await insertReview(review).then((success) => {
-      if (!success) {
-        showErrorAlert(t("manage-item-review.error-message.error-creating-review"));
-        return;
-      }
+    await saveCategoryRatings(reviewId);
+    await saveReviewImages(reviewId);
 
-      review.id = 0;
-    });
-
-    for (const categoryRating of categoryRatings) {
-      const categoryRatingValue: CategoryRatingValue = {
-        id: 0,
-        review_id: review.id,
-        category_rating_id: categoryRating.id,
-        value: categoryRating.value,
-      };
-
-      await insertCategoryRatingValue(categoryRatingValue).then((success) => {
-        if (!success) {
-          showErrorAlert(t("manage-item-review.error-message.error-inserting-category-ratings"));
-          return;
-        }
-      });
-    }
-
-    for (const photo of photos) {
-      const reviewImage: ReviewImage = {
-        review_id: review.id,
-        image: photo.webviewPath!,
-      }
-
-      await insertReviewImage(reviewImage).then((success) => {
-        if (!success) {
-          showErrorAlert(t("manage-item-review.error-message.error-inserting-review-images"));
-          return;
-        }
-      });
-    }
-
-    setSaveButtonText(t("manage-item-review.saving-review-success"));
+    setSaveButtonText(t('manage-item-review.saving-review-success'));
     setIsButtonDisabled(false);
 
     setTimeout(() => {
-      setSaveButtonText(t("manage-item-review.create-review"));
-      history.push("/app/reviews", { toast: '¡Recurso creado con éxito!' });
-      history.replace("/app/reviews", { toast: '¡Recurso creado con éxito!' });
+      setSaveButtonText(t('manage-item-review.create-review'));
+      history.push('/app/reviews', { toast: t('manage-item-review.saving-review-success') });
     }, 2000);
   };
 
@@ -316,7 +341,7 @@ const ManageItemReview = () => {
             <div className="flex absolute safe-area-top top-0 p-3" onClick={goBack}>
               <IonBackButton defaultHref="/app/reviews" color="tertiary" />
             </div>
-            <div className="flex items-center justify-center pb-3 pt-5">
+            <div className="flex items-center justify-center pb-3 pt-5 min-h-5">
               {parentCategory?.icon && (<FontAwesomeIcon
                 icon={parentCategory?.icon as IconName}
                 className="text-5xl text-white mt-5"
@@ -373,6 +398,8 @@ const ManageItemReview = () => {
                   fill="solid"
                   placeholder={t("manage-item-review.comment-input-placeholder")}
                   className="w-full"
+                  value={comment}
+                  onIonChange={(e) => setComment(e.detail.value!)}
                 />
               </IonRow>
 
@@ -401,7 +428,7 @@ const ManageItemReview = () => {
               </IonRow>
 
               <IonButton className={`z-[1000] bottom-0 right-0 right-0 mt-10 mb-5 ml-5 mr-5`}
-              id="save-review" color="tertiary" expand="full" disabled={isButtonDisabled} onClick={handleSaveButtonClick}>
+              id="save-review" color="tertiary" expand="full" disabled={isButtonDisabled} onClick={handleSaveReview}>
                 {saveButtonText}
               </IonButton>
             </IonGrid>

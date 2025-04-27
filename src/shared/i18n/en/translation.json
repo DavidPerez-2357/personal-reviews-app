@@ -52,7 +52,8 @@
             "error-saving-item": "Error saving item",
             "error-saving-review-ratings": "Error saving review ratings",
             "error-saving-review-images": "Error saving review images",
-            "error-updating-item": "Error updating item"
+            "error-updating-item": "Error updating item",
+            "error-updating-review": "Error updating review"
         }
     },
 
