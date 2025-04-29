@@ -17,7 +17,7 @@ import { Item, ItemOption } from "@dto/item/Item";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { getItemById, insertItem, updateItem } from "@services/item-service";
 import { IconName } from "@fortawesome/fontawesome-svg-core";
-import { deleteRatingValuesFromReview, getCategoryById, getCategoryRatingsByCategoryId, getChildrenCategories, getParentCategory, insertCategoryRatingValue } from "@services/category-service";
+import { deleteRatingValuesFromReview, getCategoryById, getCategoryRatingsByCategoryId, getCategoryRatingValues, getCategoryRatingValuesByReviewId, getChildrenCategories, getParentCategory, insertCategoryRatingValue } from "@services/category-service";
 import { Category } from "@dto/category/Category";
 import CategorySelectorModal from "@components/CategorySelectorModal";
 import { CategoryRating, CategoryRatingMix } from "@dto/category/CategoryRating";
@@ -26,17 +26,18 @@ import SubcategoriesBadgeSelector from "@/app/manage-review/components/Subcatego
 import { CategoryColors } from "@shared/enums/colors";
 import { useTranslation } from "react-i18next";
 import { Review } from "@dto/review/Review";
-import { deleteReviewImages, getReviewById, getReviews, insertReview, insertReviewImage, updateReview } from "@shared/services/review-service";
+import { deleteReviewImages, getReviewById, getReviewImages, getReviewImagesbyId, getReviews, insertReview, insertReviewImage, updateReview } from "@shared/services/review-service";
 import { CategoryRatingValue } from "@shared/dto/category/CategoryRatingValue";
 import { useHistory, useParams } from "react-router-dom";
 import ItemSelector from "./components/ItemSelector";
 import CategoryRatingRange from "./components/CategoryRatingRange";
 import ErrorAlert from "@/shared/components/ErrorAlert";
 import { ReviewImage } from "@/shared/dto/review/ReviewImage";
+import { UserPhoto } from "@/shared/dto/Photo";
 
 
 const ManageItemReview = () => {
-  const { photos, takePhoto, importPhoto } = usePhotoGallery();
+  const { photos, setPhotos, takePhoto, importPhoto } = usePhotoGallery();
   const { id } = useParams<{ id: string }>();
   const history = useHistory();
   const { t } = useTranslation();
@@ -96,23 +97,45 @@ const ManageItemReview = () => {
   }
 
   const setEditData = async (reviewId: number) => {
-    const review = await getReviewById(reviewId);
+    const review: Review | null = await getReviewById(reviewId);
     if (!review) throw new Error(t('manage-item-review.error-message.review-not-found'));
 
-    const item = await getItemById(review.item_id);
+    const item: Item | null = await getItemById(review.item_id);
     if (!item) throw new Error(t('manage-item-review.error-message.item-not-found'));
 
-    const category = await getCategoryById(item.category_id);
+    const category: Category | null = await getCategoryById(item.category_id);
     if (!category) throw new Error(t('manage-item-review.error-message.category-not-found'));
 
-    const parentCategory = await getParentCategory(item.category_id);
+    const parentCategory: Category | null = await getParentCategory(item.category_id);
     if (!parentCategory) throw new Error(t('manage-item-review.error-message.category-not-found'));
+
+    const categoryRatingsFound: CategoryRatingValue[] = await getCategoryRatingValuesByReviewId(reviewId);
+    if (!categoryRatings) throw new Error(t('manage-item-review.error-message.category-ratings-not-found'));
+
+    const reviewImages: ReviewImage[] = await getReviewImagesbyId(reviewId);
+    if (!reviewImages) throw new Error(t('manage-item-review.error-message.review-images-not-found'));
 
     setItemName(item.name);
     setRating(review.rating);
     setComment(review.comment || "");
     setParentCategory(parentCategory);
     setSelectedOption({ id: item.id, name: item.name, category_id: item.category_id, parent_category_id: parentCategory.id, parent_category_icon: parentCategory.icon });
+    
+    const photosConverted: UserPhoto[] = reviewImages.map((image) => ({
+      filepath: image.image,
+      webviewPath: image.image,
+    }));
+    setPhotos(photosConverted);
+
+    // Mix the category ratings with the review ratings
+    const categoryRatingsConverted: CategoryRatingMix[] = categoryRatingsFound.map((categoryRatingValue) => {
+      const categoryRating = categoryRatings.find((rating) => rating.id === categoryRatingValue.category_rating_id);
+      return {
+        id: categoryRating?.id || 0,
+        name: categoryRating?.name || "",
+        value: categoryRatingValue.value,
+      };
+    });
   }
 
   useEffect(() => {
