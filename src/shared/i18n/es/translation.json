@@ -52,7 +52,10 @@
             "error-saving-review-ratings": "Error al guardar las calificaciones de la reseña",
             "error-saving-review-images": "Error al guardar las imágenes de la reseña",
             "error-updating-item": "Error al actualizar el elemento",
-            "error-updating-review": "Error al actualizar la reseña"
+            "error-updating-review": "Error al actualizar la reseña",
+            "review-not-found": "Reseña no encontrada",
+            "item-not-found": "Elemento no encontrado",
+            "category-not-found": "Categoría no encontrada"
         }
     },
 

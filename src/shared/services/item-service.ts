@@ -125,3 +125,15 @@ export const insertTestItems = async (): Promise<void> => {
         await insertItem(item);
     }
 }
+
+export const getItemById = async (id: number): Promise<Item | null> => {
+    if (!checkDB()) return null;
+    try {
+        const query = `SELECT * FROM item WHERE id = ?`;
+        const result = await db!.query(query, [id]);
+        return result.values && result.values[0] as Item || null;
+    } catch (error) {
+        console.error("❌ Error al obtener ítem por ID", error);
+        return null;
+    }
+}

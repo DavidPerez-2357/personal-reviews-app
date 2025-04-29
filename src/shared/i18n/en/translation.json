@@ -53,7 +53,10 @@
             "error-saving-review-ratings": "Error saving review ratings",
             "error-saving-review-images": "Error saving review images",
             "error-updating-item": "Error updating item",
-            "error-updating-review": "Error updating review"
+            "error-updating-review": "Error updating review",
+            "review-not-found": "Review not found",
+            "item-not-found": "Item not found",
+            "category-not-found": "Category not found"
         }
     },
 

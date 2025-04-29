@@ -260,6 +260,30 @@ export const updateReview = async (review: Review): Promise<boolean> => {
     }
 }
 
+export const getReviewById = async (id: number): Promise<Review | null> => {
+    if (!checkDB()) return null;
+    try {
+        const query = `SELECT * FROM review WHERE id = ?`;
+        const result = await db!.query(query, [id]);
+        return result.values && result.values[0] as Review || null;
+    } catch (error) {
+        console.error("❌ Error al obtener reseña por ID");
+        return null;
+    }
+}
+
+export const deleteReviewImages = async (reviewId: number): Promise<boolean> => {
+    if (!checkDB()) return false;
+    try {
+        const query = `DELETE FROM review_image WHERE review_id = ?`;
+        const result = await db!.run(query, [reviewId]);
+        return (result.changes?.changes ?? 0) > 0;
+    } catch (error) {
+        console.error("❌ Error al eliminar imágenes de reseña", error);
+        return false;
+    }
+}
+
 /**
  * Elimina todas las reseñas de la base de datos.
  * * @returns Promise<boolean>

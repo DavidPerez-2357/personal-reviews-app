@@ -13,15 +13,20 @@ import StarRating from "@components/StarRating";
 import { useEffect, useRef, useState } from "react";
 import "@styles/ManageItemReview.css";
 import { usePhotoGallery } from "@hooks/usePhotoGallery";
-import { insertItem, updateItem } from "@services/item-service";
+import { Item, ItemOption } from "@dto/item/Item";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { getItemById, insertItem, updateItem } from "@services/item-service";
 import { IconName } from "@fortawesome/fontawesome-svg-core";
-import { getCategoryById, getCategoryRatingsByCategoryId, getChildrenCategories, getParentCategory, insertCategoryRatingValue } from "@services/category-service";
+import { deleteRatingValuesFromReview, getCategoryById, getCategoryRatingsByCategoryId, getChildrenCategories, getParentCategory, insertCategoryRatingValue } from "@services/category-service";
+import { Category } from "@dto/category/Category";
 import CategorySelectorModal from "@components/CategorySelectorModal";
 import PreviewPhotoModal from "@components/PreviewPhotoModal";
 import SubcategoriesBadgeSelector from "./components/SubcategoriesBadgeSelector";
 import { CategoryColors } from "@shared/enums/colors";
 import { useTranslation } from "react-i18next";
-import { getReviews, insertReview, insertReviewImage, updateReview } from "@shared/services/review-service";
+import { Review } from "@dto/review/Review";
+import { deleteReviewImages, getReviewById, getReviews, insertReview, insertReviewImage, updateReview } from "@shared/services/review-service";
+import { CategoryRatingValue } from "@shared/dto/category/CategoryRatingValue";
 import { useHistory, useParams } from "react-router-dom";
 import ItemSelector from "./components/ItemSelector";
 import CategoryRatingRange from "./components/CategoryRatingRange";
@@ -91,6 +96,36 @@ const ManageItemReview = () => {
       value: 0, // Valor inicial
     }));
   }
+
+  const setEditData = async (reviewId: number) => {
+    const review = await getReviewById(reviewId);
+    if (!review) throw new Error(t('manage-item-review.error-message.review-not-found'));
+
+    const item = await getItemById(review.item_id);
+    if (!item) throw new Error(t('manage-item-review.error-message.item-not-found'));
+
+    const category = await getCategoryById(item.category_id);
+    if (!category) throw new Error(t('manage-item-review.error-message.category-not-found'));
+
+    const parentCategory = await getParentCategory(item.category_id);
+    if (!parentCategory) throw new Error(t('manage-item-review.error-message.category-not-found'));
+
+    setItemName(item.name);
+    setRating(review.rating);
+    setComment(review.comment || "");
+    setParentCategory(parentCategory);
+    setSelectedOption({ id: item.id, name: item.name, category_id: item.category_id, parent_category_id: parentCategory.id, parent_category_icon: parentCategory.icon });
+  }
+
+  useEffect(() => {
+      if (editMode) {
+        setSaveButtonText(t('common.save-changes'));
+        const reviewId = parseInt(id);
+        setEditData(reviewId).catch((error) => {
+          history.push("/app/reviews", { toast: t('manage-item-review.error-message.review-not-found') });
+        });
+      }
+  }, [id, editMode]);
 
   // Funcion que se ejecuta cada vez que cambia la opción seleccionada
   useEffect(() => {
@@ -251,7 +286,14 @@ const ManageItemReview = () => {
 
   /** Guarda los ratings de las categorías asociadas */
   const saveCategoryRatings = async (reviewId: number) => {
+    if (categoryRatings.length === 0) return; // No hay ratings para guardar
+
     try {
+      if (editMode) {
+        const success = await deleteRatingValuesFromReview(reviewId);
+        if (!success) throw new Error(t('manage-item-review.error-message.error-saving-review-ratings'));
+      }
+
       for (const rating of categoryRatings) {
         const categoryRatingValue: CategoryRatingValue = {
           id: 0,
@@ -269,7 +311,14 @@ const ManageItemReview = () => {
 
   /** Guarda las imágenes asociadas a la review */
   const saveReviewImages = async (reviewId: number) => {
+    if (photos.length === 0) return; // No hay fotos para guardar
+
     try {
+      if (editMode) {
+        const success = await deleteReviewImages(reviewId);
+        if (!success) throw new Error(t('manage-item-review.error-message.error-saving-review-images'));
+      }
+
       for (const photo of photos) {
         const reviewImage: ReviewImage = {
           review_id: reviewId,
