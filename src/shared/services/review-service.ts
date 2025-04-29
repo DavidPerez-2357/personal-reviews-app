@@ -204,7 +204,12 @@ export const updateReview = async (review: Review): Promise<boolean> => {
         return false;
     }
 }
-
+/**
+ * Elimina una reseña de la base de datos.
+ * 
+ * @param id 
+ * @returns 
+ */
 export const getReviewById = async (id: number): Promise<Review | null> => {
     if (!checkDB()) return null;
     try {
@@ -217,6 +222,30 @@ export const getReviewById = async (id: number): Promise<Review | null> => {
     }
 }
 
+/**
+ * Obtiene todas las imágenes de una reseña por su ID.
+ * 
+ * @param id 
+ * @returns 
+ */
+export const getReviewImagesbyId = async (id: number): Promise<ReviewImage[]> => {
+    if (!checkDB()) return [];
+    try {
+        const query = `SELECT * FROM review_image WHERE review_id = ?`;
+        const result = await db!.query(query, [id]);
+        return result.values as ReviewImage[] || [];
+    } catch (error) {
+        console.error("❌ Error al obtener imágenes de reseña por ID", error);
+        return [];
+    }
+}
+
+/**
+ * Elimina las imágenes de una reseña por su ID.
+ * 
+ * @param id 
+ * @returns 
+ */
 export const deleteReviewImages = async (reviewId: number): Promise<boolean> => {
     if (!checkDB()) return false;
     try {
