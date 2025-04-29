@@ -1,11 +1,21 @@
+import { useState } from "react";
 import { Ham, SquarePen, Star } from "lucide-react";
 import { IonButton, IonCard } from "@ionic/react";
 import { ReviewFull} from "@dto/Review";
 import "../styles/reviewPage.css";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { IconName } from "@fortawesome/fontawesome-svg-core";
+import PreviewPhotoModal from "@/shared/components/PreviewPhotoModal";
 
 const ReviewCard = ({ review }: { review: ReviewFull }) => {
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [selectedImageUrl, setSelectedImageUrl] = useState<string | null>(null);
+
+  const handleImageClick = (image: string) => {
+    setSelectedImageUrl(image);
+    setIsModalOpen(true);
+  }
+
   return (
     <div className="flex flex-col gap-3 border-2 border-[var(--ion-color-secondary)] rounded-md p-2">
       <IonCard className="pb-4 pt-2">
@@ -32,6 +42,7 @@ const ReviewCard = ({ review }: { review: ReviewFull }) => {
                 src={image}
                 alt={`Review image ${index + 1}`}
                 className="size-20 object-cover rounded-md border border-[var(--ion-color-secondary)]"
+                onClick={() => {handleImageClick(image)}}
               />
               ))}
             </div>
@@ -52,6 +63,13 @@ const ReviewCard = ({ review }: { review: ReviewFull }) => {
           </div>
         </div>
       </IonCard>
+      {selectedImageUrl && (
+        <PreviewPhotoModal
+          isOpen={isModalOpen}
+          photoUrl={selectedImageUrl}
+          onClose={() => setIsModalOpen(false)}
+        />
+      )}
     </div>
   );
 };
