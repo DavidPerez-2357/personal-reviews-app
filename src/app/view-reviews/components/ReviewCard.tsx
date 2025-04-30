@@ -53,7 +53,7 @@ const ReviewCard = ({ review }: { review: ReviewFull }) => {
               {[...Array(5)].map((_, index) => (
                 <Star
                   key={index}
-                  fill={index < review.rating ? "var(--ion-color-primary)" : "var(--ion-color-secondary"}
+                  fill={index < review.rating ? "var(--ion-color-primary)" : "var(--ion-color-secondary)"}
                   strokeWidth={0}
                   size={35}
                 ></Star>
