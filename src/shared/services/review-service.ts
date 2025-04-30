@@ -257,3 +257,21 @@ export const deleteReviewImages = async (reviewId: number): Promise<boolean> => 
         return false;
     }
 }
+
+/**
+ * Elimina una reseña de la base de datos.
+ * 
+ * @param id 
+ * @returns 
+ */
+export const deleteReview = async (id: number): Promise<boolean> => {
+    if (!checkDB()) return false;
+    try {
+        const query = `DELETE FROM review WHERE id = ?`;
+        const result = await db!.run(query, [id]);
+        return (result.changes?.changes ?? 0) > 0;
+    } catch (error) {
+        console.error("❌ Error al eliminar reseña", error);
+        return false;
+    }
+}
