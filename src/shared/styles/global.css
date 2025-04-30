@@ -46,6 +46,10 @@
     padding-top: var(--safe-area-inset-top);
 }
 
+.safe-margin-top {
+	margin-top: var(--safe-area-inset-top);
+}
+
 .safe-area-bottom {
 	padding-bottom: var(--safe-area-inset-bottom);
 }
