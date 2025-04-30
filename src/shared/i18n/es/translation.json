@@ -55,7 +55,9 @@
             "error-updating-review": "Error al actualizar la reseña",
             "review-not-found": "Reseña no encontrada",
             "item-not-found": "Elemento no encontrado",
-            "category-not-found": "Categoría no encontrada"
+            "category-not-found": "Categoría no encontrada",
+            "category-ratings-not-found": "Calificaciones de categoría no encontradas",
+            "review-images-not-found": "Imágenes de reseña no encontradas"
         }
     },
 

@@ -56,7 +56,9 @@
             "error-updating-review": "Error updating review",
             "review-not-found": "Review not found",
             "item-not-found": "Item not found",
-            "category-not-found": "Category not found"
+            "category-not-found": "Category not found",
+            "category-ratings-not-found": "Category ratings not found",
+            "review-images-not-found": "Review images not found"
         }
     },
 

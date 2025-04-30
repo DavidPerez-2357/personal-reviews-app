@@ -399,3 +399,24 @@ export const deleteRatingValuesFromReview = async (reviewId: number): Promise<bo
         return false;
     }
 }
+
+/**
+ * Obtiene los valores de puntuación de categoría de una reseña a partir de su ID.
+ * 
+ * @param reviewId 
+ * @returns 
+ */
+export const getCategoryRatingValuesByReviewId = async (reviewId: number): Promise<CategoryRatingValue[]> => {
+    try {
+        if (!checkDB()) return [];
+
+        const query = `SELECT * FROM category_rating_value WHERE review_id = ?`;
+        const values = [reviewId];
+        const result = await db!.query(query, values);
+
+        return result.values as CategoryRatingValue[] || [];
+    } catch (error) {
+        console.error("❌ Error al obtener valores de puntuación de categoría por ID de reseña");
+        return [];
+    }
+}
