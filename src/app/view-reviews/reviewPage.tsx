@@ -8,6 +8,7 @@ import {
   IonLabel,
   IonPage,
   IonRow,
+  IonToast,
 } from "@ionic/react";
 import {
   ArrowDown,
@@ -20,15 +21,10 @@ import {
 import ReviewCard from "./components/ReviewCard";
 import { getReviewsCards, insertTestReviewImages, insertTestReviews } from "@services/review-service";
 import ReviewCardFilterModal from "./components/ReviewCardFilterModal";
-import { Review, ReviewFull, ReviewImage } from "@dto/Review";
+import { ReviewFull, ReviewImage } from "@dto/Review";
 import { useTranslation } from "react-i18next";
-import { Category } from "@dto/Category";
-import { Item } from "@dto/Item";
 import "./styles/reviewPage.css";
-import { insertCategory, insertTestCategories } from "@/shared/services/category-service";
-import { insertTestItems } from "@/shared/services/item-service";
-import { resetAllAutoIncrement } from "@/database-service";
-import PreviewPhotoModal from "@/shared/components/PreviewPhotoModal";
+import { useLocation, useHistory } from "react-router-dom"; // Import useLocation and useHistory
 
 export const ReviewPage: React.FC = () => {
 
@@ -52,6 +48,11 @@ export const ReviewPage: React.FC = () => {
     keyword: "",
   });
 
+  const [isToastOpen, setIsToastOpen] = useState(false);
+  const [toastMessage, setToastMessage] = useState("");
+
+  const location = useLocation<{ toast?: string }>(); // Get location object
+  const history = useHistory(); // Get history object
   const { t } = useTranslation();
 
   useEffect(() => {
@@ -65,7 +66,23 @@ export const ReviewPage: React.FC = () => {
       }
     }
     initializeData();
-  }, []);
+
+    // Check for toast message in location state when component mounts or location changes
+    if (location.state?.toast) {
+      setToastMessage(location.state.toast);
+      setIsToastOpen(true);
+
+      (async () => {
+        setReviews([]); // Clear reviews before fetching new ones
+        const actualicedReviews = await getReviewsCards();
+        console.log("Reviews from DB:", actualicedReviews);
+        setReviews(actualicedReviews);
+      })();
+
+      // Clear the state from history so the toast doesn't reappear on refresh/navigation
+      history.replace(location.pathname, undefined);
+    }
+  }, [location.state, history, location.pathname]); // Add dependencies
 
   const filteredReviews = useMemo(() => {
     const lowerSearchTerm = (searchTerm ?? "").toLowerCase().trim();
@@ -326,7 +343,11 @@ export const ReviewPage: React.FC = () => {
                     ([date, reviews]) => (
                       <div className="flex flex-col gap-3" key={date}>
                         <IonLabel className="text-lg" color={"medium"}>
-                          {new Date(date).toLocaleDateString()}
+                            {new Date(date).toLocaleDateString("es-ES", {
+                            day: "2-digit",
+                            month: "2-digit",
+                            year: "numeric",
+                            })}
                         </IonLabel>
                         <div className="flex flex-col gap-6">
                           {reviews.map((review) => (
@@ -363,6 +384,16 @@ export const ReviewPage: React.FC = () => {
           onApply={handleApplyFilters}
         />
       </IonContent>
+
+      {/* Update IonToast to be controlled by state */}
+      <IonToast
+        className="safe-margin-top"
+        isOpen={isToastOpen}
+        message={toastMessage}
+        position="top"
+        onDidDismiss={() => setIsToastOpen(false)} // Hide toast when dismissed
+        duration={3000} // Set duration (e.g., 3 seconds)
+      />
     </IonPage>
   );
 };
