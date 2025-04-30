@@ -2,13 +2,11 @@ import React, { useEffect, useRef, useState } from "react";
 import {
   IonModal,
   IonButton,
-  IonInput,
   IonHeader,
   IonToolbar,
   IonTitle,
   IonContent,
   IonLabel,
-  IonIcon,
   IonRange,
 } from "@ionic/react";
 import { Category } from "@dto/Category";
@@ -174,7 +172,7 @@ const ReviewCardFilterModal: React.FC<FilterModalProps> = ({
                     className={`size-23 rounded-2xl flex items-center justify-center ${
                       parent?.id === cat.id ? "selected" : ""
                     }`}
-                    style={{ backgroundColor: cat.color }}
+                    style={{ backgroundColor: CategoryColors[cat.color] }}
                   >
                     <FontAwesomeIcon icon={cat.icon as IconName} className="fa-xl"/>
                   </div>
