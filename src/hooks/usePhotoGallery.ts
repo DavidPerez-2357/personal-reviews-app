@@ -40,14 +40,11 @@ export function usePhotoGallery() {
     });
 
     const fileName = Date.now() + '.jpeg';
-    const newPhotos = [
-      {
-        filepath: fileName,
-        webviewPath: photo.webPath,
-      },
-      ...photos,
-    ];
-    setPhotos(newPhotos);
+ 
+    return {
+      filepath: fileName,
+      webviewPath: photo.webPath,
+    }
   };
 
   const deletePhoto = async (photo: UserPhoto) => {
@@ -73,14 +70,10 @@ export function usePhotoGallery() {
 
     const fileName = Date.now() + '.jpeg';
 
-    const newPhotos = [
-      {
-        filepath: fileName,
-        webviewPath: photo.webPath,
-      },
-      ...photos,
-    ];
-    setPhotos(newPhotos);
+    return {
+      filepath: fileName,
+      webviewPath: photo.webPath,
+    };
   }
 
   return {
