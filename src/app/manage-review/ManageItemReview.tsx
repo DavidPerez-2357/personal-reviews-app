@@ -1,5 +1,6 @@
 import { Camera, Images, InfoIcon } from "lucide-react";
 import {
+  IonAlert,
   IonBackButton,
   IonButton,
   IonContent,
@@ -26,7 +27,7 @@ import SubcategoriesBadgeSelector from "@/app/manage-review/components/Subcatego
 import { CategoryColors } from "@shared/enums/colors";
 import { useTranslation } from "react-i18next";
 import { Review } from "@dto/review/Review";
-import { deleteReviewImages, getReviewById, getReviewImages, getReviewImagesbyId, getReviews, insertReview, insertReviewImage, updateReview } from "@shared/services/review-service";
+import { deleteReview, deleteReviewImages, getReviewById, getReviewImages, getReviewImagesbyId, getReviews, insertReview, insertReviewImage, updateReview } from "@shared/services/review-service";
 import { CategoryRatingValue } from "@shared/dto/category/CategoryRatingValue";
 import { useHistory, useParams } from "react-router-dom";
 import ItemSelector from "./components/ItemSelector";
@@ -37,7 +38,7 @@ import { UserPhoto } from "@/shared/dto/Photo";
 
 
 const ManageItemReview = () => {
-  const { photos, setPhotos, takePhoto, importPhoto } = usePhotoGallery();
+  const { photos, savedPhotos, setPhotos, setSavedPhotos, takePhoto, importPhoto, savePhoto, deletePhoto } = usePhotoGallery();
   const { id } = useParams<{ id: string }>();
   const history = useHistory();
   const { t } = useTranslation();
@@ -49,7 +50,7 @@ const ManageItemReview = () => {
   const modal = useRef<HTMLIonModalElement>(null);
 
   // Variables del boton de guardar reseña
-  const [saveButtonText, setSaveButtonText] = useState(t("manage-item-review.create-review"));
+  const [saveButtonText, setSaveButtonText] = useState('');
   const [isButtonDisabled, setIsButtonDisabled] = useState(false);
 
   // Variables de previsualizacion de fotos
@@ -64,9 +65,10 @@ const ManageItemReview = () => {
     setIsPreviewOpen(true);
   };
 
-  // Error
+  // Alerts
   const [errorAlert, setErrorAlert] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
+  const [isDeleteAlertOpen, setIsDeleteAlertOpen] = useState(false);
 
   // Variables del fomulario
   const editMode = id !== undefined;
@@ -126,6 +128,7 @@ const ManageItemReview = () => {
       webviewPath: image.image,
     }));
     setPhotos(photosConverted);
+    setSavedPhotos(photosConverted);
 
     // Mix the category ratings with the review ratings
     const categoryRatingsConverted: CategoryRatingMix[] = categoryRatingsFound.map((categoryRatingValue) => {
@@ -136,15 +139,32 @@ const ManageItemReview = () => {
         value: categoryRatingValue.value,
       };
     });
+    
+    setCategoryRatings(categoryRatingsConverted);
+
+    if (category.parent_id) {
+      setSelectedSubcategory(category);
+    }
   }
 
   useEffect(() => {
       if (editMode) {
         setSaveButtonText(t('common.save-changes'));
         const reviewId = parseInt(id);
+        
         setEditData(reviewId).catch((error) => {
           history.push("/app/reviews", { toast: t('manage-item-review.error-message.review-not-found') });
         });
+      }else {
+        setSaveButtonText(t('manage-item-review.create-review'));
+        setSelectedOption(null);
+        setItemName("");
+        setRating(0);
+        setComment("");
+        setPhotos([]);
+        setSavedPhotos([]);
+        setSelectedSubcategory(null);
+        setParentCategory(null);
       }
   }, [id, editMode]);
 
@@ -341,6 +361,20 @@ const ManageItemReview = () => {
       }
 
       for (const photo of photos) {
+        // Guardar la foto en el sistema de archivos
+        if (savedPhotos.find((p) => p.filepath === photo.filepath)) continue; // Si la foto ya está guardada, no la guardamos de nuevo
+
+        const savedPhoto = await savePhoto(photo);
+        if (!savedPhoto) throw new Error(t('manage-item-review.error-message.error-saving-review-images'));
+      }
+
+      for (const photo of savedPhotos) {
+        // Si la foto no esta en photos, la eliminamos
+        if (!photos.find((p) => p.filepath === photo.filepath)) {
+          await deletePhoto(photo); // Eliminar la foto del sistema de archivos
+          continue;
+        }
+
         const reviewImage: ReviewImage = {
           review_id: reviewId,
           image: photo.webviewPath!,
@@ -394,10 +428,46 @@ const ManageItemReview = () => {
     setIsButtonDisabled(false);
 
     setTimeout(() => {
-      setSaveButtonText(t('manage-item-review.create-review'));
       history.push('/app/reviews', { toast: t('manage-item-review.saving-review-success') });
-    }, 2000);
+    }, 1000);
   };
+
+  const handleDeletePhoto = async (photo: UserPhoto) => {
+    handlePreviewClose();
+    setPhotos(photos.filter((p) => p.filepath !== photo.filepath));
+  }
+
+  const handleReplacePhoto = async (photo: UserPhoto) => {
+    handlePreviewClose();
+    const newPhoto = await takePhoto(); // Save the new photo to the filesystem
+    if (!newPhoto) return;
+    setPhotos(photos.map((p) => (p.filepath === photo.filepath ? newPhoto : p)));
+  }
+
+  const handleDeleteReview = async () => {
+    if (!editMode) return;
+    setIsButtonDisabled(true);
+    setSaveButtonText(t('manage-item-review.deleting-review'));
+
+    const reviewId = parseInt(id);
+    const success = await deleteReview(reviewId);
+    if (!success) {
+      setIsButtonDisabled(false);
+      setSaveButtonText(t('manage-item-review.delete-review'));
+      showError(t('manage-item-review.error-message.error-deleting-review'));
+      return;
+    }
+
+    // Delete review images from filesystem
+    for (const photo of savedPhotos) {
+      await deletePhoto(photo); // Delete the photo from the filesystem
+    }
+
+    setSaveButtonText(t('manage-item-review.deleting-review-success'));
+    setTimeout(() => {
+      history.push('/app/reviews', { toast: t('manage-item-review.deleting-review-success') });
+    }, 1000);
+  }
 
   return (
     <IonPage>
@@ -477,11 +547,11 @@ const ManageItemReview = () => {
                 <IonLabel className="section-title">{t("common.images")}</IonLabel>
 
                 <div className={`gap-x-3 gap-y-6 w-full grid grid-cols-[repeat(auto-fit,minmax(100px,max-content))] items-center`}>
-                  <div className="w-25 h-25 rounded-lg bg-[var(--ion-color-secondary)] flex items-center justify-center" onClick={takePhoto}>
+                  <div className="w-25 h-25 rounded-lg bg-[var(--ion-color-secondary)] flex items-center justify-center" onClick={async () => {setPhotos(photos.concat(await takePhoto()));}}>
                     <Camera size={40} />
                   </div>
 
-                  <div className="w-25 h-25 rounded-lg bg-[var(--ion-color-secondary)] flex items-center justify-center" onClick={importPhoto}>
+                  <div className="w-25 h-25 rounded-lg bg-[var(--ion-color-secondary)] flex items-center justify-center" onClick={async () => {setPhotos(photos.concat(await importPhoto()));}}>
                     <Images size={40} />
                   </div>
 
@@ -501,6 +571,14 @@ const ManageItemReview = () => {
               id="save-review" color="tertiary" expand="full" disabled={isButtonDisabled} onClick={handleSaveReview}>
                 {saveButtonText}
               </IonButton>
+
+              // Delte de la reseña
+              {editMode && (
+                <IonButton className={`z-[1000] bottom-0 right-0 right-0 mt-10 mb-5 ml-5 mr-5`}
+                id="delete-review" color="danger" expand="full" onClick={() => setIsDeleteAlertOpen(true)}>
+                  {t('manage-item-review.delete-review')}
+                </IonButton>
+              )}
             </IonGrid>
 
           </IonRow>
@@ -512,6 +590,9 @@ const ManageItemReview = () => {
         photoUrl={previewPhoto!}
         isOpen={isPreviewOpen}
         onClose={handlePreviewClose}
+        showActions={true}
+        onReplace={() => handleReplacePhoto(photos.find((p) => p.webviewPath === previewPhoto!)!)} // Pass the photo to replace
+        onDelete={() => handleDeletePhoto(photos.find((p) => p.webviewPath === previewPhoto!)!)} // Pass the photo to delete
       />
       <ErrorAlert
         title={t("common.error")}
@@ -520,6 +601,31 @@ const ManageItemReview = () => {
         setIsOpen={() => {}}
         buttons={[t("common.ok")]}
         onDidDismiss={() => setIsButtonDisabled(false)}
+      />
+
+      // Alert de seguro de eliminar reseña
+      <IonAlert
+        isOpen={isDeleteAlertOpen}
+        onDidDismiss={() => setIsDeleteAlertOpen(false)}
+        header={t("common.delete")}
+        message={t("manage-item-review.delete-review-confirmation")}
+        buttons={[
+          {
+            text: t("common.cancel"),
+            role: "cancel",
+            cssClass: "secondary",
+            handler: () => {
+              setErrorAlert(false);
+            },
+          },
+          {
+            text: t("common.delete"),
+            cssClass: "danger",
+            handler: () => {
+              handleDeleteReview();
+            },
+          },
+        ]}
       />
     </IonPage>
   );

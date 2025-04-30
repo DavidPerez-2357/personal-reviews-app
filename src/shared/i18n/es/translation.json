@@ -15,6 +15,7 @@
         "less": "Menos",
         "save-changes": "Guardar cambios",
         "delete": "Eliminar",
+        "replace": "Reemplazar",
 
         "preview": "Vista previa",
 
@@ -42,6 +43,10 @@
         "used-item-exists": "El elemento que estás usando existe",
         "item-input-placeholder": "Agregar o seleccionar uno existente",
         "comment-input-placeholder": "Escribe lo que te gustaría recordar...",
+        "delete-review": "Eliminar reseña",
+        "delete-review-confirm": "¿Estás seguro de que deseas eliminar esta reseña?",
+        "delete-review-success": "Reseña eliminada con éxito",
+        "deleting-review": "Eliminando reseña",
 
         "error-message": {
             "empty-title": "El título no puede estar vacío",
@@ -57,7 +62,8 @@
             "item-not-found": "Elemento no encontrado",
             "category-not-found": "Categoría no encontrada",
             "category-ratings-not-found": "Calificaciones de categoría no encontradas",
-            "review-images-not-found": "Imágenes de reseña no encontradas"
+            "review-images-not-found": "Imágenes de reseña no encontradas",
+            "error-deleting-review": "Error al eliminar la reseña"
         }
     }
 }
