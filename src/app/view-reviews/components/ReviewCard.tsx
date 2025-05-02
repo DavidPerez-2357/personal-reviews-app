@@ -1,11 +1,12 @@
 import { useState } from "react";
 import { Ham, SquarePen, Star } from "lucide-react";
 import { IonButton, IonCard } from "@ionic/react";
-import { ReviewFull} from "@dto/Review";
+import { ReviewFull } from "@dto/Review";
 import "../styles/reviewPage.css";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { IconName } from "@fortawesome/fontawesome-svg-core";
 import PreviewPhotoModal from "@/shared/components/PreviewPhotoModal";
+import StarRating from "@/shared/components/StarRating";
 
 const ReviewCard = ({ review }: { review: ReviewFull }) => {
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -14,15 +15,15 @@ const ReviewCard = ({ review }: { review: ReviewFull }) => {
   const handleImageClick = (image: string) => {
     setSelectedImageUrl(image);
     setIsModalOpen(true);
-  }
+  };
 
   return (
     <div className="flex flex-col gap-3 border-2 border-[var(--ion-color-secondary)] rounded-md p-2">
       <IonCard className="pb-4 pt-2">
         <div className="flex flex-col px-3 gap-4">
-            <div className="grid grid-cols-[1fr_auto] items-center">
+          <div className="grid grid-cols-[1fr_auto] items-center">
             <div className="flex flex-row items-center gap-3">
-            <FontAwesomeIcon icon={review.icon as IconName} className="fa-xl"/>
+              <FontAwesomeIcon icon={review.icon as IconName} className="fa-xl" />
               <span className="font-semibold text-md">{review.item}</span>
             </div>
             <IonButton
@@ -34,30 +35,31 @@ const ReviewCard = ({ review }: { review: ReviewFull }) => {
             </IonButton>
           </div>
 
-            {review.images.length > 0 && (
+          {review.images.length > 0 && (
             <div className="flex flex-row gap-2 overflow-x-auto">
               {review.images.map((image, index) => (
-              <img
-                key={index}
-                src={image}
-                alt={`Review image ${index + 1}`}
-                className="size-20 object-cover rounded-md border border-[var(--ion-color-secondary)]"
-                onClick={() => {handleImageClick(image)}}
-              />
+                <img
+                  key={index}
+                  src={image}
+                  alt={`Review image ${index + 1}`}
+                  className="size-20 object-cover rounded-md border border-[var(--ion-color-secondary)]"
+                  onClick={() => {
+                    handleImageClick(image);
+                  }}
+                />
               ))}
             </div>
-            )}
+          )}
 
           <div className="flex flex-col gap-3">
             <div className="flex flex-row gap-1">
-              {[...Array(5)].map((_, index) => (
-                <Star
-                  key={index}
-                  fill={index < review.rating ? "var(--ion-color-primary)" : "var(--ion-color-secondary)"}
-                  strokeWidth={0}
-                  size={35}
-                ></Star>
-              ))}
+              <StarRating
+                size={35}
+                rating={review.rating}
+                setRating={() => {}}
+                canEdit={false}
+                classes="pointer-events-none"
+              />
             </div>
             <span className="text-base">{review.comment}</span>
           </div>
