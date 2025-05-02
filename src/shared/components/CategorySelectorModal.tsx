@@ -54,7 +54,7 @@ const CategorySelectorModal = ({ modal, selectedCategory, setSelectedCategory }:
                     <IonTitle className="ion-padding text-2xl text-start font-bold">{t('common.select-category')}</IonTitle>
                 </IonToolbar>
             </IonHeader>
-            <IonContent className="ion-padding safe-area-bottom overflow-y-auto">
+            <IonContent className="ion-padding safe-area-bottom overflow-y-scroll">
                 <div className="grid gap-x-4 gap-y-8 grid-cols-[repeat(auto-fit,minmax(6.25rem,1fr))] justify-center items-center justify-items-center">
                     {categories.map((category) => (
                         <div key={category.id} className={`flex flex-col w-23 items-center gap-2 justify-center`} onClick={() => {
