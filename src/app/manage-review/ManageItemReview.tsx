@@ -12,7 +12,7 @@ import {
 } from "@ionic/react";
 import StarRating from "@components/StarRating";
 import { useEffect, useRef, useState } from "react";
-import "@styles/ManageItemReview.css";
+import "./styles/ManageItemReview.css";
 import { usePhotoGallery } from "@hooks/usePhotoGallery";
 import { Item, ItemOption } from "@dto/item/Item";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
@@ -54,24 +54,24 @@ const ManageItemReview = () => {
   const [isButtonDisabled, setIsButtonDisabled] = useState(false);
 
   // Variables de previsualizacion de fotos
-  const [previewPhoto, setPreviewPhoto] = useState<string | null>(null);
+  const [previewPhoto, setPreviewPhoto] = useState<UserPhoto | null>(null);
   const [isPreviewOpen, setIsPreviewOpen] = useState(false);
   const handlePreviewClose = () => {
     setIsPreviewOpen(false);
     setPreviewPhoto(null);
   };
-  const handlePreviewOpen = (photo: string) => {
+  const handlePreviewOpen = (photo: UserPhoto) => {
     setPreviewPhoto(photo);
     setIsPreviewOpen(true);
   };
 
   // Alerts
-  const [errorAlert, setErrorAlert] = useState(false);
+  const [showErrorAlert, setShowErrorAlert] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
   const [isDeleteAlertOpen, setIsDeleteAlertOpen] = useState(false);
 
   // Variables del fomulario
-  const editMode = id !== undefined;
+  const editMode = id !== "0" && id !== undefined;
   const [parentCategory, setParentCategory] = useState<Category | null>(null);
   const [childrenCategories, setChildrenCategories] = useState<Category[]>([]);
   const [selectedSubcategory, setSelectedSubcategory] = useState<Category | null>(null);
@@ -285,7 +285,7 @@ const ManageItemReview = () => {
 
   const showError = (message: string) => {
     setErrorMessage(message);
-    setErrorAlert(true);
+    setShowErrorAlert(true);
   }
 
   /** Guarda un nuevo ítem o actualiza uno existente */
@@ -463,9 +463,9 @@ const ManageItemReview = () => {
       await deletePhoto(photo); // Delete the photo from the filesystem
     }
 
-    setSaveButtonText(t('manage-item-review.deleting-review-success'));
+    setSaveButtonText(t('manage-item-review.delete-review-success'));
     setTimeout(() => {
-      history.push('/app/reviews', { toast: t('manage-item-review.deleting-review-success') });
+      history.push('/app/reviews', { toast: t('manage-item-review.delete-review-success') });
     }, 1000);
   }
 
@@ -498,9 +498,6 @@ const ManageItemReview = () => {
           <IonRow className="px-5 pb-10">
             <IonGrid>
               <IonRow className="pt-6 pb-6 gap-5 w-full">
-                {/* <IonInput fill="solid" id="item-name" placeholder="Nombre del elemento..." /> */}
-                {/* <IonButton color="tertiary" className="secondary" id="item-button-exists">¿Existe?</IonButton> */}
-
                 <ItemSelector selectedOption={selectedOption} setSelectedOption={setSelectedOption} itemName={itemName} setItemName={setItemName} />
 
                 {selectedOption != null && (
@@ -561,7 +558,7 @@ const ManageItemReview = () => {
                       src={photo.webviewPath}
                       alt={`Image ${index + 1}`}
                       className="size-25 rounded-lg object-cover"
-                      onClick={() => handlePreviewOpen(photo.webviewPath!)} // Open preview on click
+                      onClick={() => handlePreviewOpen(photo)} // Open preview on click
                     />
                   ))}
                 </div>
@@ -572,10 +569,9 @@ const ManageItemReview = () => {
                 {saveButtonText}
               </IonButton>
 
-              // Delte de la reseña
               {editMode && (
-                <IonButton className={`z-[1000] bottom-0 right-0 right-0 mt-10 mb-5 ml-5 mr-5`}
-                id="delete-review" color="danger" expand="full" onClick={() => setIsDeleteAlertOpen(true)}>
+                <IonButton
+                id="delete-review" color="danger" expand="full" className=" ml-5 mr-5" onClick={() => setIsDeleteAlertOpen(true)}>
                   {t('manage-item-review.delete-review')}
                 </IonButton>
               )}
@@ -587,35 +583,34 @@ const ManageItemReview = () => {
 
       <CategorySelectorModal modal={modal} selectedCategory={parentCategory} setSelectedCategory={setParentCategory} />
       <PreviewPhotoModal
-        photoUrl={previewPhoto!}
+        photoUrl={previewPhoto?.webviewPath!}
         isOpen={isPreviewOpen}
         onClose={handlePreviewClose}
         showActions={true}
-        onReplace={() => handleReplacePhoto(photos.find((p) => p.webviewPath === previewPhoto!)!)} // Pass the photo to replace
-        onDelete={() => handleDeletePhoto(photos.find((p) => p.webviewPath === previewPhoto!)!)} // Pass the photo to delete
+        onReplace={() => handleReplacePhoto(previewPhoto!)} // Pass the photo to replace
+        onDelete={() => handleDeletePhoto(previewPhoto!)} // Pass the photo to delete
       />
       <ErrorAlert
         title={t("common.error")}
         message={errorMessage}
-        isOpen={errorAlert}
-        setIsOpen={() => {}}
+        isOpen={showErrorAlert}
+        setIsOpen={setShowErrorAlert}
         buttons={[t("common.ok")]}
         onDidDismiss={() => setIsButtonDisabled(false)}
       />
 
-      // Alert de seguro de eliminar reseña
       <IonAlert
         isOpen={isDeleteAlertOpen}
         onDidDismiss={() => setIsDeleteAlertOpen(false)}
         header={t("common.delete")}
-        message={t("manage-item-review.delete-review-confirmation")}
+        message={t("manage-item-review.delete-review-confirm")}
         buttons={[
           {
             text: t("common.cancel"),
             role: "cancel",
             cssClass: "secondary",
             handler: () => {
-              setErrorAlert(false);
+              setShowErrorAlert(false);
             },
           },
           {
