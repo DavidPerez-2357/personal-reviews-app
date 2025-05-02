@@ -44,7 +44,7 @@ const ReviewFilterModal: React.FC<FilterModalProps> = ({
   const [allCategories, setAllCategories] = useState<Category[]>([]);
   const [selectedCategory, setSelectedCategory] = useState<Category | null>(null);
   const [subcategoryMode, setSubcategoryMode] = useState<SubcatMode>("auto");
-  const [specificSubs, setSpecificSubs] = useState<Category[]>([]);
+  const [selectedCategories, setSelectedCategories] = useState<Category[]>([]);
 
   const { t } = useTranslation();
 
@@ -69,12 +69,12 @@ const ReviewFilterModal: React.FC<FilterModalProps> = ({
   const handleSelectParent = (cat: Category | null) => {
     setSelectedCategory(cat);
     setSubcategoryMode("auto");
-    setSpecificSubs([]);
+    setSelectedCategories([]);
   };
 
   // Handle subcategory selection
   const handleSelectSub = (subcategory: Category) => {
-    setSpecificSubs([subcategory]);
+    setSelectedCategories([subcategory]);
     setSubcategoryMode("specific");
   };
 
@@ -121,7 +121,7 @@ const ReviewFilterModal: React.FC<FilterModalProps> = ({
   
       case "specific":
         // Caso 4: subcategorías específicas
-        return specificSubs.map((subcategory) => subcategory.name);
+        return selectedCategories.map((subcategory) => subcategory.name);
   
       default:
         // Si el modo no es reconocido, devolver solo la categoría padre como fallback seguro
@@ -140,7 +140,7 @@ const ReviewFilterModal: React.FC<FilterModalProps> = ({
     setRating(resetFilters.rating);
     setSelectedCategory(null);
     setSubcategoryMode("auto");
-    setSpecificSubs([]);
+    setSelectedCategories([]);
     applyFilters(resetFilters);
     onDismiss();
   };
@@ -255,7 +255,7 @@ const ReviewFilterModal: React.FC<FilterModalProps> = ({
               >
                 <div
                   className={`size-23 rounded-2xl flex items-center justify-center ${
-                    subcategoryMode === "specific" && specificSubs[0]?.id === subcategory.id
+                    subcategoryMode === "specific" && selectedCategories[0]?.id === subcategory.id
                       ? "selected"
                       : ""
                   }`}
