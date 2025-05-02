@@ -13,6 +13,7 @@
         "close": "Close",
         "more": "More",
         "less": "Less",
+        "all": "All",
         "save-changes": "Save changes",
         "delete": "Delete",
         "replace": "Replace",
@@ -66,5 +67,19 @@
             "review-images-not-found": "Review images not found",
             "error-deleting-review": "Error deleting review"
         }
+    },
+
+    "review-page": {
+        "search": "Search",
+        "search-placeholder": "Search reviews...",
+        "add-review": "Create a new review",
+        "load-more": "See more reviews",
+        "filter": "Filter",
+        "all": "All",
+        "none": "None",
+        "rating": "Rating",
+        "reset": "Reset",
+        "apply": "Apply",
+        "no-reviews": "No reviews available"
     }
 }

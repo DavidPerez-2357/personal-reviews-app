@@ -13,6 +13,7 @@
         "close": "Cerrar",
         "more": "Más",
         "less": "Menos",
+        "all": "Todos",
         "save-changes": "Guardar cambios",
         "delete": "Eliminar",
         "replace": "Reemplazar",
@@ -65,5 +66,18 @@
             "review-images-not-found": "Imágenes de reseña no encontradas",
             "error-deleting-review": "Error al eliminar la reseña"
         }
+    },
+
+    "review-page": {
+        "search": "Buscar",
+        "search-placeholder": "Buscar reseñas...",
+        "add-review": "Crear una nueva reseña",
+        "load-more": "Ver más reseñas",
+        "filter": "Filtrar",
+        "none": "Ninguno",
+        "rating": "Calificación",
+        "reset": "Reiniciar",
+        "apply": "Aplicar",
+        "no-reviews": "No hay reseñas disponibles"
     }
 }

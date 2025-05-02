@@ -1,4 +1,5 @@
-import { Category } from '@/shared/dto/category/Category';
+import { Category } from "@dto/Category"
+
 
 export const CategoryColors: Record<Category['color'], string> = {
     'red': '#B50003',

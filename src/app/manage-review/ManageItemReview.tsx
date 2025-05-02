@@ -14,16 +14,13 @@ import StarRating from "@components/StarRating";
 import { useEffect, useRef, useState } from "react";
 import "@styles/ManageItemReview.css";
 import { usePhotoGallery } from "@hooks/usePhotoGallery";
-import { Item, ItemOption } from "@dto/item/Item";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { getItemById, insertItem, updateItem } from "@services/item-service";
 import { IconName } from "@fortawesome/fontawesome-svg-core";
 import { deleteRatingValuesFromReview, getCategoryById, getCategoryRatingsByCategoryId, getCategoryRatingValues, getCategoryRatingValuesByReviewId, getChildrenCategories, getParentCategory, insertCategoryRatingValue } from "@services/category-service";
-import { Category } from "@dto/category/Category";
 import CategorySelectorModal from "@components/CategorySelectorModal";
-import { CategoryRating, CategoryRatingMix } from "@dto/category/CategoryRating";
 import PreviewPhotoModal from "@components/PreviewPhotoModal";
-import SubcategoriesBadgeSelector from "@/app/manage-review/components/SubcategoriesBadgeSelector";
+import SubcategoriesBadgeSelector from "./components/SubcategoriesBadgeSelector";
 import { CategoryColors } from "@shared/enums/colors";
 import { useTranslation } from "react-i18next";
 import { Review } from "@dto/review/Review";
@@ -33,8 +30,10 @@ import { useHistory, useParams } from "react-router-dom";
 import ItemSelector from "./components/ItemSelector";
 import CategoryRatingRange from "./components/CategoryRatingRange";
 import ErrorAlert from "@/shared/components/ErrorAlert";
-import { ReviewImage } from "@/shared/dto/review/ReviewImage";
 import { UserPhoto } from "@/shared/dto/Photo";
+import { Category, CategoryRating, CategoryRatingMix, CategoryRatingValue } from "@/shared/dto/Category";
+import { Item, ItemOption } from "@/shared/dto/Item";
+import { Review, ReviewImage } from "@/shared/dto/Review";
 
 
 const ManageItemReview = () => {

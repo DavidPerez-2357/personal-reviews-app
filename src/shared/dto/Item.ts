@@ -12,3 +12,8 @@ export interface ItemOption {
     parent_category_id: number | null;
     parent_category_icon: string;
 }
+
+export interface Origin {
+    origin_id: number;
+    item_id: number;
+}

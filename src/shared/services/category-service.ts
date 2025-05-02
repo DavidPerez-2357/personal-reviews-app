@@ -1,8 +1,6 @@
-import { Category } from '@/shared/dto/category/Category';
 import { db } from "@/database-service";
 import { checkDB } from "@/database-service";
-import {CategoryRating} from "@/shared/dto/category/CategoryRating";
-import {CategoryRatingValue} from "@/shared/dto/category/CategoryRatingValue";
+import { Category, CategoryRating, CategoryRatingValue } from "@dto/Category";
 
 /**
  * Obtiene todas las categorías de la base de datos.
@@ -178,17 +176,36 @@ export const insertTestCategories = async (): Promise<string> => {
     try {
         const existingCategories = await getCategories();
         if (existingCategories.length > 0) {
-            return "✅ La base de datos ya contiene categorías.";
+            console.log("✅ La base de datos ya contiene categorías.");
         }
 
         const categories: Category[] = [
-            { id: 1, name: "Electrónica", type: 1, color: "red", icon: "star", parent_id: null },
-            { id: 2, name: "Ropa", type: 2, color: "green", icon: "heart", parent_id: null },
-            { id: 3, name: "Hogar", type: 3, color: "turquoise", icon: "poo", parent_id: 1 }
+          { id: 1, name: "Electrónica", type: 1, color: "red", icon: "computer", parent_id: null },
+          { id: 2, name: "Ropa", type: 2, color: "green", icon: "shirt", parent_id: null},
+          { id: 3, name: "Hogar", type: 3, color: "blue", icon: "house", parent_id: null},
+          { id: 4, name: "Juguetes", type: 4, color: "yellow", icon: "chess-knight", parent_id: null},
+          { id: 5, name: "Deportes", type: 5, color: "gray", icon: "football", parent_id: null},
+          { id: 6, name: "Libros", type: 6, color: "darkgray", icon: "book", parent_id: null},
+          { id: 7, name: "Salud", type: 7, color: "turquoise", icon: "staff-snake", parent_id: null},
+          { id: 8, name: "Belleza", type: 8, color: "purple", icon: "bath", parent_id: null},
+          { id: 9, name: "Automóviles", type: 9, color: "red", icon: "car", parent_id: null},
+          { id: 10, name: "Oficina", type: 10, color: "darkgray", icon: "file", parent_id: null},
+          // Subcategorías
+          { id: 11, name: "Smartphones", type: 1, color: "darkgray", icon: "mobile", parent_id: 1},
+          { id: 12, name: "Portátiles", type: 1, color: "purple", icon: "laptop", parent_id: 1},
+          { id: 13, name: "Zapatillas", type: 2, color: "green", icon: "shoe-prints", parent_id: 2},
+          { id: 14, name: "Vestidos", type: 2, color: "red", icon: "person-dress", parent_id: 2},
+          { id: 15, name: "Muebles", type: 3, color: "turquoise", icon: "couch", parent_id: 3},
+          { id: 16, name: "Cocina", type: 3, color: "red", icon: "kitchen-set", parent_id: 3},
+          { id: 17, name: "Libros Infantiles", type: 6, color: "purple", icon: "book-skull", parent_id: 6},
+          { id: 18, name: "Maquillaje", type: 8, color: "green", icon: "soap", parent_id: 8},
+          { id: 19, name: "Suplementos", type: 7, color: "blue", icon: "prescription-bottle", parent_id: 7},
+          { id: 20, name: "Sillas", type: 3, color: "yellow", icon: "chair", parent_id: 3},
         ];
 
         const insertPromises = categories.map((category) => insertCategory(category));
         await Promise.all(insertPromises);
+        console.log("✅ Categorías de prueba insertadas correctamente.");
         return "✅ Categorías de prueba insertadas correctamente.";
     } catch (error) {
         console.error("❌ Error al insertar categorías de prueba");
