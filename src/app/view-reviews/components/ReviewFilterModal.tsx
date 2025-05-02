@@ -20,7 +20,7 @@ import { getCategories } from "@/shared/services/category-service";
 interface FilterModalProps {
   isOpen: boolean;
   onDismiss: () => void;
-  onApply: (filters: {
+  applyFilters: (filters: {
     rating?: { minRating: number; maxRating: number };
     category?: string[] | null;
   }) => void;
@@ -31,7 +31,7 @@ type SubcatMode = "auto" | "all" | "none" | "specific";
 const ReviewFilterModal: React.FC<FilterModalProps> = ({
   isOpen,
   onDismiss,
-  onApply,
+  applyFilters: applyFilters,
 }) => {
   // Refs
   const modal = useRef<HTMLIonModalElement>(null);
@@ -42,8 +42,8 @@ const ReviewFilterModal: React.FC<FilterModalProps> = ({
   >({ minRating: 0, maxRating: 5 });
   // Categories state
   const [allCategories, setAllCategories] = useState<Category[]>([]);
-  const [parent, setParent] = useState<Category | null>(null);
-  const [subcatMode, setSubcatMode] = useState<SubcatMode>("auto");
+  const [selectedCategory, setSelectedCategory] = useState<Category | null>(null);
+  const [subcategoryMode, setSubcategoryMode] = useState<SubcatMode>("auto");
   const [specificSubs, setSpecificSubs] = useState<Category[]>([]);
 
   const { t } = useTranslation();
@@ -51,8 +51,8 @@ const ReviewFilterModal: React.FC<FilterModalProps> = ({
   useEffect(() => {
     const fetchCategories = async () => {
       try {
-        const cats = await getCategories();
-        setAllCategories(cats);
+        const categories = await getCategories();
+        setAllCategories(categories);
       } catch (err) {
         console.error("Error fetching categories:", err);
       }
@@ -61,76 +61,87 @@ const ReviewFilterModal: React.FC<FilterModalProps> = ({
   }, []);
 
     // Handle parent category selection
-    const childList = parent
-    ? allCategories.filter((c) => c.parent_id === parent.id)
+    const filteredChildCategories = selectedCategory
+    ? allCategories.filter((c) => c.parent_id === selectedCategory.id)
     : [];
 
   // Close modal when it is dismissed
   const handleSelectParent = (cat: Category | null) => {
-    setParent(cat);
-    setSubcatMode("auto");
+    setSelectedCategory(cat);
+    setSubcategoryMode("auto");
     setSpecificSubs([]);
   };
 
   // Handle subcategory selection
-  const handleSelectSub = (sub: Category) => {
-    setSpecificSubs([sub]);
-    setSubcatMode("specific");
+  const handleSelectSub = (subcategory: Category) => {
+    setSpecificSubs([subcategory]);
+    setSubcategoryMode("specific");
   };
 
-  // Handle apply button click
-  const handleApply = () => {
-    let categoryFilter: string[] | null;
-
-    if (!parent) {
-      // Case 2: no parent selected
-      categoryFilter = null;
-      return;
-    }
-    const children = childList;
-    if (children.length === 0) {
-      // Case 1: parent with no children
-      categoryFilter = [parent.name];
-      return;
-    } 
-    switch (subcatMode) {
-      case "auto":
-        // Case 3: parent + automatic subcategories
-        categoryFilter = [parent.name, ...children.map((c) => c.name)];
-        break;
-      case "all":
-        // Case 5: parent + all subcategories
-        categoryFilter = [parent.name, ...children.map((c) => c.name)];
-        break;
-      case "none":
-        // Case 6: parent + no subcategories
-        categoryFilter = [parent.name];
-        break;
-      case "specific":
-        // Case 4: parent + specific subcategories
-        categoryFilter = specificSubs.map((c) => c.name);
-        break;
-    }
-
-    onApply({
+  const handleApplyFilter = () => {
+    // Determinar las categorías seleccionadas
+    const selectedCategories = getSelectedCategories();
+  
+    // Aplicar los filtros con los valores seleccionados
+    applyFilters({
       rating: ratingFilter,
-      category: categoryFilter,
+      category: selectedCategories,
     });
+  
+    // Cerrar el modal o panel de filtros
     onDismiss();
   };
+  
+  /**
+   * Determina qué categorías deben aplicarse como filtro,
+   * según la selección del usuario y el modo de subcategorías.
+   */
+  const getSelectedCategories = (): string[] | null => {
+    if (!selectedCategory) {
+      // Caso 2: Sin categoría padre seleccionada
+      return null;
+    }
+  
+    const hasNoChildren = filteredChildCategories.length === 0;
+  
+    if (hasNoChildren) {
+      // Caso 1: Categoría padre sin subcategorías
+      return [selectedCategory.name];
+    }
+  
+    switch (subcategoryMode) {
+      case "auto":
+      case "all":
+        // Caso 3 y 5: incluir padre + todas las subcategorías
+        return [selectedCategory.name, ...filteredChildCategories.map((child) => child.name)];
+  
+      case "none":
+        // Caso 6: solo la categoría padre
+        return [selectedCategory.name];
+  
+      case "specific":
+        // Caso 4: subcategorías específicas
+        return specificSubs.map((subcategory) => subcategory.name);
+  
+      default:
+        // Si el modo no es reconocido, devolver solo la categoría padre como fallback seguro
+        console.warn(`Modo de subcategoría no reconocido: ${subcategoryMode}`);
+        return [selectedCategory.name];
+    }
+  };  
 
   // Handle reset button click
-  const handleReset = () => {
+  const handleResetFilter = () => {
     const resetFilters = {
       rating: { minRating: 0, maxRating: 5 },
       category: null,
     };
 
     setRating(resetFilters.rating);
-    setParent(null);
-    setSubcatMode("auto");
+    setSelectedCategory(null);
+    setSubcategoryMode("auto");
     setSpecificSubs([]);
-    onApply(resetFilters);
+    applyFilters(resetFilters);
     onDismiss();
   };
 
@@ -159,7 +170,7 @@ const ReviewFilterModal: React.FC<FilterModalProps> = ({
             >
               <div
                 className={`size-23 rounded-2xl flex items-center bg-[var(--ion-color-secondary)] justify-center ${
-                  !parent ? "selected" : ""
+                  !selectedCategory ? "selected" : ""
                 }`}
               >
                 <FontAwesomeIcon icon="boxes-stacked" className="fa-xl" />
@@ -176,7 +187,7 @@ const ReviewFilterModal: React.FC<FilterModalProps> = ({
                 >
                   <div
                     className={`size-23 rounded-2xl flex items-center justify-center ${
-                      parent?.id === cat.id ? "selected" : ""
+                      selectedCategory?.id === cat.id ? "selected" : ""
                     }`}
                     style={{ backgroundColor: CategoryColors[cat.color] }}
                   >
@@ -191,20 +202,20 @@ const ReviewFilterModal: React.FC<FilterModalProps> = ({
 
           <div
             className={`subcategories flex gap-x-4 items-center overflow-x-auto whitespace-nowrap pb-3 pt-2 ps-2 ${
-              childList.length > 0 ? "show" : ""
+              filteredChildCategories.length > 0 ? "show" : ""
             }`}
           >
-            {childList.length > 0 && (
+            {filteredChildCategories.length > 0 && (
               <>
                 <div
                   className="flex flex-col items-center gap-2 justify-center min-w-[5.5rem]"
-                  onClick={() => setSubcatMode("all")}
+                  onClick={() => setSubcategoryMode("all")}
                 >
                   <div
                     className={`size-23 rounded-2xl flex items-center justify-center ${
-                      (subcatMode === "all" ||
-                        (parent && subcatMode === "auto")) &&
-                      childList.length > 0
+                      (subcategoryMode === "all" ||
+                        (selectedCategory && subcategoryMode === "auto")) &&
+                      filteredChildCategories.length > 0
                         ? "selected"
                         : ""
                     }`}
@@ -219,11 +230,11 @@ const ReviewFilterModal: React.FC<FilterModalProps> = ({
 
                 <div
                   className="flex flex-col items-center gap-2 justify-center min-w-[5.5rem]"
-                  onClick={() => setSubcatMode("none")}
+                  onClick={() => setSubcategoryMode("none")}
                 >
                   <div
                     className={`size-23 rounded-2xl flex items-center justify-center ${
-                      subcatMode === "none" ? "selected" : ""
+                      subcategoryMode === "none" ? "selected" : ""
                     }`}
                     style={{ backgroundColor: "var(--ion-color-secondary)" }}
                   >
@@ -236,24 +247,24 @@ const ReviewFilterModal: React.FC<FilterModalProps> = ({
               </>
             )}
 
-            {childList.map((sub) => (
+            {filteredChildCategories.map((subcategory) => (
               <div
                 className="flex flex-col items-center gap-2 justify-center min-w-[5.5rem]"
-                key={sub.id}
-                onClick={() => handleSelectSub(sub)}
+                key={subcategory.id}
+                onClick={() => handleSelectSub(subcategory)}
               >
                 <div
                   className={`size-23 rounded-2xl flex items-center justify-center ${
-                    subcatMode === "specific" && specificSubs[0]?.id === sub.id
+                    subcategoryMode === "specific" && specificSubs[0]?.id === subcategory.id
                       ? "selected"
                       : ""
                   }`}
-                  style={{ backgroundColor: CategoryColors[sub.color] }}
+                  style={{ backgroundColor: CategoryColors[subcategory.color] }}
                 >
-                  <FontAwesomeIcon icon={sub.icon as IconName} className="fa-xl"/>
+                  <FontAwesomeIcon icon={subcategory.icon as IconName} className="fa-xl"/>
                 </div>
                 <IonLabel className="truncate max-w-full text-xs">
-                  {sub.name}
+                  {subcategory.name}
                 </IonLabel>
               </div>
             ))}
@@ -286,7 +297,7 @@ const ReviewFilterModal: React.FC<FilterModalProps> = ({
 
         <div className="flex justify-between mt-6 gap-4">
           <IonButton
-            onClick={handleReset}
+            onClick={handleResetFilter}
             color="secondary"
             expand="block"
             size="large"
@@ -295,7 +306,7 @@ const ReviewFilterModal: React.FC<FilterModalProps> = ({
             {t('review-page.reset')}
           </IonButton>
           <IonButton
-            onClick={handleApply}
+            onClick={handleApplyFilter}
             color="tertiary"
             expand="block"
             size="large"
