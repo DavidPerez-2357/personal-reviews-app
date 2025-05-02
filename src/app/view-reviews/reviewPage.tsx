@@ -19,12 +19,15 @@ import {
   Star,
 } from "lucide-react";
 import ReviewCard from "./components/ReviewCard";
-import { getReviewsCards } from "@services/review-service";
+import { getReviewsCards, insertTestReviews } from "@services/review-service";
 import { ReviewFull, ReviewImage } from "@dto/Review";
 import { useTranslation } from "react-i18next";
 import "./styles/reviewPage.css";
 import { useLocation, useHistory } from "react-router-dom"; // Import useLocation and useHistory
 import ReviewFilterModal from "./components/ReviewFilterModal";
+import { insertTestCategories } from "@/shared/services/category-service";
+import { insertTestItems } from "@/shared/services/item-service";
+import { resetAllAutoIncrement } from "@/database-service";
 
 export const ReviewPage: React.FC = () => {
 
@@ -39,11 +42,11 @@ export const ReviewPage: React.FC = () => {
   const [visibleReviewsCount, setVisibleReviewsCount] = useState(VISIBLE_REVIEWS_LIMIT);
 
   const [customFilters, setCustomFilters] = useState<{
-    rating?: { lower: number; upper: number };
+    rating?: { minRating: number; maxRating: number };
     category?: string[];
     keyword?: string;
   }>({
-    rating: { lower: 0, upper: 5 },
+    rating: { minRating: 0, maxRating: 5 },
     category: [],
     keyword: "",
   });
@@ -59,7 +62,6 @@ export const ReviewPage: React.FC = () => {
     async function initializeData() {
       try {
         const reviewsFromDB = await getReviewsCards();
-
         setReviews(reviewsFromDB);
       } catch (err) {
         console.error("Error initializing data:", err);
@@ -106,8 +108,8 @@ export const ReviewPage: React.FC = () => {
       // Filter for the modal: rating
       const modalRatingMatch =
         !customFilters.rating || // If there's no rating filter, pass
-        (rating >= customFilters.rating.lower && // Check the range
-          rating <= customFilters.rating.upper);
+        (rating >= customFilters.rating.minRating && // Check the range
+          rating <= customFilters.rating.maxRating);
 
       // Filter for the modal: category
       const modalCategoryMatch =
@@ -182,12 +184,12 @@ export const ReviewPage: React.FC = () => {
 
   // Function to apply filters from the modal
   const handleApplyFilters = (filters: {
-    rating?: { lower: number; upper: number };
+    rating?: { minRating: number; maxRating: number };
     category?: string[] | null;
   }) => {
     const isDefaultFilters =
       (!filters.rating ||
-        (filters.rating.lower === 0 && filters.rating.upper === 5)) &&
+        (filters.rating.minRating === 0 && filters.rating.maxRating === 5)) &&
       (!filters.category || filters.category.length === 0);
 
     setCustomFilters({
@@ -282,8 +284,8 @@ export const ReviewPage: React.FC = () => {
                     <IonButton
                       color={
                         (customFilters.rating &&
-                          (customFilters.rating.lower !== 0 ||
-                            customFilters.rating.upper !== 5)) ||
+                          (customFilters.rating.minRating !== 0 ||
+                            customFilters.rating.maxRating !== 5)) ||
                         (customFilters.category &&
                           customFilters.category.length > 0)
                           ? "tertiary"
@@ -296,8 +298,8 @@ export const ReviewPage: React.FC = () => {
                         size={20}
                         color={
                           (customFilters.rating &&
-                            (customFilters.rating.lower !== 0 ||
-                              customFilters.rating.upper !== 5)) || 
+                            (customFilters.rating.minRating !== 0 ||
+                              customFilters.rating.maxRating !== 5)) || 
                           (customFilters.category &&
                             customFilters.category.length > 0) 
                             ? "var(--ion-color-secondary)"
@@ -305,8 +307,8 @@ export const ReviewPage: React.FC = () => {
                         }
                         fill={
                           (customFilters.rating &&
-                            (customFilters.rating.lower !== 0 ||
-                              customFilters.rating.upper !== 5)) ||
+                            (customFilters.rating.minRating !== 0 ||
+                              customFilters.rating.maxRating !== 5)) ||
                           (customFilters.category &&
                             customFilters.category.length > 0)
                             ? "var(--ion-color-tertiary-contrast)"
@@ -330,8 +332,8 @@ export const ReviewPage: React.FC = () => {
                     <IonLabel>{t('review-page.no-reviews')}</IonLabel>
                   </div>
                 ) : sortOrder !== "none" ||
-                  customFilters.rating?.lower !== 0 ||
-                  customFilters.rating?.upper !== 5 ||
+                  customFilters.rating?.minRating !== 0 ||
+                  customFilters.rating?.maxRating !== 5 ||
                   customFilters.category?.length !== 0 ? (
                   // Display sorted or filtered reviews directly
                   visibleReviews.map((review) => (
@@ -381,7 +383,7 @@ export const ReviewPage: React.FC = () => {
         <ReviewFilterModal
           isOpen={isFilterModalOpen}
           onDismiss={() => setFilterModalOpen(false)}
-          onApply={handleApplyFilters}
+          applyFilters={handleApplyFilters}
         />
       </IonContent>
 
