@@ -46,13 +46,12 @@ const PreviewPhotoModal = ({
             </IonHeader>
             <IonContent className="max-h-full overflow-y-scroll">
                 {showActions && (
-                    <div className="flex justify-between gap-4 mb-4">
+                    <div className="flex justify-between gap-4 pb-10 pt-1 px-5">
                         <IonButton
                             onClick={onDelete}
                             color="danger"
                             expand="block"
-                            size="large"
-                            className="flex-1"
+                            className="flex-1 text-lg h-12"
                         >
                         {t('common.delete')}
                         </IonButton>
@@ -60,8 +59,7 @@ const PreviewPhotoModal = ({
                         onClick={onReplace}
                         color="tertiary"
                         expand="block"
-                        size="large"
-                        className="flex-1"
+                        className="flex-1 text-lg h-12"
                         >
                         {t('common.replace')}
                         </IonButton>
