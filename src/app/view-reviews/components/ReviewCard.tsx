@@ -29,7 +29,7 @@ const ReviewCard = ({ review }: { review: ReviewFull }) => {
             <IonButton
               color={"tertiary"}
               className="aspect-square edit-button"
-              routerLink={`/app/reviews/edit/${review.id}`}
+              routerLink={`/app/reviews/${review.id}/edit`}
             >
               <SquarePen size={20}></SquarePen>
             </IonButton>
