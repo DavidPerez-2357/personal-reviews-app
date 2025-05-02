@@ -19,12 +19,12 @@ import {
   Star,
 } from "lucide-react";
 import ReviewCard from "./components/ReviewCard";
-import { getReviewsCards, insertTestReviewImages, insertTestReviews } from "@services/review-service";
-import ReviewCardFilterModal from "./components/ReviewCardFilterModal";
+import { getReviewsCards } from "@services/review-service";
 import { ReviewFull, ReviewImage } from "@dto/Review";
 import { useTranslation } from "react-i18next";
 import "./styles/reviewPage.css";
 import { useLocation, useHistory } from "react-router-dom"; // Import useLocation and useHistory
+import ReviewFilterModal from "./components/ReviewFilterModal";
 
 export const ReviewPage: React.FC = () => {
 
@@ -378,7 +378,7 @@ export const ReviewPage: React.FC = () => {
         </IonGrid>
 
         {/* Custom filters modal */}
-        <ReviewCardFilterModal
+        <ReviewFilterModal
           isOpen={isFilterModalOpen}
           onDismiss={() => setFilterModalOpen(false)}
           onApply={handleApplyFilters}
