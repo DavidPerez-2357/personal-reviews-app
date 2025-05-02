@@ -10,13 +10,12 @@ import {
   IonRange,
 } from "@ionic/react";
 import { Category } from "@dto/Category";
-import { Ban, Boxes } from "lucide-react";
-import { getCategories } from "@services/category-service";
 import { useTranslation } from "react-i18next";
 import "../styles/reviewPage.css";
 import { IconName } from "@fortawesome/fontawesome-svg-core";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { CategoryColors } from "@/shared/enums/colors";
+import { getCategories } from "@/shared/services/category-service";
 
 interface FilterModalProps {
   isOpen: boolean;
@@ -29,16 +28,19 @@ interface FilterModalProps {
 
 type SubcatMode = "auto" | "all" | "none" | "specific";
 
-const ReviewCardFilterModal: React.FC<FilterModalProps> = ({
+const ReviewFilterModal: React.FC<FilterModalProps> = ({
   isOpen,
   onDismiss,
   onApply,
 }) => {
+  // Refs
   const modal = useRef<HTMLIonModalElement>(null);
+
+  // Filters state
   const [ratingFilter, setRating] = useState<
     { lower: number; upper: number } | undefined
   >({ lower: 0, upper: 5 });
-
+  // Categories state
   const [allCategories, setAllCategories] = useState<Category[]>([]);
   const [parent, setParent] = useState<Category | null>(null);
   const [subcatMode, setSubcatMode] = useState<SubcatMode>("auto");
@@ -49,7 +51,6 @@ const ReviewCardFilterModal: React.FC<FilterModalProps> = ({
   useEffect(() => {
     const fetchCategories = async () => {
       try {
-        
         const cats = await getCategories();
         setAllCategories(cats);
       } catch (err) {
@@ -59,52 +60,56 @@ const ReviewCardFilterModal: React.FC<FilterModalProps> = ({
     fetchCategories();
   }, []);
 
+  // Close modal when it is dismissed
   const handleSelectParent = (cat: Category | null) => {
     setParent(cat);
     setSubcatMode("auto");
     setSpecificSubs([]);
   };
 
+  // Handle parent category selection
   const childList = parent
     ? allCategories.filter((c) => c.parent_id === parent.id)
     : [];
 
+  // Handle subcategory selection
   const handleSelectSub = (sub: Category) => {
     setSpecificSubs([sub]);
     setSubcatMode("specific");
   };
 
+  // Handle apply button click
   const handleApply = () => {
     let categoryFilter: string[] | null;
 
     if (!parent) {
       // Case 2: no parent selected
       categoryFilter = null;
-    } else {
-      const children = childList;
-      if (children.length === 0) {
-        // Case 1: parent with no children
+      return;
+    }
+    const children = childList;
+    if (children.length === 0) {
+      // Case 1: parent with no children
+      categoryFilter = [parent.name];
+      return;
+    } 
+    switch (subcatMode) {
+      case "auto":
+        // Case 3: parent + automatic subcategories
+        categoryFilter = [parent.name, ...children.map((c) => c.name)];
+        break;
+      case "all":
+        // Case 5: parent + all subcategories
+        categoryFilter = [parent.name, ...children.map((c) => c.name)];
+        break;
+      case "none":
+        // Case 6: parent + no subcategories
         categoryFilter = [parent.name];
-      } else {
-        switch (subcatMode) {
-          case "auto":
-            // Case 3: parent + automatic subcategories
-            categoryFilter = [parent.name, ...children.map((c) => c.name)];
-            break;
-          case "all":
-            // Case 5: parent + all subcategories
-            categoryFilter = [parent.name, ...children.map((c) => c.name)];
-            break;
-          case "none":
-            // Case 6: parent + no subcategories
-            categoryFilter = [parent.name];
-            break;
-          case "specific":
-            // Case 4: parent + specific subcategories
-            categoryFilter = specificSubs.map((c) => c.name);
-            break;
-        }
-      }
+        break;
+      case "specific":
+        // Case 4: parent + specific subcategories
+        categoryFilter = specificSubs.map((c) => c.name);
+        break;
     }
 
     onApply({
@@ -114,6 +119,7 @@ const ReviewCardFilterModal: React.FC<FilterModalProps> = ({
     onDismiss();
   };
 
+  // Handle reset button click
   const handleReset = () => {
     const resetFilters = {
       rating: { lower: 0, upper: 5 },
@@ -156,9 +162,9 @@ const ReviewCardFilterModal: React.FC<FilterModalProps> = ({
                   !parent ? "selected" : ""
                 }`}
               >
-                <Boxes size={40}></Boxes>
+                <FontAwesomeIcon icon="boxes-stacked" className="fa-xl" />
               </div>
-              <IonLabel className="truncate max-w-full text-xs">{t('review-page.all')}</IonLabel>
+              <IonLabel className="truncate max-w-full text-xs">{t('common.all')}</IonLabel>
             </div>
             {allCategories
               .filter((c) => !c.parent_id)
@@ -204,10 +210,10 @@ const ReviewCardFilterModal: React.FC<FilterModalProps> = ({
                     }`}
                     style={{ backgroundColor: "var(--ion-color-secondary)" }}
                   >
-                    <Boxes size={40}></Boxes>
+                    <FontAwesomeIcon icon="boxes-stacked" className="fa-xl" />
                   </div>
                   <IonLabel className="truncate max-w-full text-xs">
-                  {t('review-page.all')}
+                  {t('common.all')}
                   </IonLabel>
                 </div>
 
@@ -221,7 +227,7 @@ const ReviewCardFilterModal: React.FC<FilterModalProps> = ({
                     }`}
                     style={{ backgroundColor: "var(--ion-color-secondary)" }}
                   >
-                    <Ban size={40}></Ban>
+                    <FontAwesomeIcon icon="ban" className="fa-xl" />
                   </div>
                   <IonLabel className="truncate max-w-full text-xs">
                     {t('review-page.none')}
@@ -299,4 +305,4 @@ const ReviewCardFilterModal: React.FC<FilterModalProps> = ({
   );
 };
 
-export default React.memo(ReviewCardFilterModal);
+export default React.memo(ReviewFilterModal);
