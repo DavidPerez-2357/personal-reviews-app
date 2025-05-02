@@ -21,7 +21,7 @@ interface FilterModalProps {
   isOpen: boolean;
   onDismiss: () => void;
   onApply: (filters: {
-    rating?: { lower: number; upper: number };
+    rating?: { minRating: number; maxRating: number };
     category?: string[] | null;
   }) => void;
 }
@@ -38,8 +38,8 @@ const ReviewFilterModal: React.FC<FilterModalProps> = ({
 
   // Filters state
   const [ratingFilter, setRating] = useState<
-    { lower: number; upper: number } | undefined
-  >({ lower: 0, upper: 5 });
+    { minRating: number; maxRating: number } | undefined
+  >({ minRating: 0, maxRating: 5 });
   // Categories state
   const [allCategories, setAllCategories] = useState<Category[]>([]);
   const [parent, setParent] = useState<Category | null>(null);
@@ -60,17 +60,17 @@ const ReviewFilterModal: React.FC<FilterModalProps> = ({
     fetchCategories();
   }, []);
 
+    // Handle parent category selection
+    const childList = parent
+    ? allCategories.filter((c) => c.parent_id === parent.id)
+    : [];
+
   // Close modal when it is dismissed
   const handleSelectParent = (cat: Category | null) => {
     setParent(cat);
     setSubcatMode("auto");
     setSpecificSubs([]);
   };
-
-  // Handle parent category selection
-  const childList = parent
-    ? allCategories.filter((c) => c.parent_id === parent.id)
-    : [];
 
   // Handle subcategory selection
   const handleSelectSub = (sub: Category) => {
@@ -122,7 +122,7 @@ const ReviewFilterModal: React.FC<FilterModalProps> = ({
   // Handle reset button click
   const handleReset = () => {
     const resetFilters = {
-      rating: { lower: 0, upper: 5 },
+      rating: { minRating: 0, maxRating: 5 },
       category: null,
     };
 
@@ -272,10 +272,14 @@ const ReviewFilterModal: React.FC<FilterModalProps> = ({
               max={5}
               pin={true}
               pinFormatter={(value: number) => `${value}`}
-              value={ratingFilter || { lower: 0, upper: 5 }}
-              onIonChange={(e) =>
-                setRating(e.detail.value as { lower: number; upper: number })
-              }
+              value={{
+                lower: ratingFilter?.minRating ?? 0,
+                upper: ratingFilter?.maxRating ?? 5,
+              }}
+              onIonChange={(e) => {
+                const rangeValue = e.detail.value as { lower: number; upper: number };
+                setRating({ minRating: rangeValue.lower, maxRating: rangeValue.upper });
+              }}
             ></IonRange>
           </div>
         </div>
