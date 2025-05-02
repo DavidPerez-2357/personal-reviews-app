@@ -1,4 +1,4 @@
-import { Category } from "@/shared/dto/category/Category";
+import { Category } from "@dto/Category";
 import { SubCategoryColors } from "@/shared/enums/colors";
 import { getChildrenCategories } from "@/shared/services/category-service";
 import { IconName } from "@fortawesome/fontawesome-svg-core";

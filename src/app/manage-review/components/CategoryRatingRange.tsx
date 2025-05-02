@@ -1,4 +1,4 @@
-import { CategoryRatingMix } from "@/shared/dto/category/CategoryRating";
+import { CategoryRatingMix } from "@dto/Category";
 import { IonRange } from "@ionic/react";
 import { Dispatch, SetStateAction, useState } from "react";
 
