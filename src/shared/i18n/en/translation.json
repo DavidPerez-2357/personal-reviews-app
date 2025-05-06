@@ -88,6 +88,7 @@
         "language": "Language",
         "theme": "Theme",
         
+        "change-theme": "Change theme",
         "dark-mode": "Dark mode",
         "light-mode": "Light mode",
 
