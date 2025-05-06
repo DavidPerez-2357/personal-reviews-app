@@ -3,6 +3,7 @@ import { Moon, Sun, Check } from "lucide-react"; // Import Check
 import React, { useRef, useEffect, useState } from "react"; // Import useEffect and useState
 import { useTranslation } from "react-i18next";
 import { Storage } from "@ionic/storage"; // Import Storage
+import { SafeArea } from '@capacitor-community/safe-area'; // Added import
 
 interface ChangeThemeModalProps {
   isOpen: boolean;
@@ -15,7 +16,7 @@ const ChangeThemeModal: React.FC<ChangeThemeModalProps> = ({
 }: ChangeThemeModalProps) => {
   const modal = useRef<HTMLIonModalElement>(null);
   const { t } = useTranslation();
-  const storage = useMemo(() => new Storage(), []); // Memoize storage instance
+  const storage = new Storage(); // Create a new instance of Storage
   const [currentTheme, setCurrentTheme] = useState<"light" | "dark">("light"); // State for current theme
 
   useEffect(() => {
@@ -31,7 +32,7 @@ const ChangeThemeModal: React.FC<ChangeThemeModalProps> = ({
     if (isOpen) {
       loadTheme();
     }
-  }, [isOpen]); // Reload theme when modal opens
+  }, [isOpen, storage]); // Reload theme when modal opens
 
   // Function to change the theme using Ionic's dark class and save preference
   const handleChangeTheme = async (theme: "light" | "dark") => {
@@ -39,6 +40,22 @@ const ChangeThemeModal: React.FC<ChangeThemeModalProps> = ({
     document.body.classList.toggle("ion-palette-dark", theme === "dark");
     await storage.set("appTheme", theme); // Save the theme preference
     setCurrentTheme(theme); // Update current theme state
+
+    // Update SafeArea configuration for status and navigation bars
+    try {
+      await SafeArea.enable({
+        config: {
+          customColorsForSystemBars: true,
+          statusBarColor: '#00000000', // Assuming transparent status bar
+          statusBarContent: theme === 'dark' ? 'light' : 'dark',
+          navigationBarColor: '#00000000', // Assuming transparent navigation bar
+          navigationBarContent: theme === 'dark' ? 'light' : 'dark',
+        },
+      });
+    } catch (error) {
+      console.error('Error updating SafeArea theme:', error);
+    }
+
     onDismiss();
   };
 
