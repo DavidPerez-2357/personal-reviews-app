@@ -15,7 +15,7 @@ const ChangeThemeModal: React.FC<ChangeThemeModalProps> = ({
 }: ChangeThemeModalProps) => {
   const modal = useRef<HTMLIonModalElement>(null);
   const { t } = useTranslation();
-  const storage = new Storage(); // Create storage instance
+  const storage = useMemo(() => new Storage(), []); // Memoize storage instance
   const [currentTheme, setCurrentTheme] = useState<"light" | "dark">("light"); // State for current theme
 
   useEffect(() => {
