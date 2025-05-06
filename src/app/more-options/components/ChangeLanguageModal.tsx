@@ -1,8 +1,11 @@
 import { IonModal } from "@ionic/react";
-import React, { useRef } from "react";
-import { useTranslation } from "react-i18next"; // Importar useTranslation
+import React, { useEffect, useRef } from "react";
+import { useTranslation } from "react-i18next";
 import SpainFlag from "../assets/ES-Spain.svg";
 import UKFlag from "../assets/UK-UnitedKingdom.svg";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faCheck } from "@fortawesome/free-solid-svg-icons";
+import { Check } from "lucide-react";
 
 interface changeLenguageModalProps {
   isOpen: boolean;
@@ -14,12 +17,19 @@ const changeLenguageModal: React.FC<changeLenguageModalProps> = ({
   onDismiss,
 }: changeLenguageModalProps) => {
   const modal = useRef<HTMLIonModalElement>(null);
-  const { t, i18n } = useTranslation(); // Obtener t y i18n
+  const { t, i18n } = useTranslation();
 
-  // Función para cambiar el idioma
+  useEffect(() => {
+    const storedLang = localStorage.getItem("language");
+    if (storedLang) {
+      i18n.changeLanguage(storedLang);
+    }
+  }, [i18n]);
+
   const handleChangeLanguage = (lang: string) => {
     i18n.changeLanguage(lang);
-    onDismiss(); // Cerrar el modal después de cambiar el idioma
+    localStorage.setItem("language", lang);
+    onDismiss();
   };
 
   return (
@@ -32,28 +42,32 @@ const changeLenguageModal: React.FC<changeLenguageModalProps> = ({
     >
       <div className="flex flex-col gap-5 p-5">
         <h1 className="text-4xl font-bold text-start text-[var(--ion-text-color)]">
-          {t("more-options.change-language")} 
+          {t("more-options.change-language")}
         </h1>
-        <div className="flex flex-col gap-5">
+        <div
+          className="flex flex-col gap-5 overflow-y-auto"
+          style={{ maxHeight: "60vh" }}
+        >
           <div
-            className="flex items-center gap-5 p-5 border-2 border-[var(--ion-color-secondary)] rounded-md cursor-pointer" // Añadir cursor-pointer
-            onClick={() => handleChangeLanguage("es")} // Llamar a handleChangeLanguage con 'es'
+            className="flex items-center gap-5 p-5 border-2 border-[var(--ion-color-secondary)] rounded-md cursor-pointer bg-[var(--ion-background-color-step-50)] hover:bg-[var(--ion-background-color-step-100)]"
+            onClick={() => handleChangeLanguage("es")}
           >
-            {/* Usar etiqueta img con la URL importada */}
-            <img src={SpainFlag} alt="Spanish Flag" className="w-8 h-auto rounded-md" /> 
-            <span className="text-2xl text-[var(--ion-text-color)]">
+            <img src={SpainFlag} alt="Spanish Flag" className="w-8 h-auto rounded-md" />
+            <span className="text-lg text-[var(--ion-text-color)] flex-grow">
               {t("more-options.spanish")}
             </span>
+            {i18n.language === "es" && <Check size={24} className="text-[var(--ion-color-primary)]" />}
           </div>
+
           <div
-            className="flex items-center gap-5 p-5 border-2 border-[var(--ion-color-secondary)] rounded-md cursor-pointer" // Añadir cursor-pointer
-            onClick={() => handleChangeLanguage("en")} // Llamar a handleChangeLanguage con 'en'
+            className="flex items-center gap-5 p-5 border-2 border-[var(--ion-color-secondary)] rounded-md cursor-pointer bg-[var(--ion-background-color-step-50)] hover:bg-[var(--ion-background-color-step-100)]"
+            onClick={() => handleChangeLanguage("en")}
           >
-            {/* Usar etiqueta img con la URL importada */}
-            <img src={UKFlag} alt="UK Flag" className="w-8 h-auto rounded-md" /> 
-            <span className="text-2xl text-[var(--ion-text-color)]">
+            <img src={UKFlag} alt="UK Flag" className="w-8 h-auto rounded-md" />
+            <span className="text-lg text-[var(--ion-text-color)] flex-grow">
               {t("more-options.english")}
             </span>
+            {i18n.language === "en" && <Check size={24} className="text-[var(--ion-color-primary)]" />}
           </div>
         </div>
       </div>
