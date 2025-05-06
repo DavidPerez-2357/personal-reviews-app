@@ -20,7 +20,7 @@ setupIonicReact();
 
 const App: React.FC = () => {
   const [dbReady, setDbReady] = useState(false);
-  const storage = new Storage(); // Create storage instance
+  // Removed redundant instantiation of Storage
 
   useEffect(() => {
     const initializeApp = async () => {
