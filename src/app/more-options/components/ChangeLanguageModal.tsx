@@ -6,6 +6,7 @@ import UKFlag from "../assets/UK-UnitedKingdom.svg";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faCheck } from "@fortawesome/free-solid-svg-icons";
 import { Check } from "lucide-react";
+import { Storage } from "@ionic/storage"; // Import Storage
 
 interface changeLenguageModalProps {
   isOpen: boolean;
@@ -18,17 +19,23 @@ const changeLenguageModal: React.FC<changeLenguageModalProps> = ({
 }: changeLenguageModalProps) => {
   const modal = useRef<HTMLIonModalElement>(null);
   const { t, i18n } = useTranslation();
+  const storage = new Storage(); // Create storage instance
 
   useEffect(() => {
-    const storedLang = localStorage.getItem("language");
-    if (storedLang) {
-      i18n.changeLanguage(storedLang);
-    }
-  }, [i18n]);
+    const loadLanguage = async () => {
+      await storage.create(); // Ensure storage is ready
+      const storedLang = await storage.get("language");
+      if (storedLang) {
+        i18n.changeLanguage(storedLang);
+      }
+    };
+    loadLanguage();
+  }, [i18n, storage]);
 
-  const handleChangeLanguage = (lang: string) => {
+  const handleChangeLanguage = async (lang: string) => {
+    await storage.create(); // Ensure storage is ready
     i18n.changeLanguage(lang);
-    localStorage.setItem("language", lang);
+    await storage.set("language", lang); // Save the language preference
     onDismiss();
   };
 
