@@ -20,7 +20,7 @@ setupIonicReact();
 
 const App: React.FC = () => {
   const [dbReady, setDbReady] = useState(false);
-  // Removed redundant instantiation of Storage
+  const storage = new Storage(); // Instantiate Storage
 
   useEffect(() => {
     const initializeApp = async () => {
@@ -28,25 +28,23 @@ const App: React.FC = () => {
         // Initialize Storage
         await storage.create();
 
-        // Apply saved theme or default
-        const savedTheme = await storage.get('appTheme');
-        if (savedTheme) {
-          document.body.classList.toggle('ion-palette-dark', savedTheme === 'dark');
-        } else {
-          // Optional: Detect system preference or default to light
+        // Determine and apply theme
+        let currentAppTheme = await storage.get('appTheme');
+        if (!currentAppTheme) {
           const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-          document.body.classList.toggle('ion-palette-dark', prefersDark);
-          await storage.set('appTheme', prefersDark ? 'dark' : 'light'); // Save the detected/default theme
+          currentAppTheme = prefersDark ? 'dark' : 'light';
+          await storage.set('appTheme', currentAppTheme); // Save the detected/default theme
         }
+        document.body.classList.toggle('ion-palette-dark', currentAppTheme === 'dark');
 
         // Initialize Safe Area
         await SafeArea.enable({
           config: {
             customColorsForSystemBars: true,
             statusBarColor: '#00000000',
-            statusBarContent: savedTheme === 'dark' || (!savedTheme && window.matchMedia('(prefers-color-scheme: dark)').matches) ? 'light' : 'dark', // Adjust status bar content based on theme
+            statusBarContent: currentAppTheme === 'dark' ? 'light' : 'dark', // Adjust status bar content based on theme
             navigationBarColor: '#00000000',
-            navigationBarContent: savedTheme === 'dark' || (!savedTheme && window.matchMedia('(prefers-color-scheme: dark)').matches) ? 'light' : 'dark', // Adjust nav bar content based on theme
+            navigationBarContent: currentAppTheme === 'dark' ? 'light' : 'dark', // Adjust nav bar content based on theme
           },
         });
 
