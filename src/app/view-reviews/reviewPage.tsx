@@ -19,15 +19,12 @@ import {
   Star,
 } from "lucide-react";
 import ReviewCard from "./components/ReviewCard";
-import { getReviewsCards, insertTestReviews } from "@services/review-service";
+import { getReviewsCards } from "@services/review-service";
 import { ReviewFull, ReviewImage } from "@dto/Review";
 import { useTranslation } from "react-i18next";
 import "./styles/reviewPage.css";
 import { useLocation, useHistory } from "react-router-dom"; // Import useLocation and useHistory
 import ReviewFilterModal from "./components/ReviewFilterModal";
-import { insertTestCategories } from "@/shared/services/category-service";
-import { insertTestItems } from "@/shared/services/item-service";
-import { resetAllAutoIncrement } from "@/database-service";
 
 export const ReviewPage: React.FC = () => {
 
