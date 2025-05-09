@@ -16,6 +16,7 @@ export interface CategoryRating {
 
 export interface CategoryRatingMix {
     id: number;
+    category_id: number;
     name: string;
     value: number; // Debe estar entre 0 y 10
 }
