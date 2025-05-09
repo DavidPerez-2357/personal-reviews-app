@@ -17,6 +17,8 @@ const ReviewCard = ({ review }: { review: ReviewFull }) => {
     setIsModalOpen(true);
   };
 
+  console.log("Item ID:", review.item_id);
+
   return (
     <div className="flex flex-col gap-3 border-2 border-[var(--ion-color-secondary)] rounded-md p-2">
       <IonCard className="pb-4 pt-2">
@@ -24,7 +26,14 @@ const ReviewCard = ({ review }: { review: ReviewFull }) => {
           <div className="grid grid-cols-[1fr_auto] items-center">
             <div className="flex flex-row items-center gap-3">
               <FontAwesomeIcon icon={review.icon as IconName} className="fa-xl" />
-              <span className="font-semibold text-md">{review.item}</span>
+                <IonButton
+                  fill="clear"
+                  color="text-color"
+                  className="font-semibold text-md"
+                  routerLink={`/app/items/${review.item_id}/viewItem`}
+                >
+                  {review.item}
+                </IonButton>
             </div>
             <IonButton
               color={"tertiary"}
