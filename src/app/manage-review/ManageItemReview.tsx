@@ -17,30 +17,40 @@ import { usePhotoGallery } from "@hooks/usePhotoGallery";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { getItemById, insertItem, updateItem } from "@services/item-service";
 import { IconName } from "@fortawesome/fontawesome-svg-core";
-import { deleteRatingValuesFromReview, getCategoryById, getCategoryRatingsByCategoryId, getCategoryRatingValues, getCategoryRatingValuesByReviewId, getChildrenCategories, getParentCategory, insertCategoryRatingValue } from "@services/category-service";
+import { deleteRatingValuesFromReview, getCategoryById, getCategoryRatingMixByReviewId, getCategoryRatingsByCategoryId, getChildrenCategories, getParentCategories, getParentCategory, insertCategoryRatingValue } from "@services/category-service";
 import CategorySelectorModal from "@components/CategorySelectorModal";
 import PreviewPhotoModal from "@components/PreviewPhotoModal";
 import SubcategoriesBadgeSelector from "./components/SubcategoriesBadgeSelector";
 import { CategoryColors } from "@shared/enums/colors";
 import { useTranslation } from "react-i18next";
-import { Review } from "@dto/review/Review";
-import { deleteReview, deleteReviewImages, getReviewById, getReviewImages, getReviewImagesbyId, getReviews, insertReview, insertReviewImage, updateReview } from "@shared/services/review-service";
-import { CategoryRatingValue } from "@shared/dto/category/CategoryRatingValue";
-import { useHistory, useParams } from "react-router-dom";
+import { deleteReview, deleteReviewImages, getReviewById, getReviewImagesbyId, insertReview, insertReviewImage, updateReview } from "@shared/services/review-service";
+import { useHistory, useLocation, useParams } from "react-router-dom";
 import ItemSelector from "./components/ItemSelector";
 import CategoryRatingRange from "./components/CategoryRatingRange";
 import ErrorAlert from "@/shared/components/ErrorAlert";
 import { UserPhoto } from "@/shared/dto/Photo";
-import { Category, CategoryRating, CategoryRatingMix, CategoryRatingValue } from "@/shared/dto/Category";
-import { Item, ItemOption } from "@/shared/dto/Item";
-import { Review, ReviewImage } from "@/shared/dto/Review";
-
+import { Category, CategoryRating, CategoryRatingMix, CategoryRatingValue } from "@dto/Category";
+import { Item, ItemOption } from "@dto/Item";
+import { Review, ReviewImage } from "@dto/Review";
+import { init } from "i18next";
+import { Capacitor } from '@capacitor/core';
 
 const ManageItemReview = () => {
-  const { photos, savedPhotos, setPhotos, setSavedPhotos, takePhoto, importPhoto, savePhoto, deletePhoto } = usePhotoGallery();
-  const { id } = useParams<{ id: string }>();
+  const { savedPhotos, setSavedPhotos, takePhoto, importPhoto, savePhoto, deletePhoto } = usePhotoGallery();
+  let { id } = useParams<{ id: string }>();
   const history = useHistory();
   const { t } = useTranslation();
+  const location = useLocation();
+
+  // Variable de no encontrar categorias
+  const notFoundAnyCategories: Category = {
+    id: 0,
+    name: t('common.no-categories-found'),
+    type: 1,
+    color: "darkgray",
+    icon: "circle-exclamation",
+    parent_id: null,
+  };
 
   // Referencias
   const contentRef = useRef<HTMLIonContentElement>(null);
@@ -51,6 +61,9 @@ const ManageItemReview = () => {
   // Variables del boton de guardar reseña
   const [saveButtonText, setSaveButtonText] = useState('');
   const [isButtonDisabled, setIsButtonDisabled] = useState(false);
+
+  // Variables del boton de eliminar reseña
+  const [deleteButtonText, setDeleteButtonText] = useState(t('manage-item-review.delete-review'));
 
   // Variables de previsualizacion de fotos
   const [previewPhoto, setPreviewPhoto] = useState<UserPhoto | null>(null);
@@ -70,8 +83,9 @@ const ManageItemReview = () => {
   const [isDeleteAlertOpen, setIsDeleteAlertOpen] = useState(false);
 
   // Variables del fomulario
-  const editMode = id !== "0" && id !== undefined;
-  const [parentCategory, setParentCategory] = useState<Category | null>(null);
+  const [isInitialLoad, setIsInitialLoad] = useState(true);
+  const editMode = Boolean(id);
+  const [parentCategory, setParentCategory] = useState<Category>(notFoundAnyCategories);
   const [childrenCategories, setChildrenCategories] = useState<Category[]>([]);
   const [selectedSubcategory, setSelectedSubcategory] = useState<Category | null>(null);
   const [itemName, setItemName] = useState("");
@@ -79,6 +93,9 @@ const ManageItemReview = () => {
   const [categoryRatings, setCategoryRatings] = useState<CategoryRatingMix[]>([]);
   const [selectedOption, setSelectedOption] = useState<ItemOption | null>(null);
   const [comment, setComment] = useState("");
+
+  // Variables de categorias
+  const [categories, setCategories] = useState<Category[]>([]);
 
   const getSelectedCategory = () => {
     if (selectedSubcategory) {
@@ -89,125 +106,165 @@ const ManageItemReview = () => {
     return null;
   }
 
-  const convertToCategoryRatingMix = (categoryRatings: CategoryRating[]) => {
+  const convertToCategoryRatingMix = (categoryRatings: CategoryRating[]): CategoryRatingMix[] => {
     return categoryRatings.map((categoryRating) => ({
       id: categoryRating.id,
       name: categoryRating.name,
+      category_id: categoryRating.category_id,
       value: 0, // Valor inicial
     }));
   }
 
   const setEditData = async (reviewId: number) => {
-    const review: Review | null = await getReviewById(reviewId);
-    if (!review) throw new Error(t('manage-item-review.error-message.review-not-found'));
+    try {
+        const review: Review | null = await getReviewById(reviewId);
+        if (!review) throw new Error(t('manage-item-review.error-message.review-not-found'));
 
-    const item: Item | null = await getItemById(review.item_id);
-    if (!item) throw new Error(t('manage-item-review.error-message.item-not-found'));
+        const item: Item | null = await getItemById(review.item_id);
+        if (!item) throw new Error(t('manage-item-review.error-message.item-not-found'));
 
-    const category: Category | null = await getCategoryById(item.category_id);
-    if (!category) throw new Error(t('manage-item-review.error-message.category-not-found'));
+        const category: Category | null = await getCategoryById(item.category_id);
+        if (!category) throw new Error(t('manage-item-review.error-message.category-not-found'));
 
-    const parentCategory: Category | null = await getParentCategory(item.category_id);
-    if (!parentCategory) throw new Error(t('manage-item-review.error-message.category-not-found'));
+        const parentCategory: Category = category.parent_id ? await getParentCategory(category.parent_id) || notFoundAnyCategories : category;
 
-    const categoryRatingsFound: CategoryRatingValue[] = await getCategoryRatingValuesByReviewId(reviewId);
-    if (!categoryRatings) throw new Error(t('manage-item-review.error-message.category-ratings-not-found'));
+        const categoryRatingsFound: CategoryRatingMix[] = await getCategoryRatingMixByReviewId(reviewId);
+        const reviewImages: ReviewImage[] = await getReviewImagesbyId(reviewId);
 
-    const reviewImages: ReviewImage[] = await getReviewImagesbyId(reviewId);
-    if (!reviewImages) throw new Error(t('manage-item-review.error-message.review-images-not-found'));
+        setIsInitialLoad(true);
 
-    setItemName(item.name);
-    setRating(review.rating);
-    setComment(review.comment || "");
-    setParentCategory(parentCategory);
-    setSelectedOption({ id: item.id, name: item.name, category_id: item.category_id, parent_category_id: parentCategory.id, parent_category_icon: parentCategory.icon });
-    
-    const photosConverted: UserPhoto[] = reviewImages.map((image) => ({
-      filepath: image.image,
-      webviewPath: image.image,
-    }));
-    setPhotos(photosConverted);
-    setSavedPhotos(photosConverted);
+        // Configurar los datos en el estado
+        setItemName(item.name);
+        setRating(review.rating);
+        setComment(review.comment || "");
+        setSelectedOption({
+            id: item.id,
+            name: item.name,
+            category_id: item.category_id,
+            parent_category_id: parentCategory.id,
+            parent_category_icon: parentCategory?.icon || '',
+        });
 
-    // Mix the category ratings with the review ratings
-    const categoryRatingsConverted: CategoryRatingMix[] = categoryRatingsFound.map((categoryRatingValue) => {
-      const categoryRating = categoryRatings.find((rating) => rating.id === categoryRatingValue.category_rating_id);
-      return {
-        id: categoryRating?.id || 0,
-        name: categoryRating?.name || "",
-        value: categoryRatingValue.value,
-      };
-    });
-    
-    setCategoryRatings(categoryRatingsConverted);
+        const photosConverted: UserPhoto[] = reviewImages.map((image) => ({
+            filepath: image.image,
+            webviewPath: Capacitor.convertFileSrc(image.image),
+        }));
+        setSavedPhotos(photosConverted);
 
-    if (category.parent_id) {
-      setSelectedSubcategory(category);
+        setCategoryRatings(categoryRatingsFound);
+
+        // Manejar categorías padre e hija
+        if (category.parent_id) {
+            setParentCategory(parentCategory);
+            setSelectedSubcategory(category);
+        } else {
+            setParentCategory(category);
+            setSelectedSubcategory(null);
+        }
+
+        // Cargar las subcategorías de la categoría padre
+        if (parentCategory) {
+            const children = await getChildrenCategories(parentCategory.id);
+            setChildrenCategories(children);
+        }
+    } catch (error) {
+        console.error(error);
+        throw error; // Permitir que el efecto maneje el error
     }
-  }
+  };
 
   useEffect(() => {
-      if (editMode) {
-        setSaveButtonText(t('common.save-changes'));
+    // Resetear el estado antes de cargar una nueva reseña
+    setSaveButtonText(editMode ? t('common.save-changes') : t('manage-item-review.create-review'));
+    setIsButtonDisabled(false);
+    setItemName("");
+    setRating(0);
+    setComment("");
+    setSavedPhotos([]);
+    setSelectedOption(null);
+    setParentCategory(notFoundAnyCategories);
+    setSelectedSubcategory(null);
+    setCategoryRatings([]);
+    setChildrenCategories([]);
+
+    if (editMode) {
         const reviewId = parseInt(id);
-        
-        setEditData(reviewId).catch((error) => {
-          history.push("/app/reviews", { toast: t('manage-item-review.error-message.review-not-found') });
+        setEditData(reviewId)
+            .then(() => setIsInitialLoad(false))
+            .catch((error) => {
+                console.error(error);
+                setIsInitialLoad(false);
+                history.push("/app/reviews", { toast: t('manage-item-review.error-message.review-not-found') });
+            });
+    } else {
+        setIsInitialLoad(false);
+    }
+  }, [location.key]);
+
+  useEffect(() => {
+    getParentCategories()
+        .then((data) => {
+            console.log("🔍 Categorías cargadas:", data);
+            setCategories(data);
+
+            if (data.length === 0) {
+                setParentCategory(notFoundAnyCategories);
+            } else if (parentCategory === null || parentCategory.id === 0 || !editMode) {
+                setParentCategory(data[0]);
+            }
+        })
+        .catch((error) => {
+            console.error("❌ Error al cargar categorías:", error);
+            setCategories([]);
+            setParentCategory(notFoundAnyCategories);
         });
-      }else {
-        setSaveButtonText(t('manage-item-review.create-review'));
-        setSelectedOption(null);
-        setItemName("");
-        setRating(0);
-        setComment("");
-        setPhotos([]);
-        setSavedPhotos([]);
-        setSelectedSubcategory(null);
-        setParentCategory(null);
-      }
-  }, [id, editMode]);
+  }, []);
+
+  useEffect(() => {
+    setSaveButtonText(editMode ? t('common.save-changes') : t('manage-item-review.create-review'));
+  }, [editMode]);
 
   // Funcion que se ejecuta cada vez que cambia la opción seleccionada
   useEffect(() => {
-    if (selectedOption) {
-      getParentCategory(selectedOption.category_id).then((category) => {
-        // Solo actualiza el estado si la categoría realmente cambió
-        setParentCategory((prevCategory) => {
-          if (prevCategory?.id !== category?.id) {
-            return category;
-          }
-          return prevCategory;
-        });
+    if (isInitialLoad) return; // No se ha cambiado el formulario por el usuario, no se actualizan los ratings
+    if (!selectedOption) return;
 
-        if (!category) {
-          setChildrenCategories([]);
-          return;
+    getParentCategory(selectedOption.category_id).then((category) => {
+      // Solo actualiza el estado si la categoría realmente cambió
+      setParentCategory((prevCategory) => {
+        if (prevCategory?.id !== category?.id && category) {
+          return category;
         }
+        return prevCategory || notFoundAnyCategories;
       });
-    }
+
+      if (!category) {
+        setChildrenCategories([]);
+        return;
+      }
+    });
     
   }, [selectedOption]);
 
   useEffect(() => {
-    setSelectedSubcategory(null); // Reset selected subcategory when parent category changes
-
     if (!parentCategory) return;
 
-    getChildrenCategories(parentCategory?.id).then((categories) => {
-      setChildrenCategories((prevCategories) => {
-        // Solo actualiza si las categorías realmente cambiaron
-        if (
-          prevCategories.length !== categories.length ||
-          !prevCategories.every((cat, index) => cat.id === categories[index].id)
-        ) {
-          return categories;
+    getChildrenCategories(parentCategory.id).then((categories) => {
+        setChildrenCategories(categories);
+
+        // Mantener la subcategoría seleccionada si ya está configurada
+        if (selectedSubcategory && categories.some((cat) => cat.id === selectedSubcategory.id)) {
+            return;
         }
-        return prevCategories;
-      });
+
+        // Si no hay subcategoría seleccionada o no coincide, resetear
+        setSelectedSubcategory(null);
     });
   }, [parentCategory]);
 
-  useEffect(() => {
+  /* useEffect(() => {
+    if (!isInitialLoad) return; // No se ha cambiado el formulario por el usuario
+
     if (!selectedOption?.parent_category_id) {
         setSelectedSubcategory(null); // Reset selected subcategory if no parent category is selected
     }else {
@@ -219,27 +276,40 @@ const ManageItemReview = () => {
           }
         });
     }
-  }, [itemName, selectedOption]);
+  }, [itemName, selectedOption]); */
     
 
   useEffect(() => {
     const selectedCategory = getSelectedCategory();
     if (!selectedCategory) return;
 
-    getCategoryRatingsByCategoryId(selectedCategory?.id).then((ratings) => {
-      setCategoryRatings((prevRatings) => {
-        // Solo actualiza si los ratings realmente cambiaron
-        if (
-          prevRatings.length !== ratings.length ||
-          !prevRatings.every((rating, index) => rating.id === ratings[index].id)
-        ) {
-          return convertToCategoryRatingMix(ratings);
-        }
-        return prevRatings;
-      });
-    });
+    // Evitar sobrescribir los ratings si estás en modo edición y ya se cargaron
+    if (editMode && isInitialLoad) return;
 
+    // Obtener los ratings de la categoría seleccionada
+    getCategoryRatingsByCategoryId(selectedCategory.id).then((ratings) => {
+        setCategoryRatings(convertToCategoryRatingMix(ratings));
+    }).catch((error) => {
+        console.error("❌ Error al obtener los ratings de la categoría seleccionada:", error);
+        setCategoryRatings([]);
+    });
   }, [parentCategory, selectedSubcategory]);
+
+  const handleTakePhoto = async () => {
+    const newPhoto = await takePhoto();
+    if (!newPhoto) return;
+    const savedPhoto = await savePhoto(newPhoto);
+    if (!savedPhoto) return;
+    setSavedPhotos([...savedPhotos, savedPhoto]);
+  }
+
+  const handleGetPhotoFromGallery = async () => {
+    const newPhoto = await importPhoto();
+    if (!newPhoto) return;
+    const savedPhoto = await savePhoto(newPhoto);
+    if (!savedPhoto) return;
+    setSavedPhotos([...savedPhotos, savedPhoto]);
+  }
 
   // Funciones para manejar el input y su desplegable
   const handleParentScroll = async (event: CustomEvent) => {
@@ -285,23 +355,27 @@ const ManageItemReview = () => {
   const showError = (message: string) => {
     setErrorMessage(message);
     setShowErrorAlert(true);
+
+    setIsButtonDisabled(false);
+    setSaveButtonText(t('manage-item-review.create-review'));
+    setDeleteButtonText(t('manage-item-review.delete-review'));
   }
 
   /** Guarda un nuevo ítem o actualiza uno existente */
   const saveOrUpdateItem = async (item: Item): Promise<number | null> => {
     try {
-      if (!selectedOption) {
-        const itemId = await insertItem(item);
-        if (!itemId) throw new Error(t('manage-item-review.error-message.error-creating-item'));
-        return itemId;
-      } else {
-        const success = await updateItem(item);
-        if (!success) throw new Error(t('manage-item-review.error-message.error-updating-item'));
-        return selectedOption.id;
-      }
+        if (!selectedOption) {
+            const itemId = await insertItem(item);
+            if (!itemId) throw new Error(t('manage-item-review.error-message.error-creating-item'));
+            return itemId;
+        } else {
+            const success = await updateItem(item);
+            if (!success) throw new Error(t('manage-item-review.error-message.error-updating-item'));
+            return selectedOption.id;
+        }
     } catch (error) {
-      showError((error as Error).message);
-      return null;
+        showError((error as Error).message);
+        return null;
     }
   };
 
@@ -329,63 +403,92 @@ const ManageItemReview = () => {
     if (categoryRatings.length === 0) return; // No hay ratings para guardar
 
     try {
-      if (editMode) {
-        const success = await deleteRatingValuesFromReview(reviewId);
-        if (!success) throw new Error(t('manage-item-review.error-message.error-saving-review-ratings'));
-      }
+        if (editMode) {
+            const success = await deleteRatingValuesFromReview(reviewId);
+            if (!success) {
+                console.error("❌ Error al eliminar los valores de puntuación existentes.");
+                throw new Error(t('manage-item-review.error-message.error-saving-review-ratings'));
+            }
+        }
 
-      for (const rating of categoryRatings) {
-        const categoryRatingValue: CategoryRatingValue = {
-          id: 0,
-          review_id: reviewId,
-          category_rating_id: rating.id,
-          value: rating.value,
-        };
-        const success = await insertCategoryRatingValue(categoryRatingValue);
-        if (!success) throw new Error(t('manage-item-review.error-message.error-saving-review-ratings'));
-      }
+        for (const rating of categoryRatings) {
+            if (rating.value < 0 || rating.value > 10) {
+                throw new Error(t('manage-item-review.error-message.invalid-rating-value'));
+            }
+
+            const categoryRatingValue: CategoryRatingValue = {
+                id: 0,
+                review_id: reviewId,
+                category_rating_id: rating.id,
+                value: rating.value,
+            };
+            const success = await insertCategoryRatingValue(categoryRatingValue);
+            if (!success) throw new Error(t('manage-item-review.error-message.error-saving-review-ratings'));
+        }
+
+        return true;
     } catch (error) {
-      showError((error as Error).message);
+        showError((error as Error).message);
+        return false;
     }
   };
 
   /** Guarda las imágenes asociadas a la review */
   const saveReviewImages = async (reviewId: number) => {
-    if (photos.length === 0) return; // No hay fotos para guardar
+    if (savedPhotos.length === 0) return true; // No hay fotos para guardar
+
+
 
     try {
-      if (editMode) {
-        const success = await deleteReviewImages(reviewId);
-        if (!success) throw new Error(t('manage-item-review.error-message.error-saving-review-images'));
-      }
 
-      for (const photo of photos) {
-        // Guardar la foto en el sistema de archivos
-        if (savedPhotos.find((p) => p.filepath === photo.filepath)) continue; // Si la foto ya está guardada, no la guardamos de nuevo
+        if (editMode && savedPhotos.length > 0) {
+            const success = await deleteReviewImages(reviewId);
+            if (!success) throw new Error(t('manage-item-review.error-message.error-saving-review-images'));
+        }
+        /* const localSavedPhotos = [...savedPhotos]; // Copia local de las fotos guardadas
 
-        const savedPhoto = await savePhoto(photo);
-        if (!savedPhoto) throw new Error(t('manage-item-review.error-message.error-saving-review-images'));
-      }
+        i
 
-      for (const photo of savedPhotos) {
-        // Si la foto no esta en photos, la eliminamos
-        if (!photos.find((p) => p.filepath === photo.filepath)) {
-          await deletePhoto(photo); // Eliminar la foto del sistema de archivos
-          continue;
+        for (const photo of photos) {
+            // Guardar la foto en el sistema de archivos
+            if (localSavedPhotos.find((p) => p.filepath === photo.filepath)) continue; // Si la foto ya está guardada, no la guardamos de nuevo
+
+            const savedPhoto = await savePhoto(photo);
+            console.log("✅ Foto guardada:", savedPhoto);
+
+            if (!savedPhoto) throw new Error(t('manage-item-review.error-message.error-saving-review-images'));
+            localSavedPhotos.push(savedPhoto); // Agregar la foto guardada a la copia local
         }
 
-        const reviewImage: ReviewImage = {
-          review_id: reviewId,
-          image: photo.webviewPath!,
-        };
-        const success = await insertReviewImage(reviewImage);
-        if (!success) throw new Error(t('manage-item-review.error-message.error-saving-review-images'));
-      }
+        // Actualizar el estado con las fotos guardadas
+        setSavedPhotos(localSavedPhotos); */
+
+        for (const photo of savedPhotos) {
+            console.log("🔍 Revisando foto:", photo);
+
+            // Si la foto no está en `photos`, la eliminamos
+            /* if (!photos.find((p) => p.filepath === photo.filepath)) {
+                console.log("🗑️ Eliminando foto no utilizada:", photo);
+                await deletePhoto(photo); // Eliminar la foto del sistema de archivos
+                continue;
+            } */
+
+            const reviewImage: ReviewImage = {
+                review_id: reviewId,
+                image: photo.filepath!,
+            };
+
+            const success = await insertReviewImage(reviewImage);
+            if (!success) throw new Error(t('manage-item-review.error-message.error-saving-review-images'));
+        }
+
+        return true;
     } catch (error) {
-      showError((error as Error).message);
+        console.error("❌ Error al guardar las imágenes:", error);
+        showError((error as Error).message);
+        return false;
     }
   };
-
 
   /** Acción al hacer clic en Guardar */
   const handleSaveReview = async () => {
@@ -394,78 +497,108 @@ const ManageItemReview = () => {
     setIsButtonDisabled(true);
     setSaveButtonText(t('manage-item-review.saving-review'));
 
-    const item: Item = {
-      id: 0,
-      name: itemName,
-      image: null,
-      category_id: getSelectedCategory()?.id || 0,
-    };
+    try {
+        const item: Item = {
+            id: 0,
+            name: itemName,
+            image: null,
+            category_id: getSelectedCategory()?.id || 0,
+        };
 
-    const itemId = await saveOrUpdateItem(item);
-    if (!itemId) {
-      setIsButtonDisabled(false);
-      return;
+        console.log("🔍 Guardando ítem...");
+        const itemId = await saveOrUpdateItem(item);
+        console.log("✅ Ítem guardado con ID:", itemId);
+
+        if (!itemId) {
+            throw new Error(t('manage-item-review.error-message.error-saving-item'));
+        }
+
+        const review: Review = {
+            id: 0,
+            item_id: itemId,
+            rating,
+            comment,
+        };
+
+        console.log("Comentario:", review.comment);
+        
+
+        console.log("🔍 Guardando reseña...");
+        const reviewId = await saveOrUpdateReview(review);
+        console.log("✅ Reseña guardada con ID:", reviewId);
+
+        if (!reviewId) {
+            throw new Error(t('manage-item-review.error-message.error-saving-review'));
+        }
+
+        console.log("🔍 Guardando ratings de categorías...");
+        const categoryRatingsSaved = await saveCategoryRatings(reviewId);
+        console.log("✅ Ratings guardados:", categoryRatingsSaved);
+
+        console.log("🔍 Guardando imágenes...");
+        const reviewImagesSaved = await saveReviewImages(reviewId);
+        console.log("✅ Imágenes guardadas:", reviewImagesSaved);
+
+        // Si todo se guarda correctamente
+        setSaveButtonText(t('manage-item-review.saving-review-success'));
+        setTimeout(() => {
+            history.push('/app/reviews', { toast: t('manage-item-review.saving-review-success') });
+        }, 500);
+    } catch (error) {
+        showError((error as Error).message);
+        setSaveButtonText(editMode ? t('common.save-changes') : t('manage-item-review.create-review'));
+        setIsButtonDisabled(false);
     }
-
-    const review: Review = {
-      id: 0,
-      item_id: itemId,
-      rating,
-      comment,
-    };
-
-    const reviewId = await saveOrUpdateReview(review);
-    if (!reviewId) {
-      setIsButtonDisabled(false);
-      return;
-    }
-
-    await saveCategoryRatings(reviewId);
-    await saveReviewImages(reviewId);
-
-    setSaveButtonText(t('manage-item-review.saving-review-success'));
-    setIsButtonDisabled(false);
-
-    setTimeout(() => {
-      history.push('/app/reviews', { toast: t('manage-item-review.saving-review-success') });
-    }, 1000);
   };
 
   const handleDeletePhoto = async (photo: UserPhoto) => {
     handlePreviewClose();
-    setPhotos(photos.filter((p) => p.filepath !== photo.filepath));
+    deletePhoto(photo); // Delete the photo from the filesystem
+    setSavedPhotos(savedPhotos.filter((p) => p.filepath !== photo.filepath)); // Remove the photo from the saved photos
   }
 
   const handleReplacePhoto = async (photo: UserPhoto) => {
+    deletePhoto(photo); // Delete the photo from the filesystem
+
     handlePreviewClose();
     const newPhoto = await takePhoto(); // Save the new photo to the filesystem
+    // Delete the old photo from the filesystem
     if (!newPhoto) return;
-    setPhotos(photos.map((p) => (p.filepath === photo.filepath ? newPhoto : p)));
+    const savedPhoto = await savePhoto(newPhoto); // Save the new photo to the filesystem
+    if (!savedPhoto) return;
+    setSavedPhotos(savedPhotos.map((p) => (p.filepath === photo.filepath ? savedPhoto : p)));
   }
 
   const handleDeleteReview = async () => {
     if (!editMode) return;
     setIsButtonDisabled(true);
-    setSaveButtonText(t('manage-item-review.deleting-review'));
+    setDeleteButtonText(t('manage-item-review.deleting-review'));
 
     const reviewId = parseInt(id);
+    setDeleteButtonText(t('manage-item-review.deleting-review'));
+
     const success = await deleteReview(reviewId);
     if (!success) {
       setIsButtonDisabled(false);
-      setSaveButtonText(t('manage-item-review.delete-review'));
+      setDeleteButtonText(t('manage-item-review.delete-review'));
       showError(t('manage-item-review.error-message.error-deleting-review'));
       return;
     }
 
     // Delete review images from filesystem
-    for (const photo of savedPhotos) {
-      await deletePhoto(photo); // Delete the photo from the filesystem
+    try {
+       for (const photo of savedPhotos) {
+        await deletePhoto(photo); // Delete the photo from the filesystem
+      }
+    }catch (error) {
+      console.error("❌ Error al eliminar las imágenes de la reseña:", error);
+      // TODO: Recuperar la reseña si no se eliminan las imágenes
     }
 
-    setSaveButtonText(t('manage-item-review.delete-review-success'));
+    setDeleteButtonText(t('manage-item-review.delete-review-success'));
     setTimeout(() => {
       history.push('/app/reviews', { toast: t('manage-item-review.delete-review-success') });
-    }, 1000);
+    }, 500);
   }
 
   return (
@@ -497,7 +630,7 @@ const ManageItemReview = () => {
           <IonRow className="px-5 pb-10">
             <IonGrid>
               <IonRow className="pt-6 pb-6 gap-5 w-full">
-                <ItemSelector selectedOption={selectedOption} setSelectedOption={setSelectedOption} itemName={itemName} setItemName={setItemName} />
+                <ItemSelector selectedOption={selectedOption} setSelectedOption={setSelectedOption} itemName={itemName} setItemName={setItemName} isInitialLoad={isInitialLoad} />
 
                 {selectedOption != null && (
                   <div className="text-sm font-medium px-4 pt-2 rounded flex items-center gap-2">
@@ -535,7 +668,7 @@ const ManageItemReview = () => {
                   placeholder={t("manage-item-review.comment-input-placeholder")}
                   className="w-full"
                   value={comment}
-                  onIonChange={(e) => setComment(e.detail.value!)}
+                  onIonInput={(e => setComment(e.detail.value!))}
                 />
               </IonRow>
 
@@ -543,18 +676,18 @@ const ManageItemReview = () => {
                 <IonLabel className="section-title">{t("common.images")}</IonLabel>
 
                 <div className={`gap-x-3 gap-y-6 w-full grid grid-cols-[repeat(auto-fit,minmax(100px,max-content))] items-center`}>
-                  <div className="w-25 h-25 rounded-lg bg-[var(--ion-color-secondary)] flex items-center justify-center" onClick={async () => {setPhotos(photos.concat(await takePhoto()));}}>
+                  <div className="w-25 h-25 rounded-lg bg-[var(--ion-color-secondary)] flex items-center justify-center" onClick={async () => {handleTakePhoto();}}>
                     <Camera size={40} />
                   </div>
 
-                  <div className="w-25 h-25 rounded-lg bg-[var(--ion-color-secondary)] flex items-center justify-center" onClick={async () => {setPhotos(photos.concat(await importPhoto()));}}>
+                  <div className="w-25 h-25 rounded-lg bg-[var(--ion-color-secondary)] flex items-center justify-center" onClick={async () => {handleGetPhotoFromGallery();}}>
                     <Images size={40} />
                   </div>
 
-                  {photos.map((photo, index) => (
+                  {savedPhotos.map((photo, index) => (
                     <img
                       key={index}
-                      src={photo.webviewPath}
+                      src={Capacitor.convertFileSrc(photo.filepath!)}
                       alt={`Image ${index + 1}`}
                       className="size-25 rounded-lg object-cover"
                       onClick={() => handlePreviewOpen(photo)} // Open preview on click
@@ -571,7 +704,7 @@ const ManageItemReview = () => {
               {editMode && (
                 <IonButton
                 id="delete-review" color="danger" expand="full" className=" ml-5 mr-5" onClick={() => setIsDeleteAlertOpen(true)}>
-                  {t('manage-item-review.delete-review')}
+                  {deleteButtonText}
                 </IonButton>
               )}
             </IonGrid>
@@ -580,9 +713,9 @@ const ManageItemReview = () => {
         </IonGrid>
       </IonContent>
 
-      <CategorySelectorModal modal={modal} selectedCategory={parentCategory} setSelectedCategory={setParentCategory} />
+      <CategorySelectorModal modal={modal} selectedCategory={parentCategory} setSelectedCategory={setParentCategory} categories={categories} />
       <PreviewPhotoModal
-        photoUrl={previewPhoto?.webviewPath!}
+        photoUrl={previewPhoto?.filepath!}
         isOpen={isPreviewOpen}
         onClose={handlePreviewClose}
         showActions={true}
