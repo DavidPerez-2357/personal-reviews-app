@@ -51,7 +51,7 @@ ion-list ion-item::part(native) {
   transition-duration: 1s;
 }
 
-#save-review::part(native) {
+#save-review::part(native), #delete-review::part(native) {
     font-weight: 600;
     padding: 1rem 1.2rem;
     border-radius: 0.5rem;
