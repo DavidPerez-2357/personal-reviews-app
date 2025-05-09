@@ -10,6 +10,7 @@ import { useTranslation } from 'react-i18next';
 import ManageItemReview from '@/app/manage-review/ManageItemReview'; 
 import ReviewPage from '@/app/view-reviews/reviewPage';
 import { MoreOptions } from './more-options/moreOptions';
+import ViewItem from './view-item/ViewItem';
 
 const FooterTabBar = () => {
   const { t } = useTranslation();
@@ -23,6 +24,7 @@ const FooterTabBar = () => {
           <Route path="/app/reviews" component={ReviewPage} exact={true} />
           <Route path="/app/reviews/create" component={ManageItemReview} exact={true} />
           <Route path="/app/reviews/:id/edit" component={ManageItemReview} exact={true} />
+          <Route path="/app/items/:id/viewItem" component={ViewItem} exact={true} />
 
           <Route path="/app/items" exact={true} />
           <Route path="/app/more" exact={true} component={MoreOptions} />
