@@ -70,19 +70,19 @@ export const ReviewPage: React.FC = () => {
     initializeData();
 
     // Check for toast message in location state when component mounts or location changes
+
     if (location.state?.toast) {
       setToastMessage(location.state.toast);
       setIsToastOpen(true);
 
       (async () => {
-        setReviews([]); // Clear reviews before fetching new ones
-        const actualicedReviews = await getReviewsCards();
-        console.log("Reviews from DB:", actualicedReviews);
-        setReviews(actualicedReviews);
+      const actualicedReviews = await getReviewsCards();
+      console.log("Reviews from DB:", actualicedReviews);
+      setReviews(actualicedReviews);
       })();
 
       // Clear the state from history so the toast doesn't reappear on refresh/navigation
-      history.replace(location.pathname, undefined);
+      history.replace({ ...location, state: undefined });
     }
   }, [location.state, history, location.pathname]); // Add dependencies
 

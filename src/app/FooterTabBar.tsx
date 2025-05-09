@@ -9,6 +9,7 @@ import '@styles/FooterTabBar.css';
 import { useTranslation } from 'react-i18next';
 import ManageItemReview from '@/app/manage-review/ManageItemReview'; 
 import ReviewPage from '@/app/view-reviews/reviewPage';
+import { MoreOptions } from './more-options/moreOptions';
 
 const FooterTabBar = () => {
   const { t } = useTranslation();
@@ -24,7 +25,7 @@ const FooterTabBar = () => {
           <Route path="/app/reviews/:id/edit" component={ManageItemReview} exact={true} />
 
           <Route path="/app/items" exact={true} />
-          <Route path="/app/more" exact={true} />
+          <Route path="/app/more" exact={true} component={MoreOptions} />
           <Redirect path="/app" to="/app/reviews" exact={true} />
         </IonRouterOutlet>
         

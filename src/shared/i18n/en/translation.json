@@ -84,5 +84,19 @@
         "reset": "Reset",
         "apply": "Apply",
         "no-reviews": "No reviews available"
+    },
+
+    "more-options": {
+        "more-options": "More options",
+        "language": "Language",
+        "theme": "Theme",
+        
+        "change-theme": "Change theme",
+        "dark-mode": "Dark mode",
+        "light-mode": "Light mode",
+
+        "change-language": "Change language",
+        "spanish": "Spanish",
+        "english": "English"
     }
 }
