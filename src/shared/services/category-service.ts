@@ -1,6 +1,6 @@
 import { db } from "@/database-service";
 import { checkDB } from "@/database-service";
-import { Category, CategoryRating, CategoryRatingValue } from "@dto/Category";
+import { Category, CategoryRating, CategoryRatingMix, CategoryRatingValue } from "@dto/Category";
 
 /**
  * Obtiene todas las categorías de la base de datos.
@@ -406,17 +406,17 @@ export const deleteRatingValuesFromReview = async (reviewId: number): Promise<bo
  * @param reviewId 
  * @returns 
  */
-export const getCategoryRatingValuesByReviewId = async (reviewId: number): Promise<CategoryRatingValue[]> => {
-    try {
-        if (!checkDB()) return [];
+export const getCategoryRatingMixByReviewId = async (reviewId: number): Promise<CategoryRatingMix[]> => {
+    if (!checkDB()) return [];
 
-        const query = `SELECT * FROM category_rating_value WHERE review_id = ?`;
+    try {
+        const query = `SELECT cr.id, cr.category_id, cr.name, crv.value FROM category_rating_value crv INNER JOIN category_rating cr ON crv.category_rating_id = cr.id WHERE review_id = ?`;
         const values = [reviewId];
         const result = await db!.query(query, values);
 
-        return result.values as CategoryRatingValue[] || [];
+        return result.values as CategoryRatingMix[];
     } catch (error) {
-        console.error("❌ Error al obtener valores de puntuación de categoría por ID de reseña");
+        console.error("❌ Error al obtener valores de puntuación de categoría de la reseña");
         return [];
     }
 }
