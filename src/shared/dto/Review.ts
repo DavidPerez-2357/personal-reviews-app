@@ -14,6 +14,7 @@ export interface ReviewFull {
     images: string[];
     category: string;
     icon: string;
+    item_id: number;
     item: string;
 }
 
