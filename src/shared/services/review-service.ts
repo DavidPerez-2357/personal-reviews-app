@@ -61,6 +61,7 @@ export const getReviewsCards = async (): Promise<ReviewFull[]> => {
                    r.rating,
                    r.created_at,
                    r.updated_at,
+                   i.id                       AS item_id,
                    i.name                      AS item,
                    c.name                     AS category,
                    c.icon                     AS icon,
@@ -82,6 +83,7 @@ export const getReviewsCards = async (): Promise<ReviewFull[]> => {
                 images: row.images ? row.images.split(',') : [],
                 category: row.category,
                 icon: row.icon,
+                item_id: row.item_id,
                 item: row.item,
             }));
         } else {
