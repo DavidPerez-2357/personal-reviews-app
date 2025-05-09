@@ -65,7 +65,10 @@
             "category-not-found": "Category not found",
             "category-ratings-not-found": "Category ratings not found",
             "review-images-not-found": "Review images not found",
-            "error-deleting-review": "Error deleting review"
+            "error-deleting-review": "Error deleting review",
+            "error-deleting-item": "Error deleting item",
+            "error-deleting-review-ratings": "Error deleting review ratings",
+            "error-deleting-review-images": "Error deleting review images"
         }
     },
 

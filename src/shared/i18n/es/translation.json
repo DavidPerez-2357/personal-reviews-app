@@ -64,7 +64,11 @@
             "category-not-found": "Categoría no encontrada",
             "category-ratings-not-found": "Calificaciones de categoría no encontradas",
             "review-images-not-found": "Imágenes de reseña no encontradas",
-            "error-deleting-review": "Error al eliminar la reseña"
+            "error-deleting-review": "Error al eliminar la reseña",
+            "error-deleting-item": "Error al eliminar el elemento",
+            "error-deleting-category": "Error al eliminar la categoría",
+            "error-deleting-review-ratings": "Error al eliminar las calificaciones de la reseña",
+            "error-deleting-review-images": "Error al eliminar las imágenes de la reseña"
         }
     },
 
