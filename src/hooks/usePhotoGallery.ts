@@ -48,16 +48,28 @@ export function usePhotoGallery() {
   };
 
   const deletePhoto = async (photo: UserPhoto) => {
-    // remove photo from photos array
-    setPhotos(photos.filter((p) => p.filepath !== photo.filepath));
-    setSavedPhotos(savedPhotos.filter((p) => p.filepath !== photo.filepath));
-  
-    // delete photo file from filesystem
-    const filename = photo.filepath.substr(photo.filepath.lastIndexOf('/') + 1);
-    await Filesystem.deleteFile({
-      path: filename,
-      directory: Directory.Data,
-    });
+    try {
+        console.log("🗑️ Eliminando foto:", photo);
+
+        // Eliminar la foto del estado
+        setPhotos((prevPhotos) => prevPhotos.filter((p) => p.filepath !== photo.filepath));
+        setSavedPhotos((prevSavedPhotos) => prevSavedPhotos.filter((p) => p.filepath !== photo.filepath));
+
+        // Extraer el nombre del archivo
+        const filename = photo.filepath.substring(photo.filepath.lastIndexOf('/') + 1);
+        console.log("🗑️ Nombre del archivo a eliminar:", filename);
+
+        // Eliminar el archivo del sistema de archivos
+        await Filesystem.deleteFile({
+            path: filename,
+            directory: Directory.Data,
+        });
+
+        console.log("✅ Foto eliminada correctamente del sistema de archivos.");
+    } catch (error) {
+        console.error("❌ Error al eliminar la foto:", error);
+        throw error;
+    }
   };
 
   const importPhoto = async () => {

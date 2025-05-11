@@ -8,6 +8,8 @@ import {
     IonToolbar,
 } from "@ionic/react";
 import { useTranslation } from "react-i18next";
+import { Capacitor } from '@capacitor/core';
+import { use, useEffect, useState } from "react";
 
 interface PreviewPhotoModalProps {
     photoUrl: string;
@@ -27,6 +29,19 @@ const PreviewPhotoModal = ({
     onDelete = () => { },
 }: PreviewPhotoModalProps) => {
     const { t } = useTranslation();
+    const [imageSrc, setImageSrc] = useState<string>("");
+    
+    useEffect(() => {
+        // The photo is a file path on the device, so we need to convert it to a URL
+        const filePath = Capacitor.convertFileSrc(photoUrl) ?? "";
+
+        // Use the file path as the source for the image
+        setImageSrc(filePath);
+        console.log("Image Source:", imageSrc);
+        }
+    , [photoUrl]);
+    
+
     return (
         <IonModal
             isOpen={isOpen}
@@ -46,13 +61,12 @@ const PreviewPhotoModal = ({
             </IonHeader>
             <IonContent className="max-h-full overflow-y-scroll">
                 {showActions && (
-                    <div className="flex justify-between gap-4 mb-4">
+                    <div className="flex justify-between gap-4 pb-10 pt-1 px-5">
                         <IonButton
                             onClick={onDelete}
                             color="danger"
                             expand="block"
-                            size="large"
-                            className="flex-1"
+                            className="flex-1 text-lg h-12"
                         >
                         {t('common.delete')}
                         </IonButton>
@@ -60,14 +74,13 @@ const PreviewPhotoModal = ({
                         onClick={onReplace}
                         color="tertiary"
                         expand="block"
-                        size="large"
-                        className="flex-1"
+                        className="flex-1 text-lg h-12"
                         >
                         {t('common.replace')}
                         </IonButton>
                     </div>
                 )}
-                <img src={photoUrl} alt="Preview" className="preview" />
+                <img src={imageSrc} alt="Preview" className="preview" />
             </IonContent>
         </IonModal>
     );

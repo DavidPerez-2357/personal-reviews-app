@@ -29,6 +29,8 @@ const SubcategoriesBadgeSelector = ({ subcategories, selectedSubcategory, setSel
     };
 
     useEffect(() => {
+        console.log('subcategory selected', selectedSubcategory);
+        
         requestAnimationFrame(() => {
             checkScrollPosition();
 
@@ -39,18 +41,6 @@ const SubcategoriesBadgeSelector = ({ subcategories, selectedSubcategory, setSel
             }
         });
     }, [subcategories, selectedSubcategoryElement]);
-
-   /*  useEffect(() => {
-        requestAnimationFrame(() => {
-            checkScrollPosition();
-    
-            if (selectedSubcategoryElement) {
-                const el = selectedSubcategoryElement;
-                const scrollLeft = el.offsetLeft; // Offset para el scroll
-                scrollRef.current?.scrollTo({ left: scrollLeft, behavior: 'smooth' });
-            }
-        });
-    }, [selectedSubcategoryElement]); */
 
     if (subcategories.length === 0) {
         return null; // No hay subcategorías o la categoría padre no está definida

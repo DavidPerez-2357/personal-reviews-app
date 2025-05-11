@@ -1,7 +1,7 @@
 export interface Review {
     id: number;
     rating: number;
-    comment: string | null; 
+    comment: string; 
     item_id: number;
 }
 
