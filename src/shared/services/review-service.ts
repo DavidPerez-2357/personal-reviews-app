@@ -1,13 +1,13 @@
-import { db } from "@/database-service.ts";
-import { checkDB } from "@/database-service";
 import { Review, ReviewFull, ReviewImage } from "@dto/Review";
+import { openDatabase } from "../database/database-service";
 
 /**
  * Inserta una reseña en la base de datos.
  * @param review
  */
 export const insertReview = async (review: Review): Promise<number | null> => {
-    if (!checkDB()) return null;
+    const db = await openDatabase();
+    if (!db) return null;
     if (review.rating < 0 || review.rating > 5) {
         console.error("❌ La calificación debe estar entre 0 y 5.");
         return null;
@@ -33,10 +33,11 @@ export const insertReview = async (review: Review): Promise<number | null> => {
  * @returns Promise<Review[]>
  */
 export const getReviews = async (): Promise<Review[]> => {
+    const db = await openDatabase();
+    if (!db) return [];
+
     try {
-        if (!checkDB()) return [];
-        const query = `SELECT *
-                       FROM review`;
+        const query = `SELECT * FROM review`;
         const result = await db!.query(query);
         return result.values as Review[];
     } catch (error) {
@@ -50,11 +51,10 @@ export const getReviews = async (): Promise<Review[]> => {
  * @returns Promise<ReviewCardDTO[]>
  */
 export const getReviewsCards = async (): Promise<ReviewFull[]> => {
+    const db = await openDatabase();
+    if (!db) return [];
+
     try {
-        if (!checkDB()) {
-            console.error("❌ Error: La base de datos no está inicializada.");
-            return [];
-        };
         const query = `
             SELECT r.id,
                    r.comment,
@@ -99,10 +99,11 @@ export const getReviewsCards = async (): Promise<ReviewFull[]> => {
  * @returns Promise<ReviewImage[]>
  */
 export const getReviewImages = async (): Promise<ReviewImage[]> => {
+    const db = await openDatabase();
+    if (!db) return [];
+
     try {
-        if (!checkDB()) return [];
-        const query = `SELECT *
-                       FROM review_image`;
+        const query = `SELECT * FROM review_image`;
         const result = await db!.query(query);
         return result.values as ReviewImage[];
     } catch (error) {
@@ -116,7 +117,8 @@ export const getReviewImages = async (): Promise<ReviewImage[]> => {
  * @param reviewImage
  */
 export const insertReviewImage = async (reviewImage: ReviewImage): Promise<number | null> => {
-    if (!checkDB()) return null;
+    const db = await openDatabase();
+    if (!db) return null;
 
     try {
         const query = `INSERT INTO review_image (image, review_id)
@@ -136,7 +138,8 @@ export const insertReviewImage = async (reviewImage: ReviewImage): Promise<numbe
  * @returns Promise<void>
  */
 export const insertTestReviewImages = async (): Promise<string> => {
-    if (!checkDB()) return "❌ La base de datos no está inicializada.";
+    const db = await openDatabase();
+    if (!db) return "❌ La base de datos no está inicializada.";
 
     const existingImages = await getReviewImages();
     if (existingImages.length > 0) {
@@ -174,7 +177,8 @@ export const insertTestReviewImages = async (): Promise<string> => {
  * @returns Promise<string>
  */
 export const insertTestReviews = async (): Promise<string> => {
-    if (!checkDB()) return "❌ La base de datos no está inicializada.";
+    const db = await openDatabase();
+    if (!db) return "❌ La base de datos no está inicializada.";
 
     // Verifica si ya existen reseñas en la base de datos
     const existingReviews = await getReviews();
@@ -237,7 +241,8 @@ export const insertTestReviews = async (): Promise<string> => {
  * @returns 
  */
 export const updateReview = async (review: Review): Promise<boolean> => {
-    if (!checkDB()) return false;
+    const db = await openDatabase();
+    if (!db) return false;
     if (review.rating < 0 || review.rating > 5) {
         console.error("❌ La calificación debe estar entre 0 y 5.");
         return false;
@@ -266,7 +271,8 @@ export const updateReview = async (review: Review): Promise<boolean> => {
  * @returns 
  */
 export const getReviewById = async (id: number): Promise<Review | null> => {
-    if (!checkDB()) return null;
+    const db = await openDatabase();
+    if (!db) return null;
     try {
         const query = `SELECT * FROM review WHERE id = ?`;
         const result = await db!.query(query, [id]);
@@ -284,7 +290,8 @@ export const getReviewById = async (id: number): Promise<Review | null> => {
  * @returns 
  */
 export const getReviewImagesbyId = async (id: number): Promise<ReviewImage[]> => {
-    if (!checkDB()) return [];
+    const db = await openDatabase();
+    if (!db) return [];
     try {
         const query = `SELECT * FROM review_image WHERE review_id = ?`;
         const result = await db!.query(query, [id]);
@@ -302,7 +309,8 @@ export const getReviewImagesbyId = async (id: number): Promise<ReviewImage[]> =>
  * @returns 
  */
 export const deleteReviewImages = async (reviewId: number): Promise<boolean> => {
-    if (!checkDB()) return false;
+    const db = await openDatabase();
+    if (!db) return false;
     try {
         const query = `DELETE FROM review_image WHERE review_id = ?`;
         const result = await db!.run(query, [reviewId]);
@@ -320,7 +328,8 @@ export const deleteReviewImages = async (reviewId: number): Promise<boolean> => 
  * @returns 
  */
 export const deleteReview = async (id: number): Promise<boolean> => {
-    if (!checkDB()) return false;
+    const db = await openDatabase();
+    if (!db) return false;
     try {
         const query = `DELETE FROM review WHERE id = ?`;
         const result = await db!.run(query, [id]);

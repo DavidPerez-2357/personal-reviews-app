@@ -1,4 +1,4 @@
-import {checkDB, db} from "@/database-service";
+import { openDatabase } from "../database/database-service";
 import { Item, ItemOption, Origin } from "../dto/Item";
 
 /**
@@ -6,7 +6,8 @@ import { Item, ItemOption, Origin } from "../dto/Item";
  * @param item
  */
 export const insertItem = async (item: Item): Promise<number | null> => {
-    if (!checkDB()) return null;
+    const db = await openDatabase();
+    if (!db) return null;
 
     try {
         const query = `INSERT INTO item (name, image, category_id) VALUES (?, ?, ?)`;
@@ -25,8 +26,10 @@ export const insertItem = async (item: Item): Promise<number | null> => {
  * @returns Promise<Item[]>
  */
 export const getItems = async (): Promise<Item[]> => {
+    const db = await openDatabase();
+    if (!db) return [];
+
     try {
-        if (!checkDB()) return [];
         const query = `SELECT * FROM item`;
         const result = await db!.query(query);
         return result.values as Item[];
@@ -41,7 +44,8 @@ export const getItems = async (): Promise<Item[]> => {
  * @param origin
  */
 export const insertOrigin = async (origin: Origin): Promise<boolean> => {
-    if (!checkDB()) return false;
+    const db = await openDatabase();
+    if (!db) return false;
 
     try {
         const query = `INSERT INTO origin_item (item1_id, item2_id) VALUES (?, ?)`;
@@ -56,7 +60,8 @@ export const insertOrigin = async (origin: Origin): Promise<boolean> => {
 };
 
 export const getItemOptions = async (search: string): Promise<ItemOption[]> => {
-    if (!checkDB()) return [];
+    const db = await openDatabase();
+    if (!db) return [];
 
     try {
         const query = `SELECT i.id, i.name, i.category_id, c.parent_id AS parent_category_id, IFNULL(p.icon, c.icon) AS parent_category_icon
@@ -76,7 +81,8 @@ export const getItemOptions = async (search: string): Promise<ItemOption[]> => {
 }
 
 export const updateItem = async (item: Item): Promise<boolean> => {
-    if (!checkDB()) return false;
+    const db = await openDatabase();
+    if (!db) return false;
 
     try {
         const query = `UPDATE item SET name = ?, image = ?, category_id = ? WHERE id = ?`;
@@ -91,7 +97,8 @@ export const updateItem = async (item: Item): Promise<boolean> => {
 }
 
 export const insertTestItems = async (): Promise<void> => {
-    if (!checkDB()) return;
+    const db = await openDatabase();
+    if (!db) return;
 
     const items: Item[] = [
         { id: 1, name: "iPhone 13", image: "iphone-13.jpg", category_id: 11 },
@@ -127,7 +134,9 @@ export const insertTestItems = async (): Promise<void> => {
 }
 
 export const getItemById = async (id: number): Promise<Item | null> => {
-    if (!checkDB()) return null;
+    const db = await openDatabase();
+    if (!db) return null;
+
     try {
         const query = `SELECT * FROM item WHERE id = ?`;
         const result = await db!.query(query, [id]);

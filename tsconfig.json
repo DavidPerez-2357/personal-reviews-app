@@ -26,6 +26,7 @@
       "@dto/*": ["src/shared/dto/*"],
       "@services/*": ["src/shared/services/*"],
       "@shared/*": ["src/shared/*"],
+      "@utils/*": ["src/shared/utils/*"]
     }
   },
   "include": ["src"],
