@@ -12,7 +12,6 @@ import { useEffect, useState } from 'react';
 
 import { library } from '@fortawesome/fontawesome-svg-core'
 import { fas } from '@fortawesome/free-solid-svg-icons';
-import { initDB } from '@/database-service';
 import { openDatabase } from '@/shared/database/database-service';
 
 library.add(fas);
