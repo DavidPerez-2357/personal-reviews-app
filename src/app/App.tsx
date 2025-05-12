@@ -13,6 +13,7 @@ import { useEffect, useState } from 'react';
 import { library } from '@fortawesome/fontawesome-svg-core'
 import { fas } from '@fortawesome/free-solid-svg-icons';
 import { initDB } from '@/database-service';
+import { openDatabase } from '@/shared/database/database-service';
 
 library.add(fas);
 
@@ -49,7 +50,7 @@ const App: React.FC = () => {
         });
 
         // Initialize Database
-        await initDB();
+        await openDatabase();
         console.log('Base de datos inicializada');
 
         // Uncomment if you need test data
