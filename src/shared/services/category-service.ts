@@ -1,5 +1,6 @@
 import { Category, CategoryRating, CategoryRatingMix, CategoryRatingValue } from "@dto/Category";
 import { openDatabase } from "../database/database-service";
+import i18n from 'i18next';
 
 /**
  * Obtiene todas las categorías de la base de datos.
@@ -432,4 +433,75 @@ export const getCategoryRatingMixByReviewId = async (reviewId: number): Promise<
         console.error("❌ Error al obtener valores de puntuación de categoría de la reseña");
         return [];
     }
+}
+
+export const insertDefaultCategories = async (db: any) => {
+    const defaultReviewCategories = [
+    // 🍔 Comida
+    {
+        id: 1,
+        name: i18n.t('categories.food'),
+        type: 2,
+        color: 'orange',
+        icon: 'utensils',
+        parent_id: null,
+    },
+    {
+        id: 2,
+        name: i18n.t('categories.burger'),
+        type: 2,
+        color: 'red',
+        icon: 'hamburger',
+        parent_id: 1,
+    },
+
+    // 📱 Tecnología
+    {
+        id: 3,
+        name: i18n.t('categories.smartphone'),
+        type: 2,
+        color: 'cyan',
+        icon: 'mobile-alt',
+        parent_id: null,
+    },
+
+    // 👕 Moda
+    {
+        id: 4,
+        name: i18n.t('categories.fashion'),
+        type: 2,
+        color: 'gray',
+        icon: 'tshirt',
+        parent_id: null,
+    },
+
+    // 💆 Servicios personales
+    {
+        id: 5,
+        name: i18n.t('categories.personal_care'),
+        type: 2,
+        color: 'green',
+        icon: 'spa',
+        parent_id: null,
+    },
+
+    // 🎬 Entretenimiento
+    {
+        id: 6,
+        name: i18n.t('categories.movie'),
+        type: 2,
+        color: 'crimson',
+        icon: 'film',
+        parent_id: null,
+    }
+    ];
+
+    for (const category of defaultReviewCategories) {
+        await db.run(
+            `INSERT INTO category (id, name, type, color, icon, parent_id) VALUES (?, ?, ?, ?, ?, ?)`,
+            [category.id, category.name, category.type, category.color, category.icon, category.parent_id]
+        );
+    }
+
+    console.log("✅ Categorías por defecto insertadas correctamente.");
 }
