@@ -98,5 +98,14 @@
         "change-language": "Change language",
         "spanish": "Spanish",
         "english": "English"
+    },
+
+    "categories": {
+        "food": "Food",
+        "burger": "Burger",
+        "smartphone": "Smartphone",
+        "fashion": "Fashion",
+        "personal_care": "Personal care",
+        "movie": "Movie"
     }
 }
