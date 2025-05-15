@@ -97,6 +97,14 @@
         "change-language": "Cambiar idioma",
         "spanish": "Español",
         "english": "Inglés"
-    }
+    },
 
+    "categories": {
+        "food": "Comida",
+        "burger": "Hamburguesa",
+        "smartphone": "Teléfono móvil",
+        "fashion": "Moda",
+        "personal_care": "Cuidado personal",
+        "movie": "Película"
+    }
 }

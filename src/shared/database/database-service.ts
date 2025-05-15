@@ -3,6 +3,7 @@ import { CapacitorSQLite } from '@capacitor-community/sqlite';
 import { storageService } from '@utils/storage';
 import { applyMigrations } from './migrations';
 import schema from './initial-schema.sql?raw';
+import { insertDefaultCategories } from '../services/category-service';
 
 const DB_NAME = 'personal-reviews-db';
 const DB_VERSION = 1;
@@ -31,9 +32,7 @@ export async function openDatabase() {
 
   const currentVersion = (await storageService.get(DB_VERSION_KEY)) || 0;
 
-  if (currentVersion == 0) {
-    console.log(currentVersion);
-    
+  if (currentVersion == 0) {    
     const queries = schema.split(';').map(query => query.trim()).filter(query => query.length > 0);
     
     for (const query of queries) {
@@ -43,6 +42,7 @@ export async function openDatabase() {
         }
     }
 
+    await insertDefaultCategories(dbInstance);
     await storageService.set(DB_VERSION_KEY, 1);
   }
 
