@@ -94,6 +94,9 @@ const ManageItemReview = () => {
   const [selectedOption, setSelectedOption] = useState<ItemOption | null>(null);
   const [comment, setComment] = useState("");
 
+  // Variables para edicion
+  const [reviewHasPhotos, setReviewHasPhotos] = useState(false); // Variable para saber si la reseña tiene fotos cuando se edita
+
   // Variables de categorias
   const [categories, setCategories] = useState<Category[]>([]);
 
@@ -150,6 +153,7 @@ const ManageItemReview = () => {
             webviewPath: Capacitor.convertFileSrc(image.image),
         }));
         setSavedPhotos(photosConverted);
+        setReviewHasPhotos(photosConverted.length > 0);
 
         setCategoryRatings(categoryRatingsFound);
 
@@ -437,11 +441,8 @@ const ManageItemReview = () => {
   const saveReviewImages = async (reviewId: number) => {
     if (savedPhotos.length === 0) return true; // No hay fotos para guardar
 
-
-
     try {
-
-        if (editMode && savedPhotos.length > 0) {
+        if (editMode && savedPhotos.length > 0 && reviewHasPhotos) {
             const success = await deleteReviewImages(reviewId);
             if (!success) throw new Error(t('manage-item-review.error-message.error-saving-review-images'));
         }
