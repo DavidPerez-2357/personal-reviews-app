@@ -439,40 +439,17 @@ const ManageItemReview = () => {
 
   /** Guarda las imágenes asociadas a la review */
   const saveReviewImages = async (reviewId: number) => {
-    if (savedPhotos.length === 0) return true; // No hay fotos para guardar
-
-    try {
-        if (editMode && savedPhotos.length > 0 && reviewHasPhotos) {
+    try {      
+        if (editMode && reviewHasPhotos) {
+            console.log("🔍 Editando reseña, eliminando imágenes existentes...");
             const success = await deleteReviewImages(reviewId);
             if (!success) throw new Error(t('manage-item-review.error-message.error-saving-review-images'));
         }
-        /* const localSavedPhotos = [...savedPhotos]; // Copia local de las fotos guardadas
 
-        i
-
-        for (const photo of photos) {
-            // Guardar la foto en el sistema de archivos
-            if (localSavedPhotos.find((p) => p.filepath === photo.filepath)) continue; // Si la foto ya está guardada, no la guardamos de nuevo
-
-            const savedPhoto = await savePhoto(photo);
-            console.log("✅ Foto guardada:", savedPhoto);
-
-            if (!savedPhoto) throw new Error(t('manage-item-review.error-message.error-saving-review-images'));
-            localSavedPhotos.push(savedPhoto); // Agregar la foto guardada a la copia local
-        }
-
-        // Actualizar el estado con las fotos guardadas
-        setSavedPhotos(localSavedPhotos); */
+        if (savedPhotos.length === 0) return true; // No hay fotos para guardar
 
         for (const photo of savedPhotos) {
             console.log("🔍 Revisando foto:", photo);
-
-            // Si la foto no está en `photos`, la eliminamos
-            /* if (!photos.find((p) => p.filepath === photo.filepath)) {
-                console.log("🗑️ Eliminando foto no utilizada:", photo);
-                await deletePhoto(photo); // Eliminar la foto del sistema de archivos
-                continue;
-            } */
 
             const reviewImage: ReviewImage = {
                 review_id: reviewId,
@@ -554,13 +531,29 @@ const ManageItemReview = () => {
 
   const handleDeletePhoto = async (photo: UserPhoto) => {
     handlePreviewClose();
-    deletePhoto(photo); // Delete the photo from the filesystem
-    setSavedPhotos(savedPhotos.filter((p) => p.filepath !== photo.filepath)); // Remove the photo from the saved photos
+
+    try {
+      await deletePhoto(photo);
+      console.log("✅ Foto eliminada correctamente del sistema de archivos.");
+    } catch (error) {
+      console.error("❌ Error al eliminar la foto:", error);
+    }
+
+    // Actualiza el estado después de eliminar la foto
+    setSavedPhotos((prevPhotos) => {
+      const updatedPhotos = prevPhotos.filter((p) => p.filepath !== photo.filepath);
+      console.log("🔍 Fotos guardadas después de eliminar:", updatedPhotos.length);
+      return updatedPhotos;
+    });
   }
 
   const handleReplacePhoto = async (photo: UserPhoto) => {
-    deletePhoto(photo); // Delete the photo from the filesystem
-
+    try {
+      await deletePhoto(photo); // Delete the photo from the filesystem
+    } catch (error) {
+      console.error("❌ Error al eliminar la foto:", error);
+    }
+    
     handlePreviewClose();
     const newPhoto = await takePhoto(); // Save the new photo to the filesystem
     // Delete the old photo from the filesystem
