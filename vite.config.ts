@@ -28,6 +28,7 @@ export default defineConfig({
       '@dto': path.resolve(__dirname, 'src/shared/dto'),
       '@services': path.resolve(__dirname, 'src/shared/services'),
       '@shared': path.resolve(__dirname, 'src/shared'),
+      '@utils': path.resolve(__dirname, 'src/shared/utils'),
     },
   },
 });

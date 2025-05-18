@@ -12,7 +12,8 @@ import { useEffect, useState } from 'react';
 
 import { library } from '@fortawesome/fontawesome-svg-core'
 import { fas } from '@fortawesome/free-solid-svg-icons';
-import { initDB } from '@/database-service';
+import Loader from '@/shared/components/Loader';
+import { openDatabase } from '@/shared/database/database-service';
 
 library.add(fas);
 
@@ -49,7 +50,7 @@ const App: React.FC = () => {
         });
 
         // Initialize Database
-        await initDB();
+        await openDatabase();
         console.log('Base de datos inicializada');
 
         // Uncomment if you need test data
@@ -73,7 +74,7 @@ const App: React.FC = () => {
   if (!dbReady) {
     return (
       <IonApp>
-        <div style={{ padding: '2rem', textAlign: 'center' }}>Inicializando base de datos...</div>
+        <Loader />
       </IonApp>
     );
   }

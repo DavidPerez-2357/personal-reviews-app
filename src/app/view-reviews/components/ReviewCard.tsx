@@ -7,6 +7,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { IconName } from "@fortawesome/fontawesome-svg-core";
 import PreviewPhotoModal from "@/shared/components/PreviewPhotoModal";
 import StarRating from "@/shared/components/StarRating";
+import { Capacitor } from '@capacitor/core';
 
 const ReviewCard = ({ review }: { review: ReviewFull }) => {
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -47,7 +48,7 @@ const ReviewCard = ({ review }: { review: ReviewFull }) => {
               {review.images.map((image, index) => (
                 <img
                   key={index}
-                  src={image}
+                  src={Capacitor.convertFileSrc(image)}
                   alt={`Review image ${index + 1}`}
                   className="size-20 object-cover rounded-md border border-[var(--ion-color-secondary)]"
                   onClick={() => {

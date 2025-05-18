@@ -1,14 +1,16 @@
-import { db } from "@/database-service";
-import { checkDB } from "@/database-service";
 import { Category, CategoryRating, CategoryRatingMix, CategoryRatingValue } from "@dto/Category";
+import { openDatabase } from "../database/database-service";
+import i18n from 'i18next';
 
 /**
  * Obtiene todas las categorías de la base de datos.
  * @returns Promise<Category[]>
  */
 export const getCategories = async (): Promise<Category[]> => {
+    const db = await openDatabase();
+    if (!db) return [];
+
     try {
-        if (!checkDB()) return [];
         const query = `SELECT * FROM category`;
         const result = await db!.query(query);
         return result.values as Category[];
@@ -24,7 +26,8 @@ export const getCategories = async (): Promise<Category[]> => {
  * @returns Promise<number | null>
  */
 export const insertCategory = async (category: Category): Promise<number | null | unknown> => {
-    if (!checkDB()) return null;
+    const db = await openDatabase();
+    if (!db) return null;
 
     try {
         const query = `INSERT INTO category (name, type, color, icon, parent_id) VALUES (?, ?, ?, ?, ?)`;
@@ -43,7 +46,8 @@ export const insertCategory = async (category: Category): Promise<number | null 
  * @param categoryRating
  */
 export const insertCategoryRating = async (categoryRating: CategoryRating): Promise<number | null> => {
-    if (!checkDB()) return null;
+    const db = await openDatabase();
+    if (!db) return null;
 
     try {
         const query = `INSERT INTO category_rating (name, category_id) VALUES (?, ?)`;
@@ -63,7 +67,8 @@ export const insertCategoryRating = async (categoryRating: CategoryRating): Prom
  * @param categoryRatingValue
  */
 export const insertCategoryRatingValue = async (categoryRatingValue: CategoryRatingValue): Promise<number | null> => {
-    if (!checkDB()) return null;
+    const db = await openDatabase();
+    if (!db) return null;
     if (categoryRatingValue.value < 0 || categoryRatingValue.value > 10) {
         console.error("❌ El valor debe estar entre 0 y 10.");
         return null;
@@ -86,8 +91,10 @@ export const insertCategoryRatingValue = async (categoryRatingValue: CategoryRat
  * @returns Promise<CategoryRating[]>
  */
 export const getCategoryRatings = async (): Promise<CategoryRating[]> => {
+    const db = await openDatabase();
+    if (!db) return [];
+
     try {
-        if (!checkDB()) return [];
         const query = `SELECT * FROM category_rating`;
         const result = await db!.query(query);
         return result.values as CategoryRating[];
@@ -103,8 +110,10 @@ export const getCategoryRatings = async (): Promise<CategoryRating[]> => {
  * @returns Promise<CategoryRatingValue[]>
  */
 export const getCategoryRatingsByCategoryId = async (categoryId: number): Promise<CategoryRating[]> => {
+    const db = await openDatabase();
+    if (!db) return [];
+
     try {
-        if (!checkDB()) return [];
         const query = `SELECT * FROM category_rating WHERE category_id = ?`;
         const values = [categoryId];
         const result = await db!.query(query, values);
@@ -120,8 +129,10 @@ export const getCategoryRatingsByCategoryId = async (categoryId: number): Promis
  * @returns Promise<CategoryRatingValue[]>
  */
 export const getCategoryRatingValues = async (): Promise<CategoryRatingValue[]> => {
+    const db = await openDatabase();
+    if (!db) return [];
+
     try {
-        if (!checkDB()) return [];
         const query = `SELECT * FROM category_rating_value`;
         const result = await db!.query(query);
         return result.values as CategoryRatingValue[];
@@ -135,7 +146,8 @@ export const getCategoryRatingValues = async (): Promise<CategoryRatingValue[]> 
  * Elimina una categoría de la base de datos.
  */
 export const deleteCategory = async (id: number): Promise<boolean> => {
-    if (!checkDB()) return false;
+    const db = await openDatabase();
+    if (!db) return false;
 
     try {
         const query = `DELETE FROM category WHERE id = ?`;
@@ -153,7 +165,8 @@ export const deleteCategory = async (id: number): Promise<boolean> => {
  * Elimina todas las categorías de la base de datos.
  */
 export const deleteAllCategories = async (): Promise<boolean> => {
-    if (!checkDB()) return false;
+    const db = await openDatabase();
+    if (!db) return false;
 
     try {
         const query = `DELETE FROM category`; // Eliminar todos los registros de la tabla category
@@ -171,7 +184,8 @@ export const deleteAllCategories = async (): Promise<boolean> => {
  * @returns Promise<string>
  */
 export const insertTestCategories = async (): Promise<string> => {
-    if (!checkDB()) return "❌ La base de datos no está inicializada.";
+    const db = await openDatabase();
+    if (!db) return "❌ La base de datos no está inicializada.";
 
     try {
         const existingCategories = await getCategories();
@@ -218,7 +232,8 @@ export const insertTestCategories = async (): Promise<string> => {
  * @returns 
  */
 export const insertTestCategoryRating = async (): Promise<string> => {
-    if (!checkDB()) return "❌ La base de datos no está inicializada.";
+    const db = await openDatabase();
+    if (!db) return "❌ La base de datos no está inicializada.";
 
     try {
         const existingCategoryRatings = await getCategoryRatings();
@@ -250,20 +265,20 @@ export const insertTestCategoryRating = async (): Promise<string> => {
  * @param category 
  * @returns 
  */
-export const updateCategory = (category: Category): Promise<boolean> => {
-    if (!checkDB()) return Promise.resolve(false);
+export const updateCategory = async (category: Category): Promise<boolean> => {
+    const db = await openDatabase();
+    if (!db) return false;
 
-    return new Promise((resolve, reject) => {
+    try {
         const query = `UPDATE category SET name = ?, type = ?, color = ?, icon = ?, parent_id = ? WHERE id = ?`;
         const values = [category.name, category.type, category.color, category.icon, category.parent_id, category.id];
 
-        db!.run(query, values)
-            .then(() => resolve(true))
-            .catch((error) => {
-                console.error("❌ Error al actualizar categoría");
-                resolve(false);
-            });
-    });
+        await db!.run(query, values);
+        return true;
+    } catch (error) {
+        console.error("❌ Error al actualizar categoría");
+        return false;
+    }
 }
 
 /**
@@ -272,26 +287,19 @@ export const updateCategory = (category: Category): Promise<boolean> => {
  * @param itemId 
  * @returns 
  */
-export const getCategoryFromItem = (itemId: number): Promise<Category | null> => {
-    if (!checkDB()) return Promise.resolve(null);
+export const getCategoryFromItem = async (itemId: number): Promise<Category | null> => {
+    const db = await openDatabase();
+    if (!db) return null;
 
-    return new Promise((resolve, reject) => {
+    try {
         const query = `SELECT c.* FROM category c INNER JOIN item i ON c.id = i.category_id WHERE i.id = ?`;
         const values = [itemId];
-
-        db!.run(query, values)
-            .then((result) => {
-                if (result) {
-                    resolve(result as Category);
-                } else {
-                    resolve(null);
-                }
-            })
-            .catch((error) => {
-                console.error("❌ Error al obtener categoría del item");
-                resolve(null);
-            });
-    });
+        const result = await db!.query(query, values);
+        return result.values?.[0] as Category || null;
+    } catch (error) {
+        console.error("❌ Error al obtener categoría del item");
+        return null;
+    }
 }
 
 /**
@@ -299,8 +307,10 @@ export const getCategoryFromItem = (itemId: number): Promise<Category | null> =>
  * @returns Promise<Category[]>
  */
 export const getParentCategories = async (): Promise<Category[]> => {
+    const db = await openDatabase();
+    if (!db) return [];
+
     try {
-        if (!checkDB()) return [];
         const query = `SELECT * FROM category WHERE parent_id IS NULL`;
         const result = await db!.query(query);
         return result.values as Category[];
@@ -317,9 +327,9 @@ export const getParentCategories = async (): Promise<Category[]> => {
  * @returns 
  */
 export const getParentCategory = async (categoryId: number): Promise<Category | null> => {
+    const db = await openDatabase();
+    if (!db) return null;
     try {
-        if (!checkDB()) return null;
-
         // Obtener la categoría actual
         const queryCategory = `SELECT * FROM category WHERE id = ?`;
         const valuesCategory = [categoryId];
@@ -350,9 +360,10 @@ export const getParentCategory = async (categoryId: number): Promise<Category | 
 }
 
 export const getChildrenCategories = async (categoryId: number): Promise<Category[]> => {
-    try {
-        if (!checkDB()) return [];
+    const db = await openDatabase();
+    if (!db) return [];
 
+    try {
         const query = `SELECT * FROM category WHERE parent_id = ?`;
         const values = [categoryId];
         const result = await db!.query(query, values);
@@ -365,9 +376,10 @@ export const getChildrenCategories = async (categoryId: number): Promise<Categor
 }
 
 export const getCategoryById = async (categoryId: number): Promise<Category | null> => {
-    try {
-        if (!checkDB()) return null;
+    const db = await openDatabase();
+    if (!db) return null;
 
+    try {
         const query = `SELECT * FROM category WHERE id = ?`;
         const values = [categoryId];
         const result = await db!.query(query, values);
@@ -386,7 +398,8 @@ export const getCategoryById = async (categoryId: number): Promise<Category | nu
  * @returns 
  */
 export const deleteRatingValuesFromReview = async (reviewId: number): Promise<boolean> => {
-    if (!checkDB()) return false;
+    const db = await openDatabase();
+    if (!db) return false;
 
     try {
         const query = `DELETE FROM category_rating_value WHERE review_id = ?`;
@@ -407,7 +420,8 @@ export const deleteRatingValuesFromReview = async (reviewId: number): Promise<bo
  * @returns 
  */
 export const getCategoryRatingMixByReviewId = async (reviewId: number): Promise<CategoryRatingMix[]> => {
-    if (!checkDB()) return [];
+    const db = await openDatabase();
+    if (!db) return [];
 
     try {
         const query = `SELECT cr.id, cr.category_id, cr.name, crv.value FROM category_rating_value crv INNER JOIN category_rating cr ON crv.category_rating_id = cr.id WHERE review_id = ?`;
@@ -419,4 +433,75 @@ export const getCategoryRatingMixByReviewId = async (reviewId: number): Promise<
         console.error("❌ Error al obtener valores de puntuación de categoría de la reseña");
         return [];
     }
+}
+
+export const insertDefaultCategories = async (db: any) => {
+    const defaultReviewCategories = [
+    // 🍔 Comida
+    {
+        id: 1,
+        name: i18n.t('categories.food'),
+        type: 2,
+        color: 'orange',
+        icon: 'utensils',
+        parent_id: null,
+    },
+    {
+        id: 2,
+        name: i18n.t('categories.burger'),
+        type: 2,
+        color: 'red',
+        icon: 'hamburger',
+        parent_id: 1,
+    },
+
+    // 📱 Tecnología
+    {
+        id: 3,
+        name: i18n.t('categories.smartphone'),
+        type: 2,
+        color: 'cyan',
+        icon: 'mobile-alt',
+        parent_id: null,
+    },
+
+    // 👕 Moda
+    {
+        id: 4,
+        name: i18n.t('categories.fashion'),
+        type: 2,
+        color: 'gray',
+        icon: 'tshirt',
+        parent_id: null,
+    },
+
+    // 💆 Servicios personales
+    {
+        id: 5,
+        name: i18n.t('categories.personal_care'),
+        type: 2,
+        color: 'green',
+        icon: 'spa',
+        parent_id: null,
+    },
+
+    // 🎬 Entretenimiento
+    {
+        id: 6,
+        name: i18n.t('categories.movie'),
+        type: 2,
+        color: 'crimson',
+        icon: 'film',
+        parent_id: null,
+    }
+    ];
+
+    for (const category of defaultReviewCategories) {
+        await db.run(
+            `INSERT INTO category (id, name, type, color, icon, parent_id) VALUES (?, ?, ?, ?, ?, ?)`,
+            [category.id, category.name, category.type, category.color, category.icon, category.parent_id]
+        );
+    }
+
+    console.log("✅ Categorías por defecto insertadas correctamente.");
 }
