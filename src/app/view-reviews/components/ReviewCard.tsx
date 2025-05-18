@@ -17,8 +17,6 @@ const ReviewCard = ({ review }: { review: ReviewFull }) => {
     setIsModalOpen(true);
   };
 
-  console.log("Item ID:", review.item_id);
-
   return (
     <div className="flex flex-col gap-3 border-2 border-[var(--ion-color-secondary)] rounded-md p-2">
       <IonCard className="pb-4 pt-2">
