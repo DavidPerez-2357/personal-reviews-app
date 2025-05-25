@@ -1,5 +1,5 @@
 import { openDatabase } from "../database/database-service";
-import { Item, ItemOption, Origin } from "../dto/Item";
+import { Item, ItemOption, ItemWithCategory, Origin } from "../dto/Item";
 
 /**
  * Inserta un ítem en la base de datos.
@@ -92,6 +92,22 @@ export const updateItem = async (item: Item): Promise<boolean> => {
         return true;
     } catch (error) {
         console.error("❌ Error al actualizar ítem", error);
+        return false;
+    }
+}
+
+export const updateItemWithCategory = async (item: ItemWithCategory): Promise<boolean> => {
+    const db = await openDatabase();
+    if (!db) return false;
+
+    try {
+        const query = `UPDATE item SET name = ?, category_id = ? WHERE id = ?`;
+        const values = [item.name, item.category_id, item.id];
+
+        await db!.run(query, values);
+        return true;
+    } catch (error) {
+        console.error("❌ Error al actualizar ítem con categoría", error);
         return false;
     }
 }

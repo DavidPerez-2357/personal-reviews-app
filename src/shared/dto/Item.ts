@@ -5,6 +5,12 @@ export interface Item {
     category_id: number;
 }
 
+export interface ItemWithCategory {
+    id: number;
+    name: string;
+    category_id: number;
+}
+
 export interface ItemOption {
     id: number;
     name: string;
