@@ -248,12 +248,11 @@ export const insertTestOriginItemRelations = async (): Promise<void> => {
     { origin_id: 13, item_id: 16 }  // Lámpara
   ];
 
-  for (const { origin_id, item_id } of originItemPairs) {
-    await db.run(
-      `INSERT INTO origin_item (origin_id, item_id) VALUES (?, ?)`,
-      [origin_id, item_id]
-    );
-  }
+  const placeholders = originItemPairs.map(() => "(?, ?)").join(", ");
+  const values = originItemPairs.flatMap(({ origin_id, item_id }) => [origin_id, item_id]);
+  const query = `INSERT INTO origin_item (origin_id, item_id) VALUES ${placeholders}`;
+
+  await db.run(query, values);
 };
 
 
