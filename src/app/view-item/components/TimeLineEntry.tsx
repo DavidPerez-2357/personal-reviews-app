@@ -16,7 +16,9 @@ const TimelineEntry: React.FC<{ entry: TimelineEntry }> = ({ entry }) => {
 
       {/* Content */}
       <div className="ml-8">
-        <div className="text-[var(--ion-color-muted)] font-medium mb-2">{entry.date}</div>
+        <div className="text-[var(--ion-color-muted)] font-medium mb-2">
+          {new Date(entry.date).toLocaleDateString()}
+        </div>
         <StarRating 
             size={30}
             rating={entry.rating}
