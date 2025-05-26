@@ -41,11 +41,9 @@ const ManageItemReview = () => {
   const history = useHistory();
   const { t } = useTranslation();
   const location = useLocation();
-  const itemId = location.state?.itemId;
+ const itemId = location.state?.itemId; 
 
-  if (process.env.NODE_ENV === 'development') {  
-    console.debug("itemId", itemId);  
-  }  
+  console.log("itemId", itemId);
   // Variable de no encontrar categorias
   const notFoundAnyCategories: Category = {
     id: 0,
