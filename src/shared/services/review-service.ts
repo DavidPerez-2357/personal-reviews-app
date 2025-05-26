@@ -74,7 +74,7 @@ export const getReviewsCards = async (): Promise<ReviewFull[]> => {
         `;
         const result = await db!.query(query);
         if (result && result.values) {
-            return result.values.map((row) => ({
+            return result.values.map((row: any) => ({
                 id: row.id,
                 comment: row.comment,
                 rating: row.rating,
@@ -224,9 +224,6 @@ export const insertTestReviews = async (): Promise<string> => {
             { id: 30, rating: 3, comment: "Lo tengo hace poco, y no me termina de convencer", item_id: 5, created_at: "2024-05-05T15:00:00Z", updated_at: "2024-05-06T08:00:00Z" }
         ];
 
-
-          
-
         for (const review of reviews) {
             // No need for type assertion anymore
             await insertReview(review);
@@ -341,5 +338,33 @@ export const deleteReview = async (id: number): Promise<boolean> => {
     } catch (error) {
         console.error("❌ Error al eliminar reseña", error);
         return false;
+    }
+}
+
+/**
+ * Devuelve las reseñas de un ítem.
+ * 
+ * @param itemId
+ * @returns Promise<Review[]>
+ */
+export const getReviewsByItemId = async (itemId: number): Promise<Review[]> => {
+    const db = await openDatabase();
+    if (!db) return [];
+    try {
+        const query = `select
+                            r.id,
+                            r.rating,
+                            r.comment,
+                            r.item_id,
+                            r.created_at,
+                            r.updated_at
+                            from review r
+                            join item i on i.id = r.item_id
+                            where i.id = ?;`;
+        const result = await db!.query(query, [itemId]);
+        return result.values as Review[] || [];
+    } catch (error) {
+        console.error("❌ Error al obtener reseñas por ID de ítem", error);
+        return [];
     }
 }
