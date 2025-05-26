@@ -53,7 +53,7 @@ const StarCheckbox = ({ index, checked, size, rating, setRating, canEdit = true 
     return (
         <label title="Star" className="star">
             <input className="checkbox hidden" type="checkbox" checked={checked} onChange={handleClick} id={`star-${index}`} />
-            <Star size={iconSize} fill={checked ? colorsForRating[rating] : "var( --ion-color-secondary)"} color="none" className={`transition-all ${(checked && rating == 5 && canEdit) && ` rotate-animation-1 animation-ease animation-delay-${index - 1}00ms`}`} />
+            <Star size={iconSize} fill={checked ? colorsForRating[rating] : "var( --ion-color-secondary-step-100)"} color="none" className={`transition-all ${(checked && rating == 5 && canEdit) && ` rotate-animation-1 animation-ease animation-delay-${index - 1}00ms`}`} />
         </label>
     )
 }
