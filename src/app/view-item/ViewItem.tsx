@@ -222,14 +222,14 @@ export const ViewItem = () => {
                   }`}
                 >
                   <div className="relative flex flex-col justify-center mx-10 pt-4">
-                    {reviews.map((entry, index) => (
+                    {reviews.map((entry) => (
                       <TimelineEntry
-                        key={index}
-                        entry={{
-                          date: entry.created_at,
-                          rating: entry.rating,
-                          comment: entry.comment,
-                        }}
+                      key={entry.id}
+                      entry={{
+                        date: entry.created_at,
+                        rating: entry.rating,
+                        comment: entry.comment,
+                      }}
                       />
                     ))}
                     {/* Extending the timeline line to the bottom */}
@@ -248,9 +248,9 @@ export const ViewItem = () => {
               <StatOriginView items={itemsOfOrigin} />
               <IonGrid className="gap-4 mt-2">
                 <div className="flex flex-col gap-7">
-                  {itemsOfOrigin.map((item) => (
-                    <ItemCard item={item} />
-                  ))}
+                    {itemsOfOrigin.map((item) => (
+                    <ItemCard key={item.id} item={item} />
+                    ))}
                 </div>
               </IonGrid>
             </div>
