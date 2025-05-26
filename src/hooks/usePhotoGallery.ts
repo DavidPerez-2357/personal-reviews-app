@@ -4,7 +4,6 @@ import { useState } from 'react';
 import { Filesystem, Directory } from '@capacitor/filesystem';
 
 export function usePhotoGallery() {
-  const [photos, setPhotos] = useState<UserPhoto[]>([]);
   const [savedPhotos, setSavedPhotos] = useState<UserPhoto[]>([]);
 
   const savePhoto = async (photo: UserPhoto): Promise<UserPhoto> => {
@@ -47,13 +46,10 @@ export function usePhotoGallery() {
     }
   };
 
-  const deletePhoto = async (photo: UserPhoto) => {
-    try {
+  const deletePhoto = (photo: UserPhoto): Promise<void> => {
+    return new Promise(async (resolve, reject) => {
+      try {
         console.log("🗑️ Eliminando foto:", photo);
-
-        // Eliminar la foto del estado
-        setPhotos((prevPhotos) => prevPhotos.filter((p) => p.filepath !== photo.filepath));
-        setSavedPhotos((prevSavedPhotos) => prevSavedPhotos.filter((p) => p.filepath !== photo.filepath));
 
         // Extraer el nombre del archivo
         const filename = photo.filepath.substring(photo.filepath.lastIndexOf('/') + 1);
@@ -61,15 +57,17 @@ export function usePhotoGallery() {
 
         // Eliminar el archivo del sistema de archivos
         await Filesystem.deleteFile({
-            path: filename,
-            directory: Directory.Data,
+          path: filename,
+          directory: Directory.Data,
         });
 
         console.log("✅ Foto eliminada correctamente del sistema de archivos.");
-    } catch (error) {
+        resolve();
+      } catch (error) {
         console.error("❌ Error al eliminar la foto:", error);
-        throw error;
-    }
+        reject(error);
+      }
+    });
   };
 
   const importPhoto = async () => {
@@ -89,9 +87,7 @@ export function usePhotoGallery() {
   }
 
   return {
-    photos,
     savedPhotos,
-    setPhotos,
     setSavedPhotos,
     takePhoto,
     importPhoto,

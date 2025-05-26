@@ -15,7 +15,7 @@ import { useEffect, useRef, useState } from "react";
 import "./styles/ManageItemReview.css";
 import { usePhotoGallery } from "@hooks/usePhotoGallery";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { getItemById, insertItem, updateItem } from "@services/item-service";
+import { getItemById, insertItem, updateItem, updateItemWithCategory } from "@services/item-service";
 import { IconName } from "@fortawesome/fontawesome-svg-core";
 import { deleteRatingValuesFromReview, getCategoryById, getCategoryRatingMixByReviewId, getCategoryRatingsByCategoryId, getChildrenCategories, getParentCategories, getParentCategory, insertCategoryRatingValue } from "@services/category-service";
 import CategorySelectorModal from "@components/CategorySelectorModal";
@@ -30,7 +30,7 @@ import CategoryRatingRange from "./components/CategoryRatingRange";
 import ErrorAlert from "@/shared/components/ErrorAlert";
 import { UserPhoto } from "@/shared/dto/Photo";
 import { Category, CategoryRating, CategoryRatingMix, CategoryRatingValue } from "@dto/Category";
-import { Item, ItemOption } from "@dto/Item";
+import { Item, ItemOption, ItemWithCategory } from "@dto/Item";
 import { Review, ReviewImage } from "@dto/Review";
 import { init } from "i18next";
 import { Capacitor } from '@capacitor/core';
@@ -96,6 +96,9 @@ const ManageItemReview = () => {
   const [selectedOption, setSelectedOption] = useState<ItemOption | null>(null);
   const [comment, setComment] = useState("");
 
+  // Variables para edicion
+  const [reviewHasPhotos, setReviewHasPhotos] = useState(false); // Variable para saber si la reseña tiene fotos cuando se edita
+
   // Variables de categorias
   const [categories, setCategories] = useState<Category[]>([]);
 
@@ -152,6 +155,7 @@ const ManageItemReview = () => {
             webviewPath: Capacitor.convertFileSrc(image.image),
         }));
         setSavedPhotos(photosConverted);
+        setReviewHasPhotos(photosConverted.length > 0);
 
         setCategoryRatings(categoryRatingsFound);
 
@@ -231,6 +235,8 @@ const ManageItemReview = () => {
     if (isInitialLoad) return; // No se ha cambiado el formulario por el usuario, no se actualizan los ratings
     if (!selectedOption) return;
 
+    console.log("🔍 Opción seleccionada:", selectedOption.id);
+    
     getParentCategory(selectedOption.category_id).then((category) => {
       // Solo actualiza el estado si la categoría realmente cambió
       setParentCategory((prevCategory) => {
@@ -263,23 +269,6 @@ const ManageItemReview = () => {
         setSelectedSubcategory(null);
     });
   }, [parentCategory]);
-
-  /* useEffect(() => {
-    if (!isInitialLoad) return; // No se ha cambiado el formulario por el usuario
-
-    if (!selectedOption?.parent_category_id) {
-        setSelectedSubcategory(null); // Reset selected subcategory if no parent category is selected
-    }else {
-        getCategoryById(selectedOption.category_id).then((category) => {          
-          if (category) {
-              setSelectedSubcategory(category);
-          } else {
-              setSelectedSubcategory(null); // Reset selected subcategory if category not found
-          }
-        });
-    }
-  }, [itemName, selectedOption]); */
-    
 
   useEffect(() => {
     const selectedCategory = getSelectedCategory();
@@ -371,7 +360,13 @@ const ManageItemReview = () => {
             if (!itemId) throw new Error(t('manage-item-review.error-message.error-creating-item'));
             return itemId;
         } else {
-            const success = await updateItem(item);
+            const minItem: ItemWithCategory = {
+                id: selectedOption.id,
+                name: item.name,
+                category_id: getSelectedCategory()?.id || 0,
+            };
+
+            const success = await updateItemWithCategory(minItem);
             if (!success) throw new Error(t('manage-item-review.error-message.error-updating-item'));
             return selectedOption.id;
         }
@@ -437,43 +432,17 @@ const ManageItemReview = () => {
 
   /** Guarda las imágenes asociadas a la review */
   const saveReviewImages = async (reviewId: number) => {
-    if (savedPhotos.length === 0) return true; // No hay fotos para guardar
-
-
-
-    try {
-
-        if (editMode && savedPhotos.length > 0) {
+    try {      
+        if (editMode && reviewHasPhotos) {
+            console.log("🔍 Editando reseña, eliminando imágenes existentes...");
             const success = await deleteReviewImages(reviewId);
             if (!success) throw new Error(t('manage-item-review.error-message.error-saving-review-images'));
         }
-        /* const localSavedPhotos = [...savedPhotos]; // Copia local de las fotos guardadas
 
-        i
-
-        for (const photo of photos) {
-            // Guardar la foto en el sistema de archivos
-            if (localSavedPhotos.find((p) => p.filepath === photo.filepath)) continue; // Si la foto ya está guardada, no la guardamos de nuevo
-
-            const savedPhoto = await savePhoto(photo);
-            console.log("✅ Foto guardada:", savedPhoto);
-
-            if (!savedPhoto) throw new Error(t('manage-item-review.error-message.error-saving-review-images'));
-            localSavedPhotos.push(savedPhoto); // Agregar la foto guardada a la copia local
-        }
-
-        // Actualizar el estado con las fotos guardadas
-        setSavedPhotos(localSavedPhotos); */
+        if (savedPhotos.length === 0) return true; // No hay fotos para guardar
 
         for (const photo of savedPhotos) {
             console.log("🔍 Revisando foto:", photo);
-
-            // Si la foto no está en `photos`, la eliminamos
-            /* if (!photos.find((p) => p.filepath === photo.filepath)) {
-                console.log("🗑️ Eliminando foto no utilizada:", photo);
-                await deletePhoto(photo); // Eliminar la foto del sistema de archivos
-                continue;
-            } */
 
             const reviewImage: ReviewImage = {
                 review_id: reviewId,
@@ -555,13 +524,29 @@ const ManageItemReview = () => {
 
   const handleDeletePhoto = async (photo: UserPhoto) => {
     handlePreviewClose();
-    deletePhoto(photo); // Delete the photo from the filesystem
-    setSavedPhotos(savedPhotos.filter((p) => p.filepath !== photo.filepath)); // Remove the photo from the saved photos
+
+    try {
+      await deletePhoto(photo);
+      console.log("✅ Foto eliminada correctamente del sistema de archivos.");
+    } catch (error) {
+      console.error("❌ Error al eliminar la foto:", error);
+    }
+
+    // Actualiza el estado después de eliminar la foto
+    setSavedPhotos((prevPhotos) => {
+      const updatedPhotos = prevPhotos.filter((p) => p.filepath !== photo.filepath);
+      console.log("🔍 Fotos guardadas después de eliminar:", updatedPhotos.length);
+      return updatedPhotos;
+    });
   }
 
   const handleReplacePhoto = async (photo: UserPhoto) => {
-    deletePhoto(photo); // Delete the photo from the filesystem
-
+    try {
+      await deletePhoto(photo); // Delete the photo from the filesystem
+    } catch (error) {
+      console.error("❌ Error al eliminar la foto:", error);
+    }
+    
     handlePreviewClose();
     const newPhoto = await takePhoto(); // Save the new photo to the filesystem
     // Delete the old photo from the filesystem
