@@ -1,0 +1,4 @@
+ion-card::part(native) {
+  display: flex !important;
+  gap: 1rem;
+}
