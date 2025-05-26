@@ -191,7 +191,7 @@ const ReviewFilterModal: React.FC<FilterModalProps> = ({
                     }`}
                     style={{ backgroundColor: CategoryColors[cat.color] }}
                   >
-                    <FontAwesomeIcon icon={cat.icon as IconName} className="fa-xl"/>
+                    <FontAwesomeIcon icon={cat.icon as IconName} color="var(--ion-color-primary-contrast)" className="fa-xl"/>
                   </div>
                   <IonLabel className="truncate max-w-full text-xs">
                     {cat.name}
@@ -261,7 +261,7 @@ const ReviewFilterModal: React.FC<FilterModalProps> = ({
                   }`}
                   style={{ backgroundColor: CategoryColors[subcategory.color] }}
                 >
-                  <FontAwesomeIcon icon={subcategory.icon as IconName} className="fa-xl"/>
+                  <FontAwesomeIcon icon={subcategory.icon as IconName} color="var(--ion-color-primary-contrast)" className="fa-xl"/>
                 </div>
                 <IonLabel className="truncate max-w-full text-xs">
                   {subcategory.name}
