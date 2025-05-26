@@ -6,13 +6,13 @@ import {
   IonRow,
   IonCol,
   IonBackButton,
-  IonHeader,
   IonButton,
+  IonSelect,
+  IonSelectOption,
 } from "@ionic/react";
-import { useParams } from "react-router";
-import { getItems } from "@/shared/services/item-service";
+import { useParams, useHistory } from "react-router";
 import { ItemDisplay, ItemFull, OriginDisplay } from "@/shared/dto/Item";
-import { ChevronDown, EllipsisVertical } from "lucide-react";
+import { Building2, ChevronDown, EllipsisVertical, SquarePen, Trash } from "lucide-react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { IconName } from "@fortawesome/fontawesome-svg-core";
 import { CategoryColors } from "@/shared/enums/colors";
@@ -20,10 +20,15 @@ import StarRating from "@/shared/components/StarRating";
 import { Review } from "@/shared/dto/Review";
 import TimelineEntry from "./components/TimeLineEntry";
 import ItemCard from "./components/ItemCard";
-import OriginCard from "./components/OriginCard";
+import StatOriginView from "./components/StatsOriginView";
+import { getItemFull, getItemsByOrigin } from "@/shared/services/item-service";
+import { getReviewsByItemId } from "@/shared/services/review-service";
+import { useTranslation } from "react-i18next";
+import "./styles/viewItem.css";
 
 export const ViewItem = () => {
   const { id } = useParams<{ id: string }>();
+  const history = useHistory();
 
   const [showTimeline, setShowTimeline] = React.useState(false);
 
@@ -40,17 +45,23 @@ export const ViewItem = () => {
   });
 
   const [reviews, setReviews] = React.useState<Review[]>([]);
-  const [itemsOfOrigin, setItemsOfOrigin] = React.useState<OriginDisplay[]>([]);
+  const [itemsOfOrigin, setItemsOfOrigin] = React.useState<ItemDisplay[]>([]);
+  const [imageError, setImageError] = React.useState(false);
+
+  const { t } = useTranslation();
 
   useEffect(() => {
     const initializeData = async () => {
       try {
-        // const mainItemDetailsFromDB = await getItem(id);
+        // const mainItemDetailsFromDB = await getItemFull(Number(id));
+        // const itemReviews = await getReviewsByItemId(Number(id));
+        // const itemsOfOrigin = await getItemsByOrigin(Number(id));
 
         const mainItemDetailsFromDB: ItemFull = {
           id: 1,
           name: "Apple",
-          image: "https://desarrolloweb.com/media/761/imagenes-html.jpg",
+          image:
+            "https://iessantabarbara.es/departamentos/fisica/tecnologia/formacion/www/html01.png",
           created_at: "2023-10-01",
           updated_at: "2023-10-01",
           category_id: 11,
@@ -130,14 +141,60 @@ export const ViewItem = () => {
             category_name: "Brand",
             category_icon: "mobile-alt",
             category_color: "red",
-            average_rating: 3.8,
+            average_rating: 1.8,
             average_rating_all_items: 4.3,
             number_of_ratings: 45,
             date_last_review: "2023-08-20",
           },
+          {
+            id: 6,
+            name: "iPhone 11",
+            category_name: "Brand",
+            category_icon: "mobile-alt",
+            category_color: "red",
+            average_rating: 3.5,
+            average_rating_all_items: 4.3,
+            number_of_ratings: 60,
+            date_last_review: "2023-06-25",
+          },
+          {
+            id: 7,
+            name: "iPhone X",
+            category_name: "Brand",
+            category_icon: "mobile-alt",
+            category_color: "red",
+            average_rating: 2.5,
+            average_rating_all_items: 4.3,
+            number_of_ratings: 30,
+            date_last_review: "2023-05-15",
+          },
+          {
+            id: 8,
+            name: "iPhone 8",
+            category_name: "Brand",
+            category_icon: "mobile-alt",
+            category_color: "red",
+            average_rating: 4.0,
+            average_rating_all_items: 4.3,
+            number_of_ratings: 20,
+            date_last_review: "2023-04-10",
+          },
+          {
+            id: 9,
+            name: "iPhone 7",
+            category_name: "Brand",
+            category_icon: "mobile-alt",
+            category_color: "red",
+            average_rating: 3.0,
+            average_rating_all_items: 4.3,
+            number_of_ratings: 10,
+            date_last_review: "2023-03-05",
+          },
         ];
 
-        setItem(mainItemDetailsFromDB);
+        if (mainItemDetailsFromDB) {
+          setItem(mainItemDetailsFromDB);
+        }
         setReviews(
           itemReviews.sort(
             (a, b) =>
@@ -146,85 +203,152 @@ export const ViewItem = () => {
           )
         );
         setItemsOfOrigin(itemsOfOrigin);
+        // Si no hay elementos de origen, mostrar la línea temporal abierta
+        if (itemsOfOrigin.length === 0) {
+          setShowTimeline(true);
+        }
       } catch (err) {
         console.error("Error initializing data:", err);
       }
     };
     initializeData();
-  }, []);
+  }, [id]);
+
+
+  //según el value del IonSelect, redirigir a la página correspondiente
+  const handleSelectChange = (event: CustomEvent) => {
+    const value = event.detail.value;
+    switch (value) {
+      case "edit":
+        history.push(`/app/items/${id}/edit`);
+        break;
+      case "origin":
+        history.push(`/app/items/${id}/origin`);
+        break;
+      case "delete":
+        // Aquí podrías implementar la lógica para eliminar el item
+        console.log("Delete item with id:", id);
+        // Por ejemplo, podrías mostrar un modal de confirmación antes de eliminar
+        break;
+      default:
+        console.warn("Unhandled select option:", value);
+        break;
+    }
+  };
 
   return (
-    <IonPage>
+    <IonPage className="safe-area-top">
       <IonContent>
         <IonRow className="flex justify-between items-center ion-padding">
           <IonBackButton defaultHref="/app/items" />
-          <EllipsisVertical size={30} />
-        </IonRow>
-        <div className="flex flex-col gap-6">
-          <div
-            className="h-48 bg-cover bg-center flex items-center justify-center"
-            style={{
-              backgroundImage: `url(${item.image})`, // item.image puede ser null, CSS lo manejará
-            }}
+          <div className="relative">
+            <EllipsisVertical color="var(--ion-text-color)" className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 pointer-events-none z-10"/>
+          <IonSelect
+            interface="popover"
+            className="pr-10 w-full [&::part(icon)]:hidden" 
+            style={{ minWidth: 0, width: "2.5rem" }}
+            onIonChange={handleSelectChange}
           >
-            <IonCol className="flex items-center h-1/2 bg-[#222831]/80 ion-padding gap-3">
-              <div
-                className={`p-5 rounded-lg w-16 h-16 flex items-center justify-center`}
-                style={{
-                  backgroundColor: CategoryColors[item.category_color],
-                }}
-              >
-                <FontAwesomeIcon
-                  icon={item.category_icon as IconName}
-                  className="fa-2xl text-[var(--ion-color-primary-contrast)]"
+            <IonSelectOption value="edit">Edit</IonSelectOption>
+            <IonSelectOption value="origin">Convertir a origen </IonSelectOption>
+            <IonSelectOption value="delete">Delete</IonSelectOption>
+          </IonSelect>
+          </div>  
+        </IonRow>
+        <div className="flex flex-col gap-12 pb-10">
+          <div className="flex flex-col gap-7">
+            {/* Mostrar el contenedor solo si hay imagen y no hay error, y quitar h-48 si no hay imagen o hay error */}
+            <div
+              className={`bg-cover bg-center flex items-center justify-center${
+                item.image && !imageError ? " h-48" : ""
+              }`}
+              style={
+                item.image && !imageError
+                  ? { backgroundImage: `url(${item.image})` }
+                  : {}
+              }
+            >
+              {/* Imagen invisible para detectar error de carga */}
+              {item.image && !imageError && (
+                <img
+                  src={item.image}
+                  alt=""
+                  style={{ display: "none" }}
+                  onError={() => setImageError(true)}
                 />
-              </div>
-              <span className="text-2xl font-bold break-words text-[var(--ion-color-primary-contrast)]">
-                {item.name}
-              </span>
-            </IonCol>
-          </div>
-          <div className="ion-padding flex flex-col gap-3 justify-center items-center">
-            {reviews.length > 0 && (
-              <>
-                <StarRating
-                  size={50}
-                  rating={reviews[0].rating}
-                  setRating={() => {}}
-                />
-                <span className="text-[var(--ion-text-color)] text-lg">
-                  {reviews[0].comment}
-                </span>
-              </>
-            )}
+              )}
+              <IonCol className="flex items-center h-1/2 bg-[#222831]/80 ion-padding gap-5">
+                <div
+                  className={`p-5 rounded-lg w-16 h-16 flex items-center justify-center`}
+                  style={{
+                    backgroundColor: CategoryColors[item.category_color],
+                  }}
+                >
+                  <FontAwesomeIcon
+                    icon={item.category_icon as IconName}
+                    className="fa-2xl text-[var(--ion-color-primary-contrast)]"
+                  />
+                </div>
+                <div className="flex flex-col gap-2">
+                  <span className="text-2xl font-bold break-all text-[var(--ion-color-primary-contrast)] max-w-full">
+                    {item.name}
+                  </span>
+                  {itemsOfOrigin.length > 0 && (
+                    <span className="text-sm text-[var(--ion-color-primary-contrast)] flex items-center gap-1">
+                      <Building2 size={20} className="inline-block mr-1" />
+                      {t("common.origin")}
+                    </span>
+                  )}
+                </div>
+              </IonCol>
+            </div>
+            <div className="ion-padding flex flex-col gap-3 justify-center items-center">
+              {reviews.length > 0 && (
+                <>
+                  <StarRating
+                    size={60}
+                    rating={reviews[0].rating}
+                    setRating={() => {}}
+                  />
+                  <span className="text-[var(--ion-text-color)] text-lg">
+                    {reviews[0].comment}
+                  </span>
+                </>
+              )}
+            </div>
           </div>
           <IonButton
             color="tertiary"
             expand="block"
-            className="bg-primary mx-5"
-            routerLink="/app/reviews/create"
+            className="bg-primary mx-5 mb-5 text-lg"
+            onClick={() => history.push("/app/reviews/create", { itemId: item.id })}
           >
-            Crear Reseña
+            {t("view-item.add-review")}
           </IonButton>
           {reviews.length > 1 && (
             <div className="px-5 flex flex-col gap-4">
               <div
                 className="flex justify-between items-center cursor-pointer"
-                onClick={() => setShowTimeline(!showTimeline)}
+                onClick={() => {
+                  // Solo permitir toggle si hay elementos de origen
+                  if (itemsOfOrigin.length > 0) setShowTimeline(!showTimeline);
+                }}
               >
                 <span className="font-bold text-[var(--ion-text-color)] text-3xl">
-                  Línea del tiempo
+                  {t("view-item.timeline")}
                 </span>
-                <div className="flex items-center gap-2">
-                  <span className="text-[var(--ion-color-tertiary-contrast)] text-sm p-1 rounded-full bg-[var(--ion-color-tertiary)] flex items-center justify-center w-6 h-6">
-                    {reviews.length}
-                  </span>
-                  <ChevronDown
-                    className={`transition-transform ${
-                      showTimeline ? "rotate-180" : ""
-                    }`}
-                  />
-                </div>
+                {itemsOfOrigin.length > 0 && (
+                  <div className="flex items-center gap-2">
+                    <span className="text-[var(--ion-color-tertiary-contrast)] font-bold text-sm p-1 rounded-full bg-[var(--ion-color-tertiary)] flex items-center justify-center w-6 h-6">
+                      {reviews.length}
+                    </span>
+                    <ChevronDown
+                      className={`transition-transform ${
+                        showTimeline ? "rotate-180" : ""
+                      }`}
+                    />
+                  </div>
+                )}
               </div>
               {showTimeline && (
                 <div
@@ -250,19 +374,22 @@ export const ViewItem = () => {
               )}
             </div>
           )}
-
-          <div className="px-5 flex flex-col gap-4">
-            <span className="font-bold text-[var(--ion-text-color)] text-3xl">
-              Elementos
-            </span>
-            <IonGrid className="gap-4">
-              <div className="flex flex-col gap-7">
-                {itemsOfOrigin.map((item) => (
-                  <ItemCard item={item} />
-                ))}
-              </div>
-            </IonGrid>
-          </div>
+          {/* Mostrar la lista de elementos solo si hay itemsOfOrigin */}
+          {itemsOfOrigin.length > 0 && (
+            <div className="px-5 flex flex-col gap-4">
+              <span className="font-bold text-[var(--ion-text-color)] text-3xl">
+                {t("common.items")}
+              </span>
+              <StatOriginView items={itemsOfOrigin} />
+              <IonGrid className="gap-4 mt-2">
+                <div className="flex flex-col gap-7">
+                  {itemsOfOrigin.map((item) => (
+                    <ItemCard item={item} />
+                  ))}
+                </div>
+              </IonGrid>
+            </div>
+          )}
         </div>
       </IonContent>
     </IonPage>
