@@ -42,6 +42,15 @@
     color: var(--ion-text-color-step-100);
 }
 
+.edit-button {
+  --padding-start: 0px;
+  --padding-end: 0px;
+  --padding-top: 0px;
+  --padding-bottom: 0px;
+  min-height: 1.6rem !important;
+}
+
+
 .safe-area-top {
     padding-top: var(--safe-area-inset-top);
 }

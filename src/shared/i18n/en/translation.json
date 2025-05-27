@@ -1,111 +1,120 @@
 {
-    "common": {
-        "appName": "Personal reviews",
-        "welcome": "Welcome to my app",
-        "loading": "Loading...",
-        "error": "An error occurred",
-        "success": "Success",
-        "cancel": "Cancel",
-        "confirm": "Confirm",
-        "yes": "Yes",
-        "no": "No",
-        "ok": "OK",
-        "close": "Close",
-        "more": "More",
-        "less": "Less",
-        "all": "All",
-        "save-changes": "Save changes",
-        "delete": "Delete",
-        "replace": "Replace",
+  "common": {
+    "appName": "Personal reviews",
+    "welcome": "Welcome to my app",
+    "loading": "Loading...",
+    "error": "An error occurred",
+    "success": "Success",
+    "cancel": "Cancel",
+    "confirm": "Confirm",
+    "yes": "Yes",
+    "no": "No",
+    "ok": "OK",
+    "close": "Close",
+    "more": "More",
+    "less": "Less",
+    "all": "All",
+    "save-changes": "Save changes",
+    "delete": "Delete",
+    "edit": "Edit",
+    "replace": "Replace",
 
-        "preview": "Preview",
+    "preview": "Preview",
 
-        "reviews": "Reviews",
-        "review": "Review",
-        "items": "Items",
-        "item": "Item",
-        "comments": "Comments",
-        "comment": "Comment",
-        "categories": "Categories",
-        "category": "Category",
+    "reviews": "Reviews",
+    "review": "Review",
+    "items": "Items",
+    "item": "Item",
+    "origin": "Origin",
+    "origins": "Origins",
+    "comments": "Comments",
+    "comment": "Comment",
+    "categories": "Categories",
+    "category": "Category",
 
-        "image": "Image",
-        "images": "Images",
+    "image": "Image",
+    "images": "Images",
 
-        "select-category": "Select category",
-        "no-categories-found": "No categories found"
-    },
+    "select-category": "Select category",
+    "no-categories-found": "No categories found"
+  },
 
-    "manage-item-review": {
-        "create-review": "Create review",
-        "saving-review": "Saving review",
-        "saving-review-success": "Review saved successfully",
-        "saving-review-error": "Error saving review",
-        "used-item-exists": "The item you are using exists",
-        "item-input-placeholder": "Enter item name or select an existing one",
-        "comment-input-placeholder": "Write what you would like to remember...",
-        "delete-review": "Delete review",
-        "delete-review-confirm": "Are you sure you want to delete this review?",
-        "delete-review-success": "Review deleted successfully",
-        "deleting-review": "Deleting review",
+  "manage-item-review": {
+    "create-review": "Create review",
+    "saving-review": "Saving review",
+    "saving-review-success": "Review saved successfully",
+    "saving-review-error": "Error saving review",
+    "used-item-exists": "The item you are using exists",
+    "item-input-placeholder": "Enter item name or select an existing one",
+    "comment-input-placeholder": "Write what you would like to remember...",
+    "delete-review": "Delete review",
+    "delete-review-confirm": "Are you sure you want to delete this review?",
+    "delete-review-success": "Review deleted successfully",
+    "deleting-review": "Deleting review",
 
-        "error-message": {
-            "empty-title": "Title cannot be empty",
-            "empty-category": "Category cannot be empty",
-            "error-creating-review": "Error creating review",
-            "error-saving-review": "Error saving review",
-            "error-creating-item": "Error creating item",
-            "error-saving-item": "Error saving item",
-            "error-saving-review-ratings": "Error saving review ratings",
-            "error-saving-review-images": "Error saving review images",
-            "error-updating-item": "Error updating item",
-            "error-updating-review": "Error updating review",
-            "review-not-found": "Review not found",
-            "item-not-found": "Item not found",
-            "category-not-found": "Category not found",
-            "category-ratings-not-found": "Category ratings not found",
-            "review-images-not-found": "Review images not found",
-            "error-deleting-review": "Error deleting review",
-            "error-deleting-item": "Error deleting item",
-            "error-deleting-review-ratings": "Error deleting review ratings",
-            "error-deleting-review-images": "Error deleting review images"
-        }
-    },
-
-    "review-page": {
-        "search": "Search",
-        "search-placeholder": "Search reviews...",
-        "add-review": "Create a new review",
-        "load-more": "See more reviews",
-        "filter": "Filter",
-        "all": "All",
-        "none": "None",
-        "rating": "Rating",
-        "reset": "Reset",
-        "apply": "Apply",
-        "no-reviews": "No reviews available"
-    },
-
-    "more-options": {
-        "more-options": "More options",
-        "language": "Language",
-        "theme": "Theme",
-        
-        "change-theme": "Change theme",
-        "dark-mode": "Dark mode",
-        "light-mode": "Light mode",
-
-        "change-language": "Change language",
-        "spanish": "Spanish",
-        "english": "English"
-    },
-
-    "categories": {
-        "food": "Food",
-        "burger": "Burger",
-        "smartphone": "Smartphone",
-        "fashion": "Fashion",
-        "personal_care": "Personal care",
-        "movie": "Movie"
+    "error-message": {
+      "empty-title": "Title cannot be empty",
+      "empty-category": "Category cannot be empty",
+      "error-creating-review": "Error creating review",
+      "error-saving-review": "Error saving review",
+      "error-creating-item": "Error creating item",
+      "error-saving-item": "Error saving item",
+      "error-saving-review-ratings": "Error saving review ratings",
+      "error-saving-review-images": "Error saving review images",
+      "error-updating-item": "Error updating item",
+      "error-updating-review": "Error updating review",
+      "review-not-found": "Review not found",
+      "item-not-found": "Item not found",
+      "category-not-found": "Category not found",
+      "category-ratings-not-found": "Category ratings not found",
+      "review-images-not-found": "Review images not found",
+      "error-deleting-review": "Error deleting review",
+      "error-deleting-item": "Error deleting item",
+      "error-deleting-review-ratings": "Error deleting review ratings",
+      "error-deleting-review-images": "Error deleting review images"
     }
+  },
+
+  "review-page": {
+    "search": "Search",
+    "search-placeholder": "Search reviews...",
+    "add-review": "Create a new review",
+    "load-more": "See more reviews",
+    "filter": "Filter",
+    "all": "All",
+    "none": "None",
+    "rating": "Rating",
+    "reset": "Reset",
+    "apply": "Apply",
+    "no-reviews": "No reviews available"
+  },
+
+  "more-options": {
+    "more-options": "More options",
+    "language": "Language",
+    "theme": "Theme",
+
+    "change-theme": "Change theme",
+    "dark-mode": "Dark mode",
+    "light-mode": "Light mode",
+
+    "change-language": "Change language",
+    "spanish": "Spanish",
+    "english": "English"
+  },
+
+  "categories": {
+    "food": "Food",
+    "burger": "Burger",
+    "smartphone": "Smartphone",
+    "fashion": "Fashion",
+    "personal_care": "Personal care",
+    "movie": "Movie"
+  },
+
+  "view-item": {
+    "timeline": "Timeline",
+    "add-review": "Add review",
+    "to-origin": "Convert to origin"
+  }
 }
