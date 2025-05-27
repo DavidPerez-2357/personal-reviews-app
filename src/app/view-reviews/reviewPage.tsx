@@ -18,13 +18,13 @@ import {
   Search,
   Star,
 } from "lucide-react";
-import ReviewCard from "../../shared/components/ReviewCard";
 import { getReviewsCards } from "@services/review-service";
 import { ReviewFull } from "@dto/Review";
 import { useTranslation } from "react-i18next";
 import "./styles/reviewPage.css";
 import { useLocation, useHistory } from "react-router-dom"; // Import useLocation and useHistory
 import ReviewFilterModal from "./components/ReviewFilterModal";
+import ReviewCard from "@/shared/components/ReviewCard";
 
 export const ReviewPage: React.FC = () => {
   const VISIBLE_REVIEWS_LIMIT = 50; // Default limit for visible reviews
