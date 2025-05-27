@@ -1,9 +1,6 @@
 import { openDatabase } from "../database/database-service";
-<<<<<<< HEAD
-import { Item, ItemDisplay, ItemFull, ItemOption, Origin } from "../dto/Item";
-=======
-import { Item, ItemOption, ItemWithCategory, Origin } from "../dto/Item";
->>>>>>> origin/development
+import { Item, ItemDisplay, ItemFull, ItemOption, ItemWithCategory, Origin } from "../dto/Item";
+
 
 /**
  * Inserta un ítem en la base de datos.
@@ -166,9 +163,6 @@ export const updateItem = async (item: Item): Promise<boolean> => {
     }
 }
 
-<<<<<<< HEAD
-export const insertTestItems = async (): Promise<void> => { 
-=======
 export const updateItemWithCategory = async (item: ItemWithCategory): Promise<boolean> => {
     const db = await openDatabase();
     if (!db) return false;
@@ -186,7 +180,6 @@ export const updateItemWithCategory = async (item: ItemWithCategory): Promise<bo
 }
 
 export const insertTestItems = async (): Promise<void> => {
->>>>>>> origin/development
     const db = await openDatabase();
     if (!db) return;
 
