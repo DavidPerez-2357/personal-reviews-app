@@ -19,7 +19,7 @@ import { CategoryColors } from "@/shared/enums/colors";
 import StarRating from "@/shared/components/StarRating";
 import { Review } from "@/shared/dto/Review";
 import TimelineEntry from "./components/TimeLineEntry";
-import ItemCard from "./components/ItemCard";
+import ItemCard from "../../shared/components/ItemCard";
 import StatOriginView from "./components/StatsOriginView";
 import { getItemFull, getItemsByOrigin } from "@/shared/services/item-service";
 import { getReviewsByItemId } from "@/shared/services/review-service";
@@ -114,9 +114,9 @@ export const ViewItem = () => {
             style={{ minWidth: 0, width: "2.5rem" }}
             onIonChange={handleSelectChange}
           >
-            <IonSelectOption value="edit">Edit</IonSelectOption>
-            <IonSelectOption value="origin">Convertir a origen </IonSelectOption>
-            <IonSelectOption value="delete">Delete</IonSelectOption>
+            <IonSelectOption value="edit">{t("common.edit")}</IonSelectOption>
+            <IonSelectOption value="origin">{t("view-item.to-origin")}</IonSelectOption>
+            <IonSelectOption value="delete">{t("common.delete")}</IonSelectOption>
           </IonSelect>
           </div>  
         </IonRow>
