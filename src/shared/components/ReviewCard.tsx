@@ -2,7 +2,6 @@ import { useState } from "react";
 import { Ham, SquarePen, Star } from "lucide-react";
 import { IonButton, IonCard } from "@ionic/react";
 import { ReviewFull } from "@dto/Review";
-import "../styles/reviewPage.css";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { IconName } from "@fortawesome/fontawesome-svg-core";
 import PreviewPhotoModal from "@/shared/components/PreviewPhotoModal";
