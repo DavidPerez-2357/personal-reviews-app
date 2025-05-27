@@ -18,7 +18,7 @@ import {
   Search,
   Star,
 } from "lucide-react";
-import ReviewCard from "./components/ReviewCard";
+import ReviewCard from "../../shared/components/ReviewCard";
 import { getReviewsCards } from "@services/review-service";
 import { ReviewFull } from "@dto/Review";
 import { useTranslation } from "react-i18next";
