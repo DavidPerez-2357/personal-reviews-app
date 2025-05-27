@@ -16,6 +16,7 @@
         "all": "Todos",
         "save-changes": "Guardar cambios",
         "delete": "Eliminar",
+        "edit": "Editar",
         "replace": "Reemplazar",
 
         "preview": "Vista previa",
@@ -112,6 +113,7 @@
 
     "view-item": {
         "timeline": "Línea de tiempo",
-        "add-review": "Agregar reseña"
+        "add-review": "Agregar reseña",
+        "to-origin": "Convertir a origen"
     }
 }

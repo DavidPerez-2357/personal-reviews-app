@@ -16,6 +16,7 @@
     "all": "All",
     "save-changes": "Save changes",
     "delete": "Delete",
+    "edit": "Edit",
     "replace": "Replace",
 
     "preview": "Preview",
@@ -113,6 +114,7 @@
 
   "view-item": {
     "timeline": "Timeline",
-    "add-review": "Add review"
+    "add-review": "Add review",
+    "to-origin": "Convert to origin"
   }
 }
