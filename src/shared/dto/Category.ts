@@ -3,7 +3,7 @@ export interface Category {
     id: number;
     name: string;
     icon: string; // URL de la imagen del icono
-    color: string; // Color de la categoría en formato hexadecimal
+    color: string; // Código de color en formato hexadecimal (e.g., "#FFFFFF")  
     type: number; // Tipo de categoría (0: item, 1: review)
     parent_id: number | null; // ID de la categoría padre (null si es raíz)
 }

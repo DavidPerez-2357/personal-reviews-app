@@ -2,7 +2,6 @@ import { useState } from "react";
 import { Ham, SquarePen, Star } from "lucide-react";
 import { IonButton, IonCard } from "@ionic/react";
 import { ReviewFull } from "@dto/Review";
-import "../styles/reviewPage.css";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { IconName } from "@fortawesome/fontawesome-svg-core";
 import PreviewPhotoModal from "@/shared/components/PreviewPhotoModal";
@@ -25,14 +24,21 @@ const ReviewCard = ({ review }: { review: ReviewFull }) => {
           <div className="grid grid-cols-[1fr_auto] items-center">
             <div className="flex flex-row items-center gap-3">
               <FontAwesomeIcon icon={review.icon as IconName} className="fa-xl" />
-              <span className="font-semibold text-md">{review.item}</span>
+                <IonButton
+                  fill="clear"
+                  color="text-color"
+                  className="font-semibold text-md"
+                  routerLink={`/app/items/${review.item_id}/viewItem`}
+                >
+                  {review.item}
+                </IonButton>
             </div>
             <IonButton
               color={"tertiary"}
               className="aspect-square edit-button"
               routerLink={`/app/reviews/${review.id}/edit`}
             >
-              <SquarePen size={20}></SquarePen>
+              <SquarePen size={17}></SquarePen>
             </IonButton>
           </div>
 

@@ -15,7 +15,7 @@ import { useEffect, useRef, useState } from "react";
 import "./styles/ManageItemReview.css";
 import { usePhotoGallery } from "@hooks/usePhotoGallery";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { getItemById, insertItem, updateItem } from "@services/item-service";
+import { getItemById, insertItem, updateItem, updateItemWithCategory } from "@services/item-service";
 import { IconName } from "@fortawesome/fontawesome-svg-core";
 import { deleteRatingValuesFromReview, getCategoryById, getCategoryRatingMixByReviewId, getCategoryRatingsByCategoryId, getChildrenCategories, getParentCategories, getParentCategory, insertCategoryRatingValue } from "@services/category-service";
 import CategorySelectorModal from "@components/CategorySelectorModal";
@@ -30,7 +30,7 @@ import CategoryRatingRange from "./components/CategoryRatingRange";
 import ErrorAlert from "@/shared/components/ErrorAlert";
 import { UserPhoto } from "@/shared/dto/Photo";
 import { Category, CategoryRating, CategoryRatingMix, CategoryRatingValue } from "@dto/Category";
-import { Item, ItemOption } from "@dto/Item";
+import { Item, ItemOption, ItemWithCategory } from "@dto/Item";
 import { Review, ReviewImage } from "@dto/Review";
 import { init } from "i18next";
 import { Capacitor } from '@capacitor/core';
@@ -41,7 +41,9 @@ const ManageItemReview = () => {
   const history = useHistory();
   const { t } = useTranslation();
   const location = useLocation();
+ const itemId = location.state?.itemId; 
 
+  console.log("itemId", itemId);
   // Variable de no encontrar categorias
   const notFoundAnyCategories: Category = {
     id: 0,
@@ -233,6 +235,8 @@ const ManageItemReview = () => {
     if (isInitialLoad) return; // No se ha cambiado el formulario por el usuario, no se actualizan los ratings
     if (!selectedOption) return;
 
+    console.log("🔍 Opción seleccionada:", selectedOption.id);
+    
     getParentCategory(selectedOption.category_id).then((category) => {
       // Solo actualiza el estado si la categoría realmente cambió
       setParentCategory((prevCategory) => {
@@ -265,23 +269,6 @@ const ManageItemReview = () => {
         setSelectedSubcategory(null);
     });
   }, [parentCategory]);
-
-  /* useEffect(() => {
-    if (!isInitialLoad) return; // No se ha cambiado el formulario por el usuario
-
-    if (!selectedOption?.parent_category_id) {
-        setSelectedSubcategory(null); // Reset selected subcategory if no parent category is selected
-    }else {
-        getCategoryById(selectedOption.category_id).then((category) => {          
-          if (category) {
-              setSelectedSubcategory(category);
-          } else {
-              setSelectedSubcategory(null); // Reset selected subcategory if category not found
-          }
-        });
-    }
-  }, [itemName, selectedOption]); */
-    
 
   useEffect(() => {
     const selectedCategory = getSelectedCategory();
@@ -373,7 +360,13 @@ const ManageItemReview = () => {
             if (!itemId) throw new Error(t('manage-item-review.error-message.error-creating-item'));
             return itemId;
         } else {
-            const success = await updateItem(item);
+            const minItem: ItemWithCategory = {
+                id: selectedOption.id,
+                name: item.name,
+                category_id: getSelectedCategory()?.id || 0,
+            };
+
+            const success = await updateItemWithCategory(minItem);
             if (!success) throw new Error(t('manage-item-review.error-message.error-updating-item'));
             return selectedOption.id;
         }

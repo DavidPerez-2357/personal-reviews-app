@@ -1,5 +1,6 @@
 import { openDatabase } from "../database/database-service";
-import { Item, ItemOption, Origin } from "../dto/Item";
+import { Item, ItemDisplay, ItemFull, ItemOption, ItemWithCategory, Origin } from "../dto/Item";
+
 
 /**
  * Inserta un ítem en la base de datos.
@@ -20,6 +21,72 @@ export const insertItem = async (item: Item): Promise<number | null> => {
         return null;
     }
 };
+
+/**
+ * obtiene un ítem por su ID.
+ * @param id
+ * @returns Promise<ItemFull | null>
+ */
+export const getItemFull = async (id: number): Promise<ItemFull | null> => {
+    const db = await openDatabase();
+    if (!db) return null;
+
+    try {
+        const query = `select
+                            i.id,
+                            i.name,
+                            round(avg(r.rating), 2) as average_rating,
+                            count(r.id) as number_of_ratings,
+                            max(r.created_at) as date_last_review,
+                            c.name as category_name,
+                            c.icon as category_icon,
+                            c.color as category_color
+                        from item i
+                        join category c on i.category_id = c.id
+                        left join review r on i.id = r.item_id
+                        where i.id = ?
+                        group by i.id, i.name, c.name, c.icon, c.color
+                        order by i.id;`;
+        const result = await db!.query(query, [id]);
+        return result.values && result.values[0] as ItemFull || null;
+    } catch (error) {
+        console.error("❌ Error al obtener ítem", error);
+        return null;
+    }
+}
+
+/**
+ * Obtiene los items de un origen.
+ * @param id
+ * @returns Promise<ItemDisplay[]>
+ */
+export const getItemsByOrigin = async (id: number): Promise<ItemDisplay[]> => {
+    const db = await openDatabase();
+    if (!db) return [];
+
+    try {
+        const query = `SELECT
+                            i.id,
+                            i.name,
+                            ROUND(AVG(r.rating), 2) AS average_rating,
+                            COUNT(r.id) AS number_of_ratings,
+                            MAX(r.created_at) AS date_last_review,
+                            c.name AS category_name,
+                            c.icon AS category_icon,
+                            c.color AS category_color
+                        FROM item i
+                        JOIN category c ON i.category_id = c.id
+                        LEFT JOIN review r ON i.id = r.item_id
+                        JOIN origin_item oi on i.id = oi.item_id 
+                        WHERE oi.origin_id = ?
+                        GROUP BY i.id, i.name, c.name, c.icon, c.color`;
+        const result = await db!.query(query, [id]);
+        return result.values as ItemDisplay[];
+    } catch (error) {
+        console.error("❌ Error al obtener ítems por origen", error);
+        return [];
+    }
+}
 
 /**
  * Obtiene todos los ítems de la base de datos.
@@ -96,16 +163,32 @@ export const updateItem = async (item: Item): Promise<boolean> => {
     }
 }
 
+export const updateItemWithCategory = async (item: ItemWithCategory): Promise<boolean> => {
+    const db = await openDatabase();
+    if (!db) return false;
+
+    try {
+        const query = `UPDATE item SET name = ?, category_id = ? WHERE id = ?`;
+        const values = [item.name, item.category_id, item.id];
+
+        await db!.run(query, values);
+        return true;
+    } catch (error) {
+        console.error("❌ Error al actualizar ítem con categoría", error);
+        return false;
+    }
+}
+
 export const insertTestItems = async (): Promise<void> => {
     const db = await openDatabase();
     if (!db) return;
 
     const items: Item[] = [
-        { id: 1, name: "iPhone 13", image: "iphone-13.jpg", category_id: 11 },
-        { id: 2, name: "MacBook Air M1", image: "macbook-air.jpg", category_id: 12 },
-        { id: 3, name: "Nike Air Force 1", image: "nike-airforce.jpg", category_id: 13 },
-        { id: 4, name: "Zapatillas Adidas Ultraboost", image: "adidas-ultraboost.jpg", category_id: 13 },
-        { id: 5, name: "Silla de oficina ergonómica", image: "silla-oficina.jpg",  category_id: 10 },
+        { id: 1, name: "iPhone 13", image: "https://www.abrirllave.com/html/images/dos-parrafos-bloc-de-notas.gif", category_id: 11 },
+        { id: 2, name: "MacBook Air M1", image: "https://www.lluiscodina.com/wp-content/uploads/2019/05/html-5-ejemplo-de-marcado.png", category_id: 12 },
+        { id: 3, name: "Nike Air Force 1", image: "https://www.loading.es/blog/wp-content/uploads/ejemplo-html-codigo-editor.jpg", category_id: 13 },
+        { id: 4, name: "Zapatillas Adidas Ultraboost", image: "https://iessantabarbara.es/departamentos/fisica/tecnologia/formacion/www/html01.png", category_id: 13 },
+        { id: 5, name: "Silla de oficina ergonómica", image: "https://www.ampersoundmedia.com/wp-content/uploads/2020/07/html-scaled.jpg",  category_id: 10 },
         { id: 6, name: "Cafetera Nespresso", image: "cafetera-nespresso.jpg", category_id: 15 },
         { id: 7, name: "Kindle Paperwhite", image: "kindle-paperwhite.jpg", category_id: 6 },
         { id: 8, name: "Mochila para portátil", image: "mochila-portatil.jpg", category_id: 10 },
@@ -132,6 +215,63 @@ export const insertTestItems = async (): Promise<void> => {
         await insertItem(item);
     }
 }
+
+/**
+ * Inserta relaciones de origen entre ítems en la base de datos.
+ * 
+ * @returns Promise<void>
+ */
+export const insertTestOriginItemRelations = async (): Promise<void> => {
+  const db = await openDatabase();
+  if (!db) return;
+
+  const originItemPairs: { origin_id: number; item_id: number }[] = [
+    // iPhone 13 como origen para accesorios Apple
+    { origin_id: 1, item_id: 21 }, // Auriculares Beats Studio
+    { origin_id: 1, item_id: 24 }, // Cámara GoPro Hero 10
+
+    // MacBook Air M1 como origen para accesorios de trabajo
+    { origin_id: 2, item_id: 16 }, // Lámpara LED
+    { origin_id: 2, item_id: 11 }, // Teclado mecánico
+
+    // Sony WH-1000XM4 como origen de otros dispositivos de audio
+    { origin_id: 10, item_id: 21 }, // Beats Studio
+
+    // Smartwatch Samsung Galaxy relacionado con otro wearable
+    { origin_id: 17, item_id: 9 }, // Garmin Forerunner
+
+    // Altavoces Bose como complemento de pantalla y cámara
+    { origin_id: 20, item_id: 25 }, // Pantalla 4K LG
+    { origin_id: 20, item_id: 24 }, // GoPro
+
+    // Mochila para portátil como complemento
+    { origin_id: 8, item_id: 11 }, // Teclado
+    { origin_id: 8, item_id: 16 }, // Lámpara
+
+    // Kindle Paperwhite como origen de mochila y lámpara
+    { origin_id: 7, item_id: 8 },  // Mochila
+    { origin_id: 7, item_id: 16 }, // Lámpara
+
+    // Silla de oficina como origen de muebles y otra silla
+    { origin_id: 5, item_id: 13 }, // Mueble oficina
+    { origin_id: 5, item_id: 19 }, // Silla ergonómica
+
+    // Silla gaming DXRacer relacionada con accesorios
+    { origin_id: 14, item_id: 11 }, // Teclado mecánico
+    { origin_id: 14, item_id: 25 }, // Pantalla 4K LG
+
+    // Mueble modular relacionado con accesorios de oficina
+    { origin_id: 13, item_id: 11 }, // Teclado
+    { origin_id: 13, item_id: 16 }  // Lámpara
+  ];
+
+  const placeholders = originItemPairs.map(() => "(?, ?)").join(", ");
+  const values = originItemPairs.flatMap(({ origin_id, item_id }) => [origin_id, item_id]);
+  const query = `INSERT INTO origin_item (origin_id, item_id) VALUES ${placeholders}`;
+
+  await db.run(query, values);
+};
+
 
 export const getItemById = async (id: number): Promise<Item | null> => {
     const db = await openDatabase();

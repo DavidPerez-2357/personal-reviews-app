@@ -16,6 +16,7 @@
         "all": "Todos",
         "save-changes": "Guardar cambios",
         "delete": "Eliminar",
+        "edit": "Editar",
         "replace": "Reemplazar",
         "filter": "Filtrar",
         "sort": "Ordenar",
@@ -30,6 +31,8 @@
         "review": "Reseña",
         "items": "Elementos",
         "item": "Elemento",
+        "origin": "Origen",
+        "origins": "Orígenes",
         "comments": "Comentarios",
         "comment": "Comentario",
         "categories": "Categorías",
@@ -111,5 +114,11 @@
         "fashion": "Moda",
         "personal_care": "Cuidado personal",
         "movie": "Película"
+    },
+
+    "view-item": {
+        "timeline": "Línea de tiempo",
+        "add-review": "Agregar reseña",
+        "to-origin": "Convertir a origen"
     }
 }

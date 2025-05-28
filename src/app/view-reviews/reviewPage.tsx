@@ -18,19 +18,15 @@ import {
   Search,
   Star,
 } from "lucide-react";
-import ReviewCard from "./components/ReviewCard";
-import { getReviewsCards, insertTestReviews } from "@services/review-service";
-import { ReviewFull, ReviewImage } from "@dto/Review";
+import { getReviewsCards } from "@services/review-service";
+import { ReviewFull } from "@dto/Review";
 import { useTranslation } from "react-i18next";
 import "./styles/reviewPage.css";
 import { useLocation, useHistory } from "react-router-dom"; // Import useLocation and useHistory
 import ReviewFilterModal from "./components/ReviewFilterModal";
-import { insertTestCategories } from "@/shared/services/category-service";
-import { insertTestItems } from "@/shared/services/item-service";
-import { resetAllAutoIncrement } from "@/database-service";
+import ReviewCard from "@/shared/components/ReviewCard";
 
 export const ReviewPage: React.FC = () => {
-
   const VISIBLE_REVIEWS_LIMIT = 50; // Default limit for visible reviews
   const VISIBLE_REVIEWS_INCREMENT = 10; // Increment for loading more reviews
 
@@ -39,7 +35,9 @@ export const ReviewPage: React.FC = () => {
   const [sortOrder, setSortOrder] = useState<"asc" | "desc" | "none">("none");
   const [isFilterModalOpen, setFilterModalOpen] = useState(false);
 
-  const [visibleReviewsCount, setVisibleReviewsCount] = useState(VISIBLE_REVIEWS_LIMIT);
+  const [visibleReviewsCount, setVisibleReviewsCount] = useState(
+    VISIBLE_REVIEWS_LIMIT
+  );
 
   const [customFilters, setCustomFilters] = useState<{
     rating?: { minRating: number; maxRating: number };
@@ -76,9 +74,9 @@ export const ReviewPage: React.FC = () => {
       setIsToastOpen(true);
 
       (async () => {
-      const actualicedReviews = await getReviewsCards();
-      console.log("Reviews from DB:", actualicedReviews);
-      setReviews(actualicedReviews);
+        const actualicedReviews = await getReviewsCards();
+        console.log("Reviews from DB:", actualicedReviews);
+        setReviews(actualicedReviews);
       })();
 
       // Clear the state from history so the toast doesn't reappear on refresh/navigation
@@ -93,7 +91,6 @@ export const ReviewPage: React.FC = () => {
     );
 
     return reviews.filter((review) => {
-
       const comment = (review.comment ?? "").toLowerCase();
       const item = (review.item ?? "").toLowerCase();
       const category = (review.category ?? []).toString().toLowerCase();
@@ -116,11 +113,7 @@ export const ReviewPage: React.FC = () => {
         !lowerFilterCategory.length ||
         lowerFilterCategory.some((cat) => category.includes(cat));
 
-      return (
-        reviewTextMatch &&
-        modalRatingMatch &&
-        modalCategoryMatch
-      );
+      return reviewTextMatch && modalRatingMatch && modalCategoryMatch;
     });
   }, [reviews, searchTerm, customFilters]);
 
@@ -208,7 +201,9 @@ export const ReviewPage: React.FC = () => {
 
   // Function to load more reviews
   const loadMoreReviews = () => {
-    setVisibleReviewsCount((prevCount) => prevCount + VISIBLE_REVIEWS_INCREMENT);
+    setVisibleReviewsCount(
+      (prevCount) => prevCount + VISIBLE_REVIEWS_INCREMENT
+    );
   };
 
   return (
@@ -223,16 +218,18 @@ export const ReviewPage: React.FC = () => {
                   {reviews.length}
                 </IonLabel>
                 <IonLabel>
-                  {reviews.length === 1 ? t('common.review') : t('common.reviews')}
+                  {reviews.length === 1
+                    ? t("common.review")
+                    : t("common.reviews")}
                 </IonLabel>
               </div>
-              <IonButton 
-                color="tertiary" 
-                expand="block" 
+              <IonButton
+                color="tertiary"
+                expand="block"
                 className="bg-primary"
                 routerLink="/app/reviews/create"
               >
-                {t('review-page.add-review')}
+                {t("review-page.add-review")}
               </IonButton>
             </IonCol>
           </IonRow>
@@ -240,13 +237,15 @@ export const ReviewPage: React.FC = () => {
           {/* Section: Search bar and sort/filter buttons */}
           <IonRow>
             <IonCol className="flex flex-col gap-2">
-              <IonLabel className="section-title">{t('review-page.search')}</IonLabel>
+              <IonLabel className="section-title">
+                {t("review-page.search")}
+              </IonLabel>
               <IonGrid>
                 <IonRow className="ion-align-items-center gap-3">
                   <IonCol>
                     <IonInput
                       type="text"
-                      placeholder={t('review-page.search-placeholder')}
+                      placeholder={t("review-page.search-placeholder")}
                       value={searchTerm}
                       onIonInput={(e) => setSearchTerm(e.detail.value ?? "")}
                       fill="solid"
@@ -299,9 +298,9 @@ export const ReviewPage: React.FC = () => {
                         color={
                           (customFilters.rating &&
                             (customFilters.rating.minRating !== 0 ||
-                              customFilters.rating.maxRating !== 5)) || 
+                              customFilters.rating.maxRating !== 5)) ||
                           (customFilters.category &&
-                            customFilters.category.length > 0) 
+                            customFilters.category.length > 0)
                             ? "var(--ion-color-secondary)"
                             : "var(--ion-color-tertiary)"
                         }
@@ -329,7 +328,7 @@ export const ReviewPage: React.FC = () => {
                 {reviews.length === 0 || sortedReviews.length === 0 ? (
                   <div className="text-center flex flex-col items-center justify-center gap-2 text-[var(--ion-color-secondary-step-300)]">
                     <Star size={100} />
-                    <IonLabel>{t('review-page.no-reviews')}</IonLabel>
+                    <IonLabel>{t("review-page.no-reviews")}</IonLabel>
                   </div>
                 ) : sortOrder !== "none" ||
                   customFilters.rating?.minRating !== 0 ||
@@ -345,11 +344,11 @@ export const ReviewPage: React.FC = () => {
                     ([date, reviews]) => (
                       <div className="flex flex-col gap-3" key={date}>
                         <IonLabel className="text-lg" color={"medium"}>
-                            {new Date(date).toLocaleDateString("es-ES", {
+                          {new Date(date).toLocaleDateString("es-ES", {
                             day: "2-digit",
                             month: "2-digit",
                             year: "numeric",
-                            })}
+                          })}
                         </IonLabel>
                         <div className="flex flex-col gap-6">
                           {reviews.map((review) => (
@@ -368,12 +367,12 @@ export const ReviewPage: React.FC = () => {
           {visibleReviewsCount < sortedReviews.length && (
             <IonRow>
               <IonCol className="text-center">
-              <span
-                onClick={loadMoreReviews}
-                className="cursor-pointer text-tertiary hover:underline"
-              >
-                {t('review-page.load-more')}
-              </span>
+                <span
+                  onClick={loadMoreReviews}
+                  className="cursor-pointer text-tertiary hover:underline"
+                >
+                  {t("review-page.load-more")}
+                </span>
               </IonCol>
             </IonRow>
           )}
