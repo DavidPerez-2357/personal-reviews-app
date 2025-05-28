@@ -222,7 +222,7 @@ export const ReviewPage: React.FC = () => {
                 <IonLabel className="text-4xl font-bold">
                   {reviews.length}
                 </IonLabel>
-                <IonLabel className="text-lg font-semibold">
+                <IonLabel>
                   {reviews.length === 1 ? t('common.review') : t('common.reviews')}
                 </IonLabel>
               </div>
