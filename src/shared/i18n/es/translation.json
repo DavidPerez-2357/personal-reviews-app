@@ -17,6 +17,12 @@
         "save-changes": "Guardar cambios",
         "delete": "Eliminar",
         "replace": "Reemplazar",
+        "filter": "Filtrar",
+        "sort": "Ordenar",
+        "clear": "Limpiar",
+        "apply": "Aplicar",
+        "edit": "Editar",
+        "create": "Crear",
 
         "preview": "Vista previa",
 
@@ -77,7 +83,6 @@
         "search-placeholder": "Buscar reseñas...",
         "add-review": "Crear una nueva reseña",
         "load-more": "Ver más reseñas",
-        "filter": "Filtrar",
         "none": "Ninguno",
         "rating": "Calificación",
         "reset": "Reiniciar",

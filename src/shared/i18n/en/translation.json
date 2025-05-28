@@ -17,6 +17,12 @@
         "save-changes": "Save changes",
         "delete": "Delete",
         "replace": "Replace",
+        "filter": "Filter",
+        "sort": "Sort",
+        "clear": "Clear",
+        "apply": "Apply",
+        "edit": "Edit",
+        "create": "Create",
 
         "preview": "Preview",
 
@@ -77,7 +83,6 @@
         "search-placeholder": "Search reviews...",
         "add-review": "Create a new review",
         "load-more": "See more reviews",
-        "filter": "Filter",
         "all": "All",
         "none": "None",
         "rating": "Rating",
