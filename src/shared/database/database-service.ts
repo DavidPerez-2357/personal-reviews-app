@@ -6,7 +6,7 @@ import schema from './initial-schema.sql?raw';
 import { insertDefaultCategories } from '../services/category-service';
 
 const DB_NAME = 'personal-reviews-db';
-const DB_VERSION = 1;
+const DB_VERSION = 2;
 const DB_VERSION_KEY = 'db_version';
 
 const sqlite = new SQLiteConnection(CapacitorSQLite);
