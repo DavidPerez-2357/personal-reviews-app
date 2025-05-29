@@ -60,6 +60,7 @@ export const ReviewPage: React.FC = () => {
     async function initializeData() {
       try {
         const reviewsFromDB = await getReviewsCards();
+        console.log("Reviews fetched from DB:", reviewsFromDB);
         setReviews(reviewsFromDB);
       } catch (err) {
         console.error("Error initializing data:", err);
@@ -70,18 +71,19 @@ export const ReviewPage: React.FC = () => {
     // Check for toast message in location state when component mounts or location changes
 
     if (location.state?.toast) {
+      console.log("Toast message from location state:", location.state.toast);
       setToastMessage(location.state.toast);
       setIsToastOpen(true);
 
-      (async () => {
-        const actualicedReviews = await getReviewsCards();
-        console.log("Reviews from DB:", actualicedReviews);
-        setReviews(actualicedReviews);
-      })();
-
-      // Clear the state from history so the toast doesn't reappear on refresh/navigation
-      history.replace({ ...location, state: undefined });
+      if (location.pathname === "/app/reviews") {
+        (async () => {
+          const reviewsFromDB = await getReviewsCards();
+          console.log("Reviews fetched from DB after toast:", reviewsFromDB);
+          setReviews(reviewsFromDB);
+        })();
+      }
     }
+
   }, [location.state, history, location.pathname]); // Add dependencies
 
   const filteredReviews = useMemo(() => {

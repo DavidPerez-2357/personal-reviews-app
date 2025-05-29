@@ -41,7 +41,7 @@ const ManageItemReview = () => {
   const history = useHistory();
   const { t } = useTranslation();
   const location = useLocation();
- const itemId = location.state?.itemId; 
+  const itemId = location.state?.itemId; 
 
   console.log("itemId", itemId);
   // Variable de no encontrar categorias
@@ -95,6 +95,7 @@ const ManageItemReview = () => {
   const [categoryRatings, setCategoryRatings] = useState<CategoryRatingMix[]>([]);
   const [selectedOption, setSelectedOption] = useState<ItemOption | null>(null);
   const [comment, setComment] = useState("");
+  const [reviewDeleted, setReviewDeleted] = useState(false); // Variable para saber si la reseña ha sido eliminada
 
   // Variables para edicion
   const [reviewHasPhotos, setReviewHasPhotos] = useState(false); // Variable para saber si la reseña tiene fotos cuando se edita
@@ -192,6 +193,12 @@ const ManageItemReview = () => {
     setSelectedSubcategory(null);
     setCategoryRatings([]);
     setChildrenCategories([]);
+
+    console.log("🔍 Cargando reseña con ID:", id);
+    if (reviewDeleted) {
+      console.log("🔍 Reseña eliminada, redirigiendo a la lista de reseñas...");
+        return;
+    }
 
     if (editMode) {
         const reviewId = parseInt(id);
@@ -476,39 +483,31 @@ const ManageItemReview = () => {
             category_id: getSelectedCategory()?.id || 0,
         };
 
-        console.log("🔍 Guardando ítem...");
         const itemId = await saveOrUpdateItem(item);
-        console.log("✅ Ítem guardado con ID:", itemId);
 
         if (!itemId) {
             throw new Error(t('manage-item-review.error-message.error-saving-item'));
         }
 
+        const now = new Date().toISOString();
         const review: Review = {
             id: 0,
             item_id: itemId,
             rating,
             comment,
+            created_at: now,
+            updated_at: now,
         };
-
-        console.log("Comentario:", review.comment);
         
-
-        console.log("🔍 Guardando reseña...");
         const reviewId = await saveOrUpdateReview(review);
-        console.log("✅ Reseña guardada con ID:", reviewId);
 
         if (!reviewId) {
             throw new Error(t('manage-item-review.error-message.error-saving-review'));
         }
 
-        console.log("🔍 Guardando ratings de categorías...");
-        const categoryRatingsSaved = await saveCategoryRatings(reviewId);
-        console.log("✅ Ratings guardados:", categoryRatingsSaved);
+        await saveCategoryRatings(reviewId);
 
-        console.log("🔍 Guardando imágenes...");
-        const reviewImagesSaved = await saveReviewImages(reviewId);
-        console.log("✅ Imágenes guardadas:", reviewImagesSaved);
+        await saveReviewImages(reviewId);
 
         // Si todo se guarda correctamente
         setSaveButtonText(t('manage-item-review.saving-review-success'));
@@ -563,8 +562,9 @@ const ManageItemReview = () => {
 
     const reviewId = parseInt(id);
     setDeleteButtonText(t('manage-item-review.deleting-review'));
-
     const success = await deleteReview(reviewId);
+    setReviewDeleted(true); // Set the review as deleted
+    console.log("🔍 Reseña eliminada:", reviewDeleted);
     if (!success) {
       setIsButtonDisabled(false);
       setDeleteButtonText(t('manage-item-review.delete-review'));
@@ -577,7 +577,7 @@ const ManageItemReview = () => {
        for (const photo of savedPhotos) {
         await deletePhoto(photo); // Delete the photo from the filesystem
       }
-    }catch (error) {
+    } catch (error) {
       console.error("❌ Error al eliminar las imágenes de la reseña:", error);
       // TODO: Recuperar la reseña si no se eliminan las imágenes
     }
