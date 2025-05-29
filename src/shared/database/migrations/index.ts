@@ -1,11 +1,12 @@
+import { migration_2 } from "./migration-2";
 
 // This function applies the necessary migrations to the database based on the current version.
 export async function applyMigrations(db: any, from: number, to: number) {
     // Example migration functions
-  /* if (from < 2 && to >= 2) {
+  if (from < 2 && to >= 2) {
     await migration_2(db);
   }
-  if (from < 3 && to >= 3) {
+/*   if (from < 3 && to >= 3) {
     await migration_3(db);
   } */
 }
