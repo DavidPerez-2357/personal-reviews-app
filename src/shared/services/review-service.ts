@@ -333,8 +333,8 @@ export const deleteReview = async (id: number): Promise<boolean> => {
     if (!db) return false;
     try {
         const query = `DELETE FROM review WHERE id = ?`;
-        const result = await db!.run(query, [id]);
-        return (result.changes?.changes ?? 0) > 0;
+        await db!.run(query, [id]);
+        return true; // Siempre devuelve true si no hay error
     } catch (error) {
         console.error("❌ Error al eliminar reseña", error);
         return false;
