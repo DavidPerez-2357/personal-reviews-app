@@ -1,6 +1,5 @@
 import { Category } from "@dto/Category";
 import { SubCategoryColors } from "@/shared/enums/colors";
-import { getChildrenCategories } from "@/shared/services/category-service";
 import { IconName } from "@fortawesome/fontawesome-svg-core";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { IonLabel } from "@ionic/react";
