@@ -22,7 +22,7 @@ interface FilterModalProps {
   isOpen: boolean;
   onDismiss: () => void;
   onApplyFilters: (filters: {
-    category?: string[] | null;
+    category?: number[] | null;
     type: ItemType
   }) => void;
 }
@@ -93,7 +93,7 @@ const ItemFilterModal = ({
    * Determina qué categorías deben aplicarse como filtro,
    * según la selección del usuario y el modo de subcategorías.
    */
-  const getSelectedCategories = (): string[] | null => {
+  const getSelectedCategories = (): number[] | null => {
     if (!selectedCategory) {
       // Caso 2: Sin categoría padre seleccionada
       return null;
@@ -103,33 +103,33 @@ const ItemFilterModal = ({
   
     if (hasNoChildren) {
       // Caso 1: Categoría padre sin subcategorías
-      return [selectedCategory.name];
+      return [selectedCategory.id];
     }
   
     switch (subcategoryMode) {
       case "auto":
       case "all":
         // Caso 3 y 5: incluir padre + todas las subcategorías
-        return [selectedCategory.name, ...filteredChildCategories.map((child) => child.name)];
+        return [];
   
       case "none":
         // Caso 6: solo la categoría padre
-        return [selectedCategory.name];
+        return [selectedCategory.id];
   
       case "specific":
         // Caso 4: subcategorías específicas
-        return selectedCategories.map((subcategory) => subcategory.name);
+        return selectedCategories.map((subcategory) => subcategory.id);
   
       default:
         // Si el modo no es reconocido, devolver solo la categoría padre como fallback seguro
         console.warn(`Modo de subcategoría no reconocido: ${subcategoryMode}`);
-        return [selectedCategory.name];
+        return [selectedCategory.id];
     }
   };  
 
   // Handle reset button click
   const handleResetFilter = () => {
-    const resetFilters: {category?: string[] | null, type: ItemType} = {
+    const resetFilters: {category?: number[] | null, type: ItemType} = {
       category: null,
       type: 'all'
     };

@@ -15,7 +15,10 @@ import { useTranslation } from "react-i18next";
 import ItemFilterModal from "./components/ItemFilterModal";
 import ItemSortModal from "./components/ItemSortModal";
 import { ItemSortType, SortOrder } from "@/shared/dto/Sort";
-import { countItems } from "./services/item-service";
+import { countItems, countItemsFiltered, getItemsDisplay } from "./services/item-service";
+import { ItemDisplay } from "@/shared/dto/Item";
+import ItemCard from "@/shared/components/ItemCard";
+import { ItemType } from "@/shared/dto/Filter";
 
 
 const ViewAllItems = () => {
@@ -29,6 +32,11 @@ const ViewAllItems = () => {
     const [areItemsGrouped, setAreItemsGrouped] = useState(false);
     const [areFiltersApplied, setAreFiltersApplied] = useState(false);
     const [numberOfItems, setNumberOfItems] = useState(0);
+    const [numberOfItemsFiltered, setNumberOfItemsFiltered] = useState(0);
+    const [items, setItems] = useState<ItemDisplay[]>([]);
+    const [categoriesVisible, setCategoriesVisible] = useState<number[]>([]);
+    const [itemTypeFilter, setItemTypeFilter] = useState<ItemType>("all");
+    const PAGE_SIZE = 2;
 
     useEffect(() => {
         // Simulate fetching number of items from a service
@@ -38,26 +46,105 @@ const ViewAllItems = () => {
             console.error("Error fetching number of items:", error);
             setNumberOfItems(0);
         });
+
+        // Fetch initial items
+        fetchItems(0, PAGE_SIZE).then((fetchedItems) => {
+            setItems(fetchedItems);
+        }).catch((error) => {
+            console.error("Error fetching initial items:", error);
+            setItems([]);
+        });
     }, []);
+        
+    useEffect(() => {
+        const filters = {
+            category: categoriesVisible.length > 0 ? categoriesVisible : undefined,
+            type: itemTypeFilter,
+        }
 
-    const applyFilters = (filters: any) => {
-        console.log(filters);
+        if (
+            (categoriesVisible.length > 0 && itemTypeFilter !== "all") ||
+            (categoriesVisible.length > 0) ||
+            (itemTypeFilter !== "all") ||
+            searchTerm.trim() !== ""
+        ) {
+            countItemsFiltered(searchTerm, filters).then((count) => {
+                setNumberOfItemsFiltered(count);
+                setAreFiltersApplied(count > 0);
+            }).catch((error) => {
+            console.error("Error fetching filtered item count:", error);
+            setNumberOfItemsFiltered(0);
+            });
+        }
 
+        fetchItems(0, PAGE_SIZE).then((fetchedItems) => {
+            setItems(fetchedItems);
+        }).catch((error) => {
+            console.error("Error fetching items:", error);
+            setItems([]);
+        });
+
+    }, [sortType, sortOrder, itemTypeFilter, categoriesVisible, areItemsGrouped, searchTerm]);
+
+    const applyFilters = (filters: { category?: number[]; type: ItemType }) => {
         if (filters) {
             setAreFiltersApplied(true);
             console.log("Filters applied:", filters);
+            setItemTypeFilter(filters.type);
+            setCategoriesVisible(filters.category ? filters.category : []);
         }
 
         if (filters.type === "all" && !filters.category) {
             setAreFiltersApplied(false);
+            setItemTypeFilter("all");
+            setCategoriesVisible([]);
         }
+
+        setFilterModalOpen(false);
+    }
+
+    const fetchItems = (page: number, size: number): Promise<ItemDisplay[]> => {
+        const sort = {
+            type: sortType,
+            order: sortOrder,
+        };
+
+        const filters = {
+            category: categoriesVisible.length > 0 ? categoriesVisible : undefined,
+            type: itemTypeFilter,
+        };
+
+        console.log("Fetching items with params:",
+            page,
+            size,
+            searchTerm,
+            sort.order,
+            sort.type,
+            filters.category,
+            filters.type,
+            areItemsGrouped
+        );
+
+        return getItemsDisplay(page, size, searchTerm, sort, filters, areItemsGrouped)
+            .then((fetchedItems: ItemDisplay[]) => {
+                console.log("Fetched items:", fetchedItems);
+                return fetchedItems;
+            })
+            .catch((error: Error) => {
+                console.error("Error fetching items:", error);
+                setItems([]);
+                return [];
+            });
     }
 
     const applySort = (sortType: ItemSortType, sortOrder: SortOrder) => {
-        console.log(`Applying sort: ${sortType} in ${sortOrder} order`);
         setSortType(sortType);
         setSortOrder(sortOrder);
         setSortModalOpen(false);
+    }
+
+    const appendItems = (newItems: ItemDisplay[]) => {
+        setItems((prevItems) => [...prevItems, ...newItems]);
     }
 
     return (
@@ -166,7 +253,38 @@ const ViewAllItems = () => {
                         </IonCol>
                     </IonRow>
 
+                    <IonRow>
+                        <IonCol className="flex flex-col gap-5">
+                            {items.length > 0 ? (
+                                items.map((item) => (
+                                    <ItemCard
+                                        key={item.id}
+                                        item={item} />   
+                                ))
+                            ) : (
+                                <div className="text-center text-gray-500">
+                                    {t('common.no-items-found')}
+                                </div>
+                            )}
 
+                            {(
+                                ((items.length < numberOfItems) && (!areFiltersApplied && !searchTerm)) ||
+                                ((items.length < numberOfItemsFiltered) && (areFiltersApplied || searchTerm))
+                            ) && (
+                                <IonButton 
+                                    expand="block"
+                                    onClick={async () => {
+                                        const nextPage = Math.floor(items.length / PAGE_SIZE);
+                                        const newItems = await fetchItems(nextPage, PAGE_SIZE);
+                                        appendItems(newItems);
+                                    }}
+                                    color="secondary"
+                                >
+                                    {t('common.load-more')}
+                                </IonButton>
+                            )}
+                        </IonCol>
+                    </IonRow>
                 </IonGrid>
             </IonContent>
 
