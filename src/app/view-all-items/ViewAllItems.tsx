@@ -9,7 +9,7 @@ import {
     IonPage,
     IonRow,
 } from "@ionic/react";
-import { ArrowDown, ArrowUp, ArrowUpDown, Funnel, LayoutGrid, Search } from "lucide-react";
+import { ArrowDown, ArrowUp, ArrowUpDown, Box, Funnel, LayoutGrid, Search } from "lucide-react";
 import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import ItemFilterModal from "./components/ItemFilterModal";
@@ -36,7 +36,7 @@ const ViewAllItems = () => {
     const [items, setItems] = useState<ItemDisplay[]>([]);
     const [categoriesVisible, setCategoriesVisible] = useState<number[]>([]);
     const [itemTypeFilter, setItemTypeFilter] = useState<ItemType>("all");
-    const PAGE_SIZE = 2;
+    const PAGE_SIZE = 10;
 
     useEffect(() => {
         // Simulate fetching number of items from a service
@@ -54,7 +54,8 @@ const ViewAllItems = () => {
             console.error("Error fetching initial items:", error);
             setItems([]);
         });
-    }, []);
+
+    }, [window.location.pathname]);
         
     useEffect(() => {
         const filters = {
@@ -70,7 +71,6 @@ const ViewAllItems = () => {
         ) {
             countItemsFiltered(searchTerm, filters).then((count) => {
                 setNumberOfItemsFiltered(count);
-                setAreFiltersApplied(count > 0);
             }).catch((error) => {
             console.error("Error fetching filtered item count:", error);
             setNumberOfItemsFiltered(0);
@@ -262,12 +262,14 @@ const ViewAllItems = () => {
                                         item={item} />   
                                 ))
                             ) : (
-                                <div className="text-center text-gray-500">
-                                    {t('common.no-items-found')}
+                                <div className="text-center flex flex-col items-center justify-center gap-2 text-[var(--ion-color-secondary-step-300)]">
+                                    <Box size={100} />
+                                    <IonLabel>{t('common.no-items-found')} </IonLabel>
                                 </div>
                             )}
 
                             {(
+                                items.length !== 0 &&
                                 ((items.length < numberOfItems) && (!areFiltersApplied && !searchTerm)) ||
                                 ((items.length < numberOfItemsFiltered) && (areFiltersApplied || searchTerm))
                             ) && (
