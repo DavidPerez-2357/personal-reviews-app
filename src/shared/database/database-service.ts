@@ -43,10 +43,8 @@ export async function openDatabase() {
     }
 
     await insertDefaultCategories(dbInstance);
-    await storageService.set(DB_VERSION_KEY, 1);
-  }
-
-  if (currentVersion < DB_VERSION) {
+    await storageService.set(DB_VERSION_KEY, DB_VERSION);
+  } else if (currentVersion < DB_VERSION) {
     await applyMigrations(dbInstance, currentVersion, DB_VERSION);
     await storageService.set(DB_VERSION_KEY, DB_VERSION);
   }
