@@ -41,7 +41,9 @@
     "image": "Image",
     "images": "Images",
     "select-category": "Select category",
-    "no-categories-found": "No categories found"
+    "no-categories-found": "No categories found",
+    "no-items-found": "No items found",
+    "no-reviews-found": "No reviews found"
   },
   "manage-item-review": {
     "create-review": "Create review",

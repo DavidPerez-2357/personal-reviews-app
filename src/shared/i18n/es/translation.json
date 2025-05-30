@@ -21,7 +21,6 @@
         "all": "Todos",
         "save-changes": "Guardar cambios",
         "delete": "Eliminar",
-        "edit": "Editar",
         "replace": "Reemplazar",
          "filter": "Filtrar",
         "sort": "Ordenar",
@@ -48,7 +47,9 @@
         "images": "Imágenes",
 
         "select-category": "Selecciona una categoría",
-        "no-categories-found": "No se encontraron categorías"
+        "no-categories-found": "No se encontraron categorías",
+        "no-items-found": "No se encontraron elementos",
+        "no-reviews-found": "No se encontraron reseñas"
     },
 
     "manage-item-review": {
