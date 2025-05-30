@@ -1,119 +1,123 @@
 {
-    "common": {
-        "appName": "Personal reviews",
-        "welcome": "Bienvenido a mi aplicación",
-        "loading": "Cargando...",
-        "error": "Ocurrió un error",
-        "success": "Éxito",
-        "cancel": "Cancelar",
-        "confirm": "Confirmar",
-        "yes": "Sí",
-        "no": "No",
-        "ok": "Aceptar",
-        "close": "Cerrar",
-        "more": "Más",
-        "less": "Menos",
-        "all": "Todos",
-        "save-changes": "Guardar cambios",
-        "delete": "Eliminar",
-        "edit": "Editar",
-        "replace": "Reemplazar",
+  "config": {
+    "date-format": "es-ES"
+  },
 
-        "preview": "Vista previa",
+  "common": {
+    "appName": "Personal reviews",
+    "welcome": "Bienvenido a mi aplicación",
+    "loading": "Cargando...",
+    "error": "Ocurrió un error",
+    "success": "Éxito",
+    "cancel": "Cancelar",
+    "confirm": "Confirmar",
+    "yes": "Sí",
+    "no": "No",
+    "ok": "Aceptar",
+    "close": "Cerrar",
+    "more": "Más",
+    "less": "Menos",
+    "all": "Todos",
+    "save-changes": "Guardar cambios",
+    "delete": "Eliminar",
+    "edit": "Editar",
+    "replace": "Reemplazar",
 
-        "reviews": "Reseñas",
-        "review": "Reseña",
-        "items": "Elementos",
-        "item": "Elemento",
-        "origin": "Origen",
-        "origins": "Orígenes",
-        "comments": "Comentarios",
-        "comment": "Comentario",
-        "categories": "Categorías",
-        "category": "Categoría",
+    "preview": "Vista previa",
 
-        "image": "Imagen",
-        "images": "Imágenes",
+    "reviews": "Reseñas",
+    "review": "Reseña",
+    "items": "Elementos",
+    "item": "Elemento",
+    "origin": "Origen",
+    "origins": "Orígenes",
+    "comments": "Comentarios",
+    "comment": "Comentario",
+    "categories": "Categorías",
+    "category": "Categoría",
 
-        "select-category": "Selecciona una categoría",
-        "no-categories-found": "No se encontraron categorías"
-    },
+    "image": "Imagen",
+    "images": "Imágenes",
 
-    "manage-item-review": {
-        "create-review": "Crear reseña",
-        "saving-review": "Guardando reseña",
-        "saving-review-success": "Reseña guardada con éxito",
-        "saving-review-error": "Error al guardar la reseña",
-        "used-item-exists": "El elemento que estás usando existe",
-        "item-input-placeholder": "Agregar o seleccionar uno existente",
-        "comment-input-placeholder": "Escribe lo que te gustaría recordar...",
-        "delete-review": "Eliminar reseña",
-        "delete-review-confirm": "¿Estás seguro de que deseas eliminar esta reseña?",
-        "delete-review-success": "Reseña eliminada con éxito",
-        "deleting-review": "Eliminando reseña",
+    "select-category": "Selecciona una categoría",
+    "no-categories-found": "No se encontraron categorías"
+  },
 
-        "error-message": {
-            "empty-title": "El título no puede estar vacío",
-            "error-creating-review": "Error al crear la reseña",
-            "error-saving-review": "Error al guardar la reseña",
-            "error-creating-item": "Error al crear el elemento",
-            "error-saving-item": "Error al guardar el elemento",
-            "error-saving-review-ratings": "Error al guardar las calificaciones de la reseña",
-            "error-saving-review-images": "Error al guardar las imágenes de la reseña",
-            "error-updating-item": "Error al actualizar el elemento",
-            "error-updating-review": "Error al actualizar la reseña",
-            "review-not-found": "Reseña no encontrada",
-            "item-not-found": "Elemento no encontrado",
-            "category-not-found": "Categoría no encontrada",
-            "category-ratings-not-found": "Calificaciones de categoría no encontradas",
-            "review-images-not-found": "Imágenes de reseña no encontradas",
-            "error-deleting-review": "Error al eliminar la reseña",
-            "error-deleting-item": "Error al eliminar el elemento",
-            "error-deleting-category": "Error al eliminar la categoría",
-            "error-deleting-review-ratings": "Error al eliminar las calificaciones de la reseña",
-            "error-deleting-review-images": "Error al eliminar las imágenes de la reseña"
-        }
-    },
+  "manage-item-review": {
+    "create-review": "Crear reseña",
+    "saving-review": "Guardando reseña",
+    "saving-review-success": "Reseña guardada con éxito",
+    "saving-review-error": "Error al guardar la reseña",
+    "used-item-exists": "El elemento que estás usando existe",
+    "item-input-placeholder": "Agregar o seleccionar uno existente",
+    "comment-input-placeholder": "Escribe lo que te gustaría recordar...",
+    "delete-review": "Eliminar reseña",
+    "delete-review-confirm": "¿Estás seguro de que deseas eliminar esta reseña?",
+    "delete-review-success": "Reseña eliminada con éxito",
+    "deleting-review": "Eliminando reseña",
 
-    "review-page": {
-        "search": "Buscar",
-        "search-placeholder": "Buscar reseñas...",
-        "add-review": "Crear una nueva reseña",
-        "load-more": "Ver más reseñas",
-        "filter": "Filtrar",
-        "none": "Ninguno",
-        "rating": "Calificación",
-        "reset": "Reiniciar",
-        "apply": "Aplicar",
-        "no-reviews": "No hay reseñas disponibles"
-    },
-
-    "more-options": {
-        "more-options": "Más opciones",
-        "language": "Idioma",
-        "theme": "Tema",
-        
-        "change-theme": "Cambiar tema",
-        "dark-mode": "Modo oscuro",
-        "light-mode": "Modo claro",
-
-        "change-language": "Cambiar idioma",
-        "spanish": "Español",
-        "english": "Inglés"
-    },
-
-    "categories": {
-        "food": "Comida",
-        "burger": "Hamburguesa",
-        "smartphone": "Teléfono móvil",
-        "fashion": "Moda",
-        "personal_care": "Cuidado personal",
-        "movie": "Película"
-    },
-
-    "view-item": {
-        "timeline": "Línea de tiempo",
-        "add-review": "Agregar reseña",
-        "to-origin": "Convertir a origen"
+    "error-message": {
+      "empty-title": "El título no puede estar vacío",
+      "error-creating-review": "Error al crear la reseña",
+      "error-saving-review": "Error al guardar la reseña",
+      "error-creating-item": "Error al crear el elemento",
+      "error-saving-item": "Error al guardar el elemento",
+      "error-saving-review-ratings": "Error al guardar las calificaciones de la reseña",
+      "error-saving-review-images": "Error al guardar las imágenes de la reseña",
+      "error-updating-item": "Error al actualizar el elemento",
+      "error-updating-review": "Error al actualizar la reseña",
+      "review-not-found": "Reseña no encontrada",
+      "item-not-found": "Elemento no encontrado",
+      "category-not-found": "Categoría no encontrada",
+      "category-ratings-not-found": "Calificaciones de categoría no encontradas",
+      "review-images-not-found": "Imágenes de reseña no encontradas",
+      "error-deleting-review": "Error al eliminar la reseña",
+      "error-deleting-item": "Error al eliminar el elemento",
+      "error-deleting-category": "Error al eliminar la categoría",
+      "error-deleting-review-ratings": "Error al eliminar las calificaciones de la reseña",
+      "error-deleting-review-images": "Error al eliminar las imágenes de la reseña"
     }
+  },
+
+  "review-page": {
+    "search": "Buscar",
+    "search-placeholder": "Buscar reseñas...",
+    "add-review": "Crear una nueva reseña",
+    "load-more": "Ver más reseñas",
+    "filter": "Filtrar",
+    "none": "Ninguno",
+    "rating": "Calificación",
+    "reset": "Reiniciar",
+    "apply": "Aplicar",
+    "no-reviews": "No hay reseñas disponibles"
+  },
+
+  "more-options": {
+    "more-options": "Más opciones",
+    "language": "Idioma",
+    "theme": "Tema",
+
+    "change-theme": "Cambiar tema",
+    "dark-mode": "Modo oscuro",
+    "light-mode": "Modo claro",
+
+    "change-language": "Cambiar idioma",
+    "spanish": "Español",
+    "english": "Inglés"
+  },
+
+  "categories": {
+    "food": "Comida",
+    "burger": "Hamburguesa",
+    "smartphone": "Teléfono móvil",
+    "fashion": "Moda",
+    "personal_care": "Cuidado personal",
+    "movie": "Película"
+  },
+
+  "view-item": {
+    "timeline": "Línea de tiempo",
+    "add-review": "Agregar reseña",
+    "to-origin": "Convertir a origen"
+  }
 }
