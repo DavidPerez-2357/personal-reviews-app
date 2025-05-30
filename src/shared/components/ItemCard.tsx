@@ -12,7 +12,7 @@ const ItemCard = ({ item }: { item: ItemDisplay }) => {
   return (
     <IonCard
       button={true}
-      className="bg-[var(--ion-color-secondary)] px-4 py-5 flex-row gap-4 items-center cursor-pointer"
+      className="bg-[var(--ion-color-secondary)] pl-4 py-5 pr-10 flex-row gap-4 items-center cursor-pointer"
       routerLink={`/app/items/${item.id}/viewItem`}
     >
       <div
@@ -26,18 +26,20 @@ const ItemCard = ({ item }: { item: ItemDisplay }) => {
       </div>
 
       <div className="flex flex-col">
-        <span className="text-lg text-[var(--ion-text-color)] break-all w-5/6">
+        <span className="text-lg text-[var(--ion-text-color)] break-all">
           {item.name}
         </span>
         <div className="flex items-center gap-2">
           <StarRating
             size={30}
-            rating={Math.round(item.average_rating)}
+            rating={Math.round(item.last_review)}
             setRating={() => {}}
           />
-          <span className="font-bold text-xs text-center rounded-full p-1 min-h-6 min-w-6 text-[var(--ion-color-secondary)] bg-[var(--ion-color-secondary-contrast)]">
-            {item.number_of_ratings}
-          </span>
+          {item.number_of_reviews >= 2 && (
+            <span className="font-bold text-xs text-center rounded-full p-1 min-h-6 min-w-6 text-[var(--ion-color-secondary)] bg-[var(--ion-color-secondary-contrast)]">
+              {item.number_of_reviews}
+            </span>
+          )}
         </div>
       </div>
       <div className="absolute top-3 right-3">

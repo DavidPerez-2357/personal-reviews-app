@@ -56,7 +56,7 @@ export const getItemFull = async (id: number): Promise<ItemFull | null> => {
 }
 
 /**
- * Obtiene los items de un origen.
+ * Obtiene los items de un origen con la nueva estructura de ItemDisplay.
  * @param id
  * @returns Promise<ItemDisplay[]>
  */
@@ -65,23 +65,34 @@ export const getItemsByOrigin = async (id: number): Promise<ItemDisplay[]> => {
     if (!db) return [];
 
     try {
-        const query = `SELECT
-                            i.id,
-                            i.name,
-                            ROUND(AVG(r.rating), 2) AS average_rating,
-                            COUNT(r.id) AS number_of_ratings,
-                            MAX(r.created_at) AS date_last_review,
-                            c.name AS category_name,
-                            c.icon AS category_icon,
-                            c.color AS category_color
-                        FROM item i
-                        JOIN category c ON i.category_id = c.id
-                        LEFT JOIN review r ON i.id = r.item_id
-                        JOIN origin_item oi on i.id = oi.item_id 
-                        WHERE oi.origin_id = ?
-                        GROUP BY i.id, i.name, c.name, c.icon, c.color`;
+        const query = `
+            SELECT i.id, i.name,
+               COUNT(r.rating) AS number_of_rewviews, 
+               c.icon AS category_icon, 
+               c.color AS category_color,
+               (
+               SELECT r2.rating
+               FROM review r2
+               WHERE r2.item_id = i.id
+               ORDER BY r2.created_at DESC
+               LIMIT 1
+               ) AS last_review
+            FROM item i
+            LEFT JOIN review r ON i.id = r.item_id
+            LEFT JOIN category c ON i.category_id = c.id
+            WHERE oi.origin_id = ?
+            GROUP BY i.id, i.name, c.icon, c.color
+        `;
         const result = await db!.query(query, [id]);
-        return result.values as ItemDisplay[];
+        // Map fields to match ItemDisplay interface
+        return (result.values || []).map((row: ItemDisplay) => ({
+            id: row.id,
+            name: row.name,
+            last_review: row.last_review ? Number(new Date(row.last_review)) : 0,
+            number_of_reviews: row.number_of_reviews,
+            category_icon: row.category_icon,
+            category_color: row.category_color
+        })) as ItemDisplay[];
     } catch (error) {
         console.error("❌ Error al obtener ítems por origen", error);
         return [];
