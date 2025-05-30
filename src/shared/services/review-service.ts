@@ -63,6 +63,7 @@ export const getReviewsCards = async (): Promise<ReviewFull[]> => {
                    r.updated_at,
                    i.id                       AS item_id,
                    i.name                      AS item,
+                   c.id                       AS category_id,
                    c.name                     AS category,
                    c.icon                     AS icon,
                    GROUP_CONCAT(COALESCE(ri.image, '')) AS images
@@ -81,6 +82,7 @@ export const getReviewsCards = async (): Promise<ReviewFull[]> => {
                 created_at: row.created_at,
                 updated_at: row.updated_at,
                 images: row.images ? row.images.split(',') : [],
+                category_id: row.category_id,
                 category: row.category,
                 icon: row.icon,
                 item_id: row.item_id,
