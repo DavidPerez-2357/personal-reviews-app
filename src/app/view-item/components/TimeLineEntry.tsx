@@ -17,7 +17,7 @@ const TimelineEntry: React.FC<{ entry: TimelineEntry }> = ({ entry }) => {
       {/* Content */}
       <div className="ml-8">
         <div className="text-[var(--ion-color-muted)] font-medium mb-2">
-          {new Date(entry.date).toLocaleDateString("es-ES", {
+          {new Date(entry.date).toLocaleDateString( navigator.language || "es-ES", {
             day: "2-digit",
             month: "2-digit",
             year: "numeric",
