@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { IonTabs, IonTabBar, IonTabButton, IonLabel, IonRouterOutlet, IonRippleEffect } from '@ionic/react';
 import { IonReactRouter } from '@ionic/react-router';
 import { Route, Redirect, useLocation } from 'react-router';
@@ -15,8 +15,14 @@ import ViewAllItems from './view-all-items/ViewAllItems';
 
 const FooterTabBar = () => {
   const { t } = useTranslation();
+  const location = useLocation();
 
-  const [selectedTab, setSelectedTab] = React.useState(useLocation().pathname.split('/')[2] || 'reviews');
+  const [selectedTab, setSelectedTab] = useState(location.pathname.split('/')[2] || 'reviews');
+
+  useEffect(() => {
+    const path = location.pathname.split('/')[2];
+    setSelectedTab(path || 'reviews');
+  }, [location]);
 
   return (
     <IonReactRouter>
