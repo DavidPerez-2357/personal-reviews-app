@@ -139,8 +139,8 @@ const ReviewFilterModal: React.FC<FilterModalProps> = ({
       isOpen={isOpen}
       onDidDismiss={onDismiss}
       ref={modal}
-      initialBreakpoint={0.70}
-      breakpoints={[0, 0.70]}
+      initialBreakpoint={0.80}
+      breakpoints={[0, 0.5, 0.8, 0.90]}
       className="ion-no-padding ion-no-border"
     >
       <IonHeader className="ion-no-border">
