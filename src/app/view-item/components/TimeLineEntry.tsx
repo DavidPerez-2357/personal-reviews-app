@@ -1,4 +1,5 @@
 import StarRating from "@/shared/components/StarRating";
+import { useTranslation } from "react-i18next";
 
 interface TimelineEntry {
   date: string;
@@ -7,6 +8,9 @@ interface TimelineEntry {
 }
 
 const TimelineEntry: React.FC<{ entry: TimelineEntry }> = ({ entry }) => {
+  
+  const { t } = useTranslation();
+
   return (
     <div className="relative flex mb-12">
       {/* Timeline marker */}
@@ -17,11 +21,14 @@ const TimelineEntry: React.FC<{ entry: TimelineEntry }> = ({ entry }) => {
       {/* Content */}
       <div className="ml-8">
         <div className="text-[var(--ion-color-muted)] font-medium mb-2">
-          {new Date(entry.date).toLocaleDateString( navigator.language || "es-ES", {
-            day: "2-digit",
-            month: "2-digit",
-            year: "numeric",
-          })}
+          {new Date(entry.date).toLocaleDateString(
+            t("config.date-format"),
+            {
+              day: "2-digit",
+              month: "2-digit",
+              year: "numeric",
+            }
+          )}
         </div>
         <StarRating size={30} rating={entry.rating} setRating={() => {}} />
         <p className="text-[var(--ion-text-color)] mt-2 text-lg">
