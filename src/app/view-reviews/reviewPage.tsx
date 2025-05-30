@@ -41,7 +41,7 @@ export const ReviewPage: React.FC = () => {
 
   const [customFilters, setCustomFilters] = useState<{
     rating?: { minRating: number; maxRating: number };
-    category?: string[];
+    category?: number[];
     keyword?: string;
   }>({
     rating: { minRating: 0, maxRating: 5 },
@@ -73,28 +73,24 @@ export const ReviewPage: React.FC = () => {
       setToastMessage(location.state.toast);
       setIsToastOpen(true);
 
-      (async () => {
-        const actualicedReviews = await getReviewsCards();
-        console.log("Reviews from DB:", actualicedReviews);
-        setReviews(actualicedReviews);
-      })();
-
-      // Clear the state from history so the toast doesn't reappear on refresh/navigation
-      history.replace({ ...location, state: undefined });
+      if (location.pathname === "/app/reviews") {
+        (async () => {
+          const reviewsFromDB = await getReviewsCards();
+          setReviews(reviewsFromDB);
+        })();
+      }
     }
-  }, [location.state, history, location.pathname]); // Add dependencies
+  }, [location.state, history, location.pathname]);
 
   const filteredReviews = useMemo(() => {
     const lowerSearchTerm = (searchTerm ?? "").toLowerCase().trim();
-    const lowerFilterCategory = (customFilters.category ?? []).map((category) =>
-      category.toLowerCase().trim()
-    );
-
+    const filterCategoryIds = customFilters.category ?? [];
     return reviews.filter((review) => {
       const comment = (review.comment ?? "").toLowerCase();
       const item = (review.item ?? "").toLowerCase();
-      const category = (review.category ?? []).toString().toLowerCase();
       const rating = review.rating;
+      // Usar category_id para filtrar por id
+      const reviewCategoryId = review.category_id;
 
       // Search filter: finds the search term in the comment, item, or rating
       const reviewTextMatch =
@@ -104,14 +100,14 @@ export const ReviewPage: React.FC = () => {
 
       // Filter for the modal: rating
       const modalRatingMatch =
-        !customFilters.rating || // If there's no rating filter, pass
-        (rating >= customFilters.rating.minRating && // Check the range
+        !customFilters.rating ||
+        (rating >= customFilters.rating.minRating &&
           rating <= customFilters.rating.maxRating);
 
-      // Filter for the modal: category
+      // Filter for the modal: category (by id)
       const modalCategoryMatch =
-        !lowerFilterCategory.length ||
-        lowerFilterCategory.some((cat) => category.includes(cat));
+        !filterCategoryIds.length ||
+        filterCategoryIds.includes(reviewCategoryId);
 
       return reviewTextMatch && modalRatingMatch && modalCategoryMatch;
     });
@@ -178,7 +174,7 @@ export const ReviewPage: React.FC = () => {
   // Function to apply filters from the modal
   const handleApplyFilters = (filters: {
     rating?: { minRating: number; maxRating: number };
-    category?: string[] | null;
+    category?: number[] | null;
   }) => {
     const isDefaultFilters =
       (!filters.rating ||
@@ -190,13 +186,7 @@ export const ReviewPage: React.FC = () => {
       category: filters.category ?? [],
     });
 
-    // Reset the visible reviews limit if the filters are not the default ones
-    if (!isDefaultFilters) {
-      setVisibleReviewsCount(VISIBLE_REVIEWS_LIMIT);
-    } else {
-      // If returning to the default state, reset the limit
-      setVisibleReviewsCount(VISIBLE_REVIEWS_LIMIT);
-    }
+    setVisibleReviewsCount(VISIBLE_REVIEWS_LIMIT);
   };
 
   // Function to load more reviews
@@ -344,11 +334,14 @@ export const ReviewPage: React.FC = () => {
                     ([date, reviews]) => (
                       <div className="flex flex-col gap-3" key={date}>
                         <IonLabel className="text-lg" color={"medium"}>
-                          {new Date(date).toLocaleDateString("es-ES", {
-                            day: "2-digit",
-                            month: "2-digit",
-                            year: "numeric",
-                          })}
+                          {new Date(date).toLocaleDateString(
+                            t("config.date-format"),
+                            {
+                              day: "2-digit",
+                              month: "2-digit",
+                              year: "numeric",
+                            }
+                          )}
                         </IonLabel>
                         <div className="flex flex-col gap-6">
                           {reviews.map((review) => (

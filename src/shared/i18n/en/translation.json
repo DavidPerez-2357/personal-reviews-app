@@ -1,4 +1,7 @@
 {
+  "config": {
+    "date-format": "en-US"
+  },
   "common": {
     "appName": "Personal reviews",
     "welcome": "Welcome to my app",

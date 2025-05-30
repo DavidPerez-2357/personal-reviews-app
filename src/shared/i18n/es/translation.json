@@ -1,5 +1,10 @@
 {
-    "common": {
+   "config": {
+    "date-format": "es-ES"
+  },  
+  
+  
+  "common": {
         "appName": "Personal reviews",
         "welcome": "Bienvenido a mi aplicación",
         "loading": "Cargando...",
@@ -16,15 +21,18 @@
         "all": "Todos",
         "save-changes": "Guardar cambios",
         "delete": "Eliminar",
+        "edit": "Editar",
         "replace": "Reemplazar",
-        "filter": "Filtrar",
+         "filter": "Filtrar",
         "sort": "Ordenar",
         "clear": "Limpiar",
         "apply": "Aplicar",
         "edit": "Editar",
         "create": "Crear",
         "load-more": "Cargar más",
+
         "preview": "Vista previa",
+
         "reviews": "Reseñas",
         "review": "Reseña",
         "items": "Elementos",
@@ -35,11 +43,14 @@
         "comment": "Comentario",
         "categories": "Categorías",
         "category": "Categoría",
+
         "image": "Imagen",
         "images": "Imágenes",
+
         "select-category": "Selecciona una categoría",
         "no-categories-found": "No se encontraron categorías"
     },
+
     "manage-item-review": {
         "create-review": "Crear reseña",
         "saving-review": "Guardando reseña",
@@ -52,6 +63,7 @@
         "delete-review-confirm": "¿Estás seguro de que deseas eliminar esta reseña?",
         "delete-review-success": "Reseña eliminada con éxito",
         "deleting-review": "Eliminando reseña",
+
         "error-message": {
             "empty-title": "El título no puede estar vacío",
             "error-creating-review": "Error al crear la reseña",
@@ -74,28 +86,34 @@
             "error-deleting-review-images": "Error al eliminar las imágenes de la reseña"
         }
     },
+
     "review-page": {
         "search": "Buscar",
         "search-placeholder": "Buscar reseñas...",
         "add-review": "Crear una nueva reseña",
         "load-more": "Ver más reseñas",
+        "filter": "Filtrar",
         "none": "Ninguno",
         "rating": "Calificación",
         "reset": "Reiniciar",
         "apply": "Aplicar",
         "no-reviews": "No hay reseñas disponibles"
     },
+
     "more-options": {
         "more-options": "Más opciones",
         "language": "Idioma",
         "theme": "Tema",
+        
         "change-theme": "Cambiar tema",
         "dark-mode": "Modo oscuro",
         "light-mode": "Modo claro",
+
         "change-language": "Cambiar idioma",
         "spanish": "Español",
         "english": "Inglés"
     },
+
     "categories": {
         "food": "Comida",
         "burger": "Hamburguesa",
@@ -104,6 +122,7 @@
         "personal_care": "Cuidado personal",
         "movie": "Película"
     },
+
     "view-item": {
         "timeline": "Línea de tiempo",
         "add-review": "Agregar reseña",
