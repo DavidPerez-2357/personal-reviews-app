@@ -145,6 +145,9 @@ export const getItemsDisplay = async (
     if (sortColumn) {
       query += ` ORDER BY ${sortColumn} ${sortOrder.toUpperCase()}`;
     }
+  }else {
+    // Si no hay ordenamiento, se ordena por ID por defecto
+    query += ` ORDER BY i.id DESC`;
   }
 
   // --- Paginación
