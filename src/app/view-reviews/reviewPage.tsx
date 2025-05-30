@@ -346,7 +346,7 @@ export const ReviewPage: React.FC = () => {
                       <div className="flex flex-col gap-3" key={date}>
                         <IonLabel className="text-lg" color={"medium"}>
                           {new Date(date).toLocaleDateString(
-                            navigator.language || "es-ES",
+                            t("config.date-format"),
                             {
                               day: "2-digit",
                               month: "2-digit",
