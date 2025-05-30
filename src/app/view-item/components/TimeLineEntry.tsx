@@ -1,9 +1,9 @@
-import StarRating from "@/shared/components/StarRating"
+import StarRating from "@/shared/components/StarRating";
 
 interface TimelineEntry {
-  date: string
-  rating: number
-  comment: string
+  date: string;
+  rating: number;
+  comment: string;
 }
 
 const TimelineEntry: React.FC<{ entry: TimelineEntry }> = ({ entry }) => {
@@ -17,17 +17,19 @@ const TimelineEntry: React.FC<{ entry: TimelineEntry }> = ({ entry }) => {
       {/* Content */}
       <div className="ml-8">
         <div className="text-[var(--ion-color-muted)] font-medium mb-2">
-          {new Date(entry.date).toLocaleDateString()}
+          {new Date(entry.date).toLocaleDateString("es-ES", {
+            day: "2-digit",
+            month: "2-digit",
+            year: "numeric",
+          })}
         </div>
-        <StarRating 
-            size={30}
-            rating={entry.rating}
-            setRating={() => {}}
-        />
-        <p className="text-[var(--ion-text-color)] mt-2 text-lg">{entry.comment}</p>
+        <StarRating size={30} rating={entry.rating} setRating={() => {}} />
+        <p className="text-[var(--ion-text-color)] mt-2 text-lg">
+          {entry.comment}
+        </p>
       </div>
     </div>
-  )
-}
+  );
+};
 
 export default TimelineEntry;
