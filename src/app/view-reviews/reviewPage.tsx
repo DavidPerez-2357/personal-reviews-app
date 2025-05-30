@@ -334,11 +334,14 @@ export const ReviewPage: React.FC = () => {
                     ([date, reviews]) => (
                       <div className="flex flex-col gap-3" key={date}>
                         <IonLabel className="text-lg" color={"medium"}>
-                          {new Date(date).toLocaleDateString("es-ES", {
-                            day: "2-digit",
-                            month: "2-digit",
-                            year: "numeric",
-                          })}
+                          {new Date(date).toLocaleDateString(
+                            t("config.date-format"),
+                            {
+                              day: "2-digit",
+                              month: "2-digit",
+                              year: "numeric",
+                            }
+                          )}
                         </IonLabel>
                         <div className="flex flex-col gap-6">
                           {reviews.map((review) => (
