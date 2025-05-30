@@ -39,10 +39,8 @@ export interface ItemFull {
 export interface ItemDisplay {
     id: number;
     name: string;
-    average_rating: number;
-    number_of_ratings: number;
-    date_last_review: string;
-    category_name: string;
+    last_review: number;
+    number_of_reviews: number;
     category_icon: string;
     category_color: string;
 }
@@ -50,14 +48,13 @@ export interface ItemDisplay {
 export interface OriginDisplay {
     id: number;
     name: string;
-    average_rating: number;
+    last_review: number;
     average_rating_all_items?: number;
-    number_of_ratings: number;
+    number_of_reviews: number;
     date_last_review: string;
-    category_name: string;
     category_icon: string;
     category_color: string;
-    average_category?: string;
-    average_category_icon?: string;
-    average_category_percentage?: number;
+    most_present_category_icon?: string;
+    most_present_category_color?: string;
+    most_present_category_percentage?: number;
 }
