@@ -22,7 +22,7 @@ interface FilterModalProps {
   onDismiss: () => void;
   applyFilters: (filters: {
     rating?: { minRating: number; maxRating: number };
-    category?: string[] | null;
+    category?: number[] | null;
   }) => void;
 }
 
@@ -81,52 +81,43 @@ const ReviewFilterModal: React.FC<FilterModalProps> = ({
   const handleApplyFilter = () => {
     // Determinar las categorías seleccionadas
     const selectedCategories = getSelectedCategories();
-  
     // Aplicar los filtros con los valores seleccionados
     applyFilters({
       rating: ratingFilter,
       category: selectedCategories,
     });
-  
     // Cerrar el modal o panel de filtros
     onDismiss();
   };
-  
   /**
    * Determina qué categorías deben aplicarse como filtro,
    * según la selección del usuario y el modo de subcategorías.
    */
-  const getSelectedCategories = (): string[] | null => {
+  const getSelectedCategories = (): number[] | null => {
     if (!selectedCategory) {
       // Caso 2: Sin categoría padre seleccionada
       return null;
     }
-  
     const hasNoChildren = filteredChildCategories.length === 0;
-  
     if (hasNoChildren) {
       // Caso 1: Categoría padre sin subcategorías
-      return [selectedCategory.name];
+      return [selectedCategory.id];
     }
-  
     switch (subcategoryMode) {
       case "auto":
       case "all":
         // Caso 3 y 5: incluir padre + todas las subcategorías
-        return [selectedCategory.name, ...filteredChildCategories.map((child) => child.name)];
-  
+        return [selectedCategory.id, ...filteredChildCategories.map((child) => child.id)];
       case "none":
         // Caso 6: solo la categoría padre
-        return [selectedCategory.name];
-  
+        return [selectedCategory.id];
       case "specific":
         // Caso 4: subcategorías específicas
-        return selectedCategories.map((subcategory) => subcategory.name);
-  
+        return selectedCategories.map((subcategory) => subcategory.id);
       default:
         // Si el modo no es reconocido, devolver solo la categoría padre como fallback seguro
         console.warn(`Modo de subcategoría no reconocido: ${subcategoryMode}`);
-        return [selectedCategory.name];
+        return [selectedCategory.id];
     }
   };  
 
@@ -136,7 +127,6 @@ const ReviewFilterModal: React.FC<FilterModalProps> = ({
       rating: { minRating: 0, maxRating: 5 },
       category: null,
     };
-
     setRating(resetFilters.rating);
     setSelectedCategory(null);
     setSubcategoryMode("auto");
