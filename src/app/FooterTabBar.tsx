@@ -8,7 +8,7 @@ import { Box, Ellipsis, Star } from 'lucide-react';
 import '@styles/FooterTabBar.css';
 import { useTranslation } from 'react-i18next';
 import ManageItemReview from '@/app/manage-review/ManageItemReview'; 
-import ReviewPage from '@/app/view-reviews/reviewPage';
+import ViewAllReviews from '@/app/view-all-reviews/ViewAllReviews';
 import { MoreOptions } from './more-options/moreOptions';
 import ViewItem from './view-item/ViewItem';
 
@@ -21,7 +21,7 @@ const FooterTabBar = () => {
     <IonReactRouter>
       <IonTabs>
         <IonRouterOutlet id="main">
-          <Route path="/app/reviews" component={ReviewPage} exact={true} />
+          <Route path="/app/reviews" component={ViewAllReviews} exact={true} />
           <Route path="/app/reviews/create" component={ManageItemReview} exact={true} />
           <Route path="/app/reviews/:id/edit" component={ManageItemReview} exact={true} />
           <Route path="/app/items/:id/viewItem" component={ViewItem} exact={true} />
