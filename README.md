@@ -1,13 +1,10 @@
 # Personal Reviews
 It's an app where you can save your reviews of products, services, experiences... or anything! You can rate an item in different aspects depending on the category they're associated with, for example for videogames you can rate plot, gameplay and graphics separately. Since your opinion can change over time, you can add multiple reviews to a single product and later see them in a timeline. Items can have an origin, which is where the item came from, for example, for a car its origin can be its brand.
 
-<br>
 
 ## ⚙️ Initial Developer Setup
 
 Make sure you have [Node.js](https://nodejs.org/en) version **21 or higher** installed.
-
-<br>
 
 Install all project dependencies:
 
@@ -26,7 +23,7 @@ npm i -g @ionic/cli
 ## 🔧 Android Setup
 Make sure you have [Android Studio](https://developer.android.com/studio?hl=es-419) installed and properly configured.
 
-<br>
+
 
 Set up the Android platform by running:
 ```bash
@@ -53,7 +50,7 @@ npx cap open android
 <br>
 
 ### 📱 Splash screen configurations
-Modify file `/android/capacitor-android/values/colors.xml` and add this color:
+Modify file `/android/capacitor-android/res/values/colors.xml` and add this color:
 
 ```xml
 <color name="my_launch_background">#222831</color>
