@@ -36,6 +36,7 @@ const App: React.FC = () => {
           currentAppTheme = prefersDark ? 'dark' : 'light';
           await storage.set('appTheme', currentAppTheme); // Save the detected/default theme
         }
+
         document.body.classList.toggle('ion-palette-dark', currentAppTheme === 'dark');
 
         // Initialize Safe Area
@@ -73,7 +74,7 @@ const App: React.FC = () => {
 
   if (!dbReady) {
     return (
-      <IonApp>
+      <IonApp style={{ backgroundColor: '#222831' }}>
         <Loader />
       </IonApp>
     );
