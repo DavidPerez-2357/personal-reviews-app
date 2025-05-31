@@ -16,7 +16,6 @@ pnpm-debug.log
 
 # Dependencias de Capacitor
 ios/
-android/
 capacitor.config.json
 
 # Build y cache
@@ -40,5 +39,3 @@ Thumbs.db
 .env
 .env.local
 .env.*.local
-
-resources/android/**/*
