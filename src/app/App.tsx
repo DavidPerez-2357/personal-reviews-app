@@ -54,14 +54,6 @@ const App: React.FC = () => {
         await openDatabase();
         console.log('Base de datos inicializada');
 
-        // Uncomment if you need test data
-        /*
-        await insertTestCategories();
-        await insertTestCategoryRating();
-        await insertTestItems();
-        console.log('Datos de prueba insertados');
-        */
-
       } catch (error) {
         console.error('Error during app initialization:', error);
       } finally {
