@@ -41,7 +41,7 @@ const ManageItemReview = () => {
   const history = useHistory();
   const { t } = useTranslation();
   const location = useLocation();
-  const itemId = location.state?.itemId; 
+  const itemId = location.state?.itemId;
 
   console.log("itemId", itemId);
   // Variable de no encontrar categorias
@@ -62,10 +62,11 @@ const ManageItemReview = () => {
 
   // Variables del boton de guardar reseña
   const [saveButtonText, setSaveButtonText] = useState('');
-  const [isButtonDisabled, setIsButtonDisabled] = useState(false);
+  const [isSaveButtonDisabled, setIsSaveButtonDisabled] = useState(false);
 
   // Variables del boton de eliminar reseña
   const [deleteButtonText, setDeleteButtonText] = useState(t('manage-item-review.delete-review'));
+  const [isDeleteButtonDisabled, setIsDeleteButtonTextDisabled] = useState(false);
 
   // Variables de previsualizacion de fotos
   const [previewPhoto, setPreviewPhoto] = useState<UserPhoto | null>(null);
@@ -182,8 +183,7 @@ const ManageItemReview = () => {
 
   useEffect(() => {
     // Resetear el estado antes de cargar una nueva reseña
-    setSaveButtonText(editMode ? t('common.save-changes') : t('manage-item-review.create-review'));
-    setIsButtonDisabled(false);
+    resetButtonStates();
     setItemName("");
     setRating(0);
     setComment("");
@@ -212,7 +212,7 @@ const ManageItemReview = () => {
     } else {
         setIsInitialLoad(false);
     }
-  }, [location.key]);
+  }, [window.location.pathname, id, editMode, reviewDeleted]);
 
   useEffect(() => {
     getParentCategories()
@@ -309,7 +309,22 @@ const ManageItemReview = () => {
     setSavedPhotos([...savedPhotos, savedPhoto]);
   }
 
+  const resetButtonStates = () => {
+    setIsSaveButtonDisabled(false);
+    setIsDeleteButtonTextDisabled(false);
+    setSaveButtonText(editMode ? t('common.save-changes') : t('manage-item-review.create-review'));
+    setDeleteButtonText(t('manage-item-review.delete-review'));
+  }
+
   // Funciones para manejar el input y su desplegable
+  /**
+   * Maneja el evento de scroll del contenido principal.
+   * Ajusta la posición y animación del botón de guardar ("save-review") dependiendo de si el usuario está cerca del fondo del contenido.
+   * Si el usuario no está en la parte inferior, el botón se fija en la pantalla y se aplica una animación.
+   * Si el usuario está en la parte inferior, el botón vuelve a su posición normal.
+   *
+   * @param event Evento de scroll personalizado de Ionic.
+   */
   const handleParentScroll = async (event: CustomEvent) => {
     const target = event.detail as HTMLIonContentElement;
     const button = document.getElementById("save-review");
@@ -321,7 +336,8 @@ const ManageItemReview = () => {
     const scrollHeight = scrollEl.scrollHeight;
     const clientHeight = scrollEl.clientHeight;
 
-    const offset = button && button.style.position === "fixed" ? 5 : (button?.offsetHeight || 0) * 4;
+    // Calcula el offset para determinar si el usuario está cerca del fondo
+    const offset = button && button.style.position === "fixed" ? 20 : (button?.offsetHeight || 0) * 4;
 
     const isAtBottom = scrollTop + clientHeight >= scrollHeight - offset;
 
@@ -354,7 +370,8 @@ const ManageItemReview = () => {
     setErrorMessage(message);
     setShowErrorAlert(true);
 
-    setIsButtonDisabled(false);
+    setIsSaveButtonDisabled(false);
+    setIsDeleteButtonTextDisabled(false);
     setSaveButtonText(t('manage-item-review.create-review'));
     setDeleteButtonText(t('manage-item-review.delete-review'));
   }
@@ -472,7 +489,8 @@ const ManageItemReview = () => {
   const handleSaveReview = async () => {
     if (!validateForm()) return;
 
-    setIsButtonDisabled(true);
+    setIsSaveButtonDisabled(true);
+    setIsDeleteButtonTextDisabled(true);
     setSaveButtonText(t('manage-item-review.saving-review'));
 
     try {
@@ -516,8 +534,7 @@ const ManageItemReview = () => {
         }, 500);
     } catch (error) {
         showError((error as Error).message);
-        setSaveButtonText(editMode ? t('common.save-changes') : t('manage-item-review.create-review'));
-        setIsButtonDisabled(false);
+        resetButtonStates();
     }
   };
 
@@ -557,7 +574,8 @@ const ManageItemReview = () => {
 
   const handleDeleteReview = async () => {
     if (!editMode) return;
-    setIsButtonDisabled(true);
+    setIsSaveButtonDisabled(true);
+    setIsDeleteButtonTextDisabled(true);
     setDeleteButtonText(t('manage-item-review.deleting-review'));
 
     const reviewId = parseInt(id);
@@ -566,8 +584,7 @@ const ManageItemReview = () => {
     setReviewDeleted(true); // Set the review as deleted
     console.log("🔍 Reseña eliminada:", reviewDeleted);
     if (!success) {
-      setIsButtonDisabled(false);
-      setDeleteButtonText(t('manage-item-review.delete-review'));
+      resetButtonStates();
       showError(t('manage-item-review.error-message.error-deleting-review'));
       return;
     }
@@ -614,20 +631,21 @@ const ManageItemReview = () => {
             <SubcategoriesBadgeSelector subcategories={childrenCategories} selectedSubcategory={selectedSubcategory} setSelectedSubcategory={setSelectedSubcategory} />
           </IonRow>
 
-          <IonRow className="px-5 pb-10">
-            <IonGrid>
-              <IonRow className="pt-6 pb-6 gap-5 w-full">
+          <IonRow className="px-5 py-10">
+            <IonGrid className="flex flex-col gap-12">
+              <IonRow className="gap-2 w-full">
+                <IonLabel className="section-title">{t("common.item")}</IonLabel>
                 <ItemSelector selectedOption={selectedOption} setSelectedOption={setSelectedOption} itemName={itemName} setItemName={setItemName} isInitialLoad={isInitialLoad} />
 
                 {selectedOption != null && (
-                  <div className="text-sm font-medium px-4 pt-2 rounded flex items-center gap-2">
+                  <div className="text-sm font-medium px-4 pt-5 rounded flex items-center gap-2">
                     <InfoIcon className="w-4 h-4" />
                     {t("manage-item-review.used-item-exists")}
                   </div>
                 )}
               </IonRow>
 
-              <IonRow className="flex flex-col py-6 gap-2">
+              <IonRow className="flex flex-col gap-2">
                 <IonLabel className="section-title">{t("common.review")}</IonLabel>
                 <StarRating
                   size={65}
@@ -647,7 +665,7 @@ const ManageItemReview = () => {
                 </div>
               </IonRow>
 
-              <IonRow className="flex py-6 flex-col gap-2">
+              <IonRow className="flex flex-col gap-2">
                 <IonLabel className="section-title">{t("common.comment")}</IonLabel>
                 <IonTextarea
                   autoGrow={true}
@@ -659,7 +677,7 @@ const ManageItemReview = () => {
                 />
               </IonRow>
 
-              <IonRow className="flex py-6 flex-col gap-2 ">
+              <IonRow className="flex flex-col gap-2 ">
                 <IonLabel className="section-title">{t("common.images")}</IonLabel>
 
                 <div className={`gap-x-3 gap-y-6 w-full grid grid-cols-[repeat(auto-fit,minmax(100px,max-content))] items-center`}>
@@ -683,17 +701,31 @@ const ManageItemReview = () => {
                 </div>
               </IonRow>
 
-              <IonButton className={`z-[1000] bottom-0 right-0 right-0 mt-10 mb-5 ml-5 mr-5`}
-              id="save-review" color="tertiary" expand="full" disabled={isButtonDisabled} onClick={handleSaveReview}>
-                {saveButtonText}
-              </IonButton>
+                <div className="flex flex-col gap-4">
+                  <IonButton
+                    className="z-[1000] bottom-0 right-0 mt-10 mb-5 ml-5 mr-5"
+                    id="save-review"
+                    color="tertiary"
+                    expand="full"
+                    disabled={isSaveButtonDisabled}
+                    onClick={handleSaveReview}
+                  >
+                    {saveButtonText}
+                  </IonButton>
 
-              {editMode && (
-                <IonButton
-                id="delete-review" color="danger" expand="full" className=" ml-5 mr-5" onClick={() => setIsDeleteAlertOpen(true)}>
-                  {deleteButtonText}
-                </IonButton>
-              )}
+                  {editMode && (
+                    <IonButton
+                    id="delete-review"
+                    color="danger"
+                    expand="full"
+                    className="ml-5 mr-5"
+                    onClick={() => setIsDeleteAlertOpen(true)}
+                    disabled={isDeleteButtonDisabled}
+                    >
+                    {deleteButtonText}
+                    </IonButton>
+                  )}
+                </div>
             </IonGrid>
 
           </IonRow>
@@ -715,7 +747,7 @@ const ManageItemReview = () => {
         isOpen={showErrorAlert}
         setIsOpen={setShowErrorAlert}
         buttons={[t("common.ok")]}
-        onDidDismiss={() => setIsButtonDisabled(false)}
+        onDidDismiss={() => resetButtonStates() }
       />
 
       <IonAlert
