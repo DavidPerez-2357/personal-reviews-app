@@ -453,7 +453,7 @@ export const insertDefaultCategories = async (db: any) => {
         { id: 11, name: i18n.t('categories.entertainment'), type: 2, color: 'gold', icon: 'star', parent_id: null },
 
         // 🚗 Vehículos (Padre)
-        { id: 16, name: i18n.t('categories.veicles'), type: 2, color: 'brown', icon: 'car', parent_id: null },
+        { id: 16, name: i18n.t('categories.vehicles'), type: 2, color: 'brown', icon: 'car', parent_id: null },
 
         // ✈️ Viajes (Padre)
         { id: 17, name: i18n.t('categories.travel'), type: 2, color: 'cyan', icon: 'plane', parent_id: null },
