@@ -47,7 +47,7 @@ const CategorySelectorModal = ({ modal, selectedCategory, setSelectedCategory, c
                                 modal.current?.dismiss(category);
                             }}>
                                 <div className={`rounded-xl flex items-center justify-center size-23 ${selectedCategory?.id === category.id ? 'selected' : ''}`} style={{ backgroundColor: CategoryColors[category.color] }}>
-                                    <FontAwesomeIcon icon={category.icon as IconName} size="3x" color="var(----ion-color-primary-contrast)" />
+                                    <FontAwesomeIcon icon={category.icon as IconName} size="3x" color="var(--ion-color-primary-contrast)" />
                                 </div>
                                 <IonLabel className="truncate max-w-full text-xs">{category.name}</IonLabel>
                             </div>
