@@ -66,7 +66,7 @@ const ManageItemReview = () => {
 
   // Variables del boton de eliminar reseña
   const [deleteButtonText, setDeleteButtonText] = useState(t('manage-item-review.delete-review'));
-  const [isDeleteButtonDisabled, setIsDeleteButtonTextDisabled] = useState(false);
+  const [isDeleteButtonDisabled, setIsDeleteButtonDisabled] = useState(false);
 
   // Variables de previsualizacion de fotos
   const [previewPhoto, setPreviewPhoto] = useState<UserPhoto | null>(null);
@@ -311,7 +311,7 @@ const ManageItemReview = () => {
 
   const resetButtonStates = () => {
     setIsSaveButtonDisabled(false);
-    setIsDeleteButtonTextDisabled(false);
+    setIsDeleteButtonDisabled(false);
     setSaveButtonText(editMode ? t('common.save-changes') : t('manage-item-review.create-review'));
     setDeleteButtonText(t('manage-item-review.delete-review'));
   }
@@ -371,7 +371,7 @@ const ManageItemReview = () => {
     setShowErrorAlert(true);
 
     setIsSaveButtonDisabled(false);
-    setIsDeleteButtonTextDisabled(false);
+    setIsDeleteButtonDisabled(false);
     setSaveButtonText(t('manage-item-review.create-review'));
     setDeleteButtonText(t('manage-item-review.delete-review'));
   }
@@ -490,7 +490,7 @@ const ManageItemReview = () => {
     if (!validateForm()) return;
 
     setIsSaveButtonDisabled(true);
-    setIsDeleteButtonTextDisabled(true);
+    setIsDeleteButtonDisabled(true);
     setSaveButtonText(t('manage-item-review.saving-review'));
 
     try {
@@ -575,7 +575,7 @@ const ManageItemReview = () => {
   const handleDeleteReview = async () => {
     if (!editMode) return;
     setIsSaveButtonDisabled(true);
-    setIsDeleteButtonTextDisabled(true);
+    setIsDeleteButtonDisabled(true);
     setDeleteButtonText(t('manage-item-review.deleting-review'));
 
     const reviewId = parseInt(id);
