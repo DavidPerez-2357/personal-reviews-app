@@ -110,6 +110,7 @@ export const getItemsDisplay = async (
     SELECT 
       i.id,
       i.name,
+      i.is_origin,
       COUNT(r.rating) AS number_of_reviews, 
       c.icon AS category_icon,
       c.color AS category_color,
@@ -119,10 +120,11 @@ export const getItemsDisplay = async (
         WHERE r2.item_id = i.id
         ORDER BY r2.created_at DESC
         LIMIT 1
-      ) AS last_review
+      ) AS last_rating,
     FROM item i
     LEFT JOIN review r ON i.id = r.item_id
     LEFT JOIN category c ON i.category_id = c.id
+    LEFT JOIN origin o ON i.id = o.item_id
   `;
 
   // --- Aplicar filtros
@@ -159,8 +161,9 @@ export const getItemsDisplay = async (
     return result.values.map((row: any) => ({
       id: row.id,
       name: row.name,
-      last_review: row.last_review || '',
+      last_rating: row.last_rating || 0,
       number_of_reviews: row.number_of_reviews || 0,
+      is_origin: row.is_origin,
       category_icon: row.category_icon,
       category_color: row.category_color
     })) as ItemDisplay[];

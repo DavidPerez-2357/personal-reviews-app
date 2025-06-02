@@ -11,7 +11,7 @@ import {
   IonSelectOption,
 } from "@ionic/react";
 import { useParams, useHistory } from "react-router";
-import { ItemDisplay, ItemFull, OriginDisplay } from "@/shared/dto/Item";
+import { ItemDisplay, ItemFull } from "@/shared/dto/Item";
 import { Building2, ChevronDown, EllipsisVertical, SquarePen, Trash } from "lucide-react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { IconName } from "@fortawesome/fontawesome-svg-core";

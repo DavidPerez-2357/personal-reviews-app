@@ -39,22 +39,10 @@ export interface ItemFull {
 export interface ItemDisplay {
     id: number;
     name: string;
-    last_review: number;
+    last_rating: number;
     number_of_reviews: number;
-    category_icon: string;
-    category_color: string;
-}
+    is_origin: boolean;
 
-export interface OriginDisplay {
-    id: number;
-    name: string;
-    last_review: number;
-    average_rating_all_items?: number;
-    number_of_reviews: number;
-    date_last_review: string;
     category_icon: string;
     category_color: string;
-    most_present_category_icon?: string;
-    most_present_category_color?: string;
-    most_present_category_percentage?: number;
 }
