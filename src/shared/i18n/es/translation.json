@@ -52,18 +52,18 @@
         "no-reviews-found": "No se encontraron reseñas"
     },
 
-    "manage-item-review": {
-        "create-review": "Crear reseña",
-        "saving-review": "Guardando reseña",
-        "saving-review-success": "Reseña guardada con éxito",
-        "saving-review-error": "Error al guardar la reseña",
-        "used-item-exists": "El elemento que estás usando existe",
-        "item-input-placeholder": "Agregar o seleccionar uno existente",
-        "comment-input-placeholder": "Escribe lo que te gustaría recordar...",
-        "delete-review": "Eliminar reseña",
-        "delete-review-confirm": "¿Estás seguro de que deseas eliminar esta reseña?",
-        "delete-review-success": "Reseña eliminada con éxito",
-        "deleting-review": "Eliminando reseña",
+  "manage-item-review": {
+    "create-review": "Crear reseña",
+    "saving-review": "Guardando reseña",
+    "saving-review-success": "Reseña guardada con éxito",
+    "saving-review-error": "Error al guardar la reseña",
+    "used-item-exists": "Elemento existente. Se ha vínculado correctamente",
+    "item-input-placeholder": "Escribe el nombre del elemento...",
+    "comment-input-placeholder": "Escribe lo que te gustaría recordar...",
+    "delete-review": "Eliminar reseña",
+    "delete-review-confirm": "¿Estás seguro de que deseas eliminar esta reseña?",
+    "delete-review-success": "Reseña eliminada con éxito",
+    "deleting-review": "Eliminando reseña",
 
         "error-message": {
             "empty-title": "El título no puede estar vacío",
@@ -115,14 +115,56 @@
         "english": "Inglés"
     },
 
-    "categories": {
-        "food": "Comida",
-        "burger": "Hamburguesa",
-        "smartphone": "Teléfono móvil",
-        "fashion": "Moda",
-        "personal_care": "Cuidado personal",
-        "movie": "Película"
-    },
+  "categories": {
+    "food": "Comida",
+    "electronics": "Electrónica",
+    "fashion": "Moda",
+    "health": "Salud",
+    "entertainment": "Entretenimiento",
+    "vehicles": "Vehículos",
+    "travel": "Viajes",
+    "sports": "Deportes",
+    "hostelery": "Hostelería"
+  },
+
+  "category-rating": {
+    "taste": "Sabor",
+    "quality": "Calidad",
+    "price": "Precio",
+    "presentation": "Presentación",
+    "performance": "Rendimiento",
+    "battery": "Batería",
+    "camera": "Cámara",
+    "features": "Funciones",
+    "design": "Diseño",
+    "comfort": "Comodidad",
+    "fit": "Ajuste",
+    "effectiveness": "Eficacia",
+    "scent": "Aroma",
+    "ingredients": "Ingredientes",
+    "story": "Historia",
+    "visuals": "Visuales",
+    "sound": "Sonido",
+    "originality": "Originalidad",
+    "fuel_efficiency": "Eficiencia de combustible",
+    "safety": "Seguridad",
+    "experience": "Experiencia",
+    "organization": "Organización",
+    "activities": "Actividades",
+    "fun": "Diversión",
+    "variety": "Variedad",
+    "fitness_benefits": "Beneficios físicos",
+    "teamwork": "Trabajo en equipo",
+    "equipment_quality": "Calidad del equipo",
+    "accessibility": "Accesibilidad",
+    "professionalism": "Profesionalidad",
+    "facilities": "Instalaciones",
+    "cleanliness": "Limpieza",
+    "location": "Ubicación",
+    "ambience": "Ambiente",
+    "drink_quality": "Calidad de las bebidas",
+    "music": "Música"
+  },
 
     "view-item": {
         "timeline": "Línea de tiempo",

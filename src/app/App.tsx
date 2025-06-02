@@ -36,6 +36,7 @@ const App: React.FC = () => {
           currentAppTheme = prefersDark ? 'dark' : 'light';
           await storage.set('appTheme', currentAppTheme); // Save the detected/default theme
         }
+
         document.body.classList.toggle('ion-palette-dark', currentAppTheme === 'dark');
 
         // Initialize Safe Area
@@ -53,14 +54,6 @@ const App: React.FC = () => {
         await openDatabase();
         console.log('Base de datos inicializada');
 
-        // Uncomment if you need test data
-        /*
-        await insertTestCategories();
-        await insertTestCategoryRating();
-        await insertTestItems();
-        console.log('Datos de prueba insertados');
-        */
-
       } catch (error) {
         console.error('Error during app initialization:', error);
       } finally {
@@ -73,7 +66,7 @@ const App: React.FC = () => {
 
   if (!dbReady) {
     return (
-      <IonApp>
+      <IonApp style={{ backgroundColor: '#222831' }}>
         <Loader />
       </IonApp>
     );

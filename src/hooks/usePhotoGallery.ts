@@ -2,6 +2,7 @@ import { UserPhoto } from '@/shared/dto/Photo';
 import { Camera, CameraOptions, CameraResultType, CameraSource } from '@capacitor/camera';
 import { useState } from 'react';
 import { Filesystem, Directory } from '@capacitor/filesystem';
+import { SafeArea } from '@capacitor-community/safe-area';
 
 export function usePhotoGallery() {
   const [savedPhotos, setSavedPhotos] = useState<UserPhoto[]>([]);
@@ -71,18 +72,44 @@ export function usePhotoGallery() {
   };
 
   const importPhoto = async () => {
-    const photo = await Camera.getPhoto({
-      quality: 90,
-      allowEditing: false,
-      resultType: CameraResultType.Uri,
-      source: CameraSource.Photos
-    });
+    
 
-    const fileName = Date.now() + '.jpeg';
+    try {
+      const photo = await Camera.getPhoto({
+        quality: 90,
+        allowEditing: false,
+        resultType: CameraResultType.Uri,
+        source: CameraSource.Photos
+      });
+
+      const fileName = Date.now() + '.jpeg';
+
+      return {
+        filepath: fileName,
+        webviewPath: photo.webPath,
+      };
+
+    } catch (error) {
+      // Puede ser cancelación con X o swipe abajo
+      console.warn('Camera canceled:', error);
+    } finally {
+      // Siempre se ejecuta, incluso si se cancela con swipe
+      setTimeout(() => {
+        SafeArea.enable({
+          config: {
+            customColorsForSystemBars: true,
+            statusBarColor: '#00000000',
+            statusBarContent: 'dark',
+            navigationBarColor: '#00000000',
+            navigationBarContent: 'dark',
+          },
+        });
+      }, 500);
+    }
 
     return {
-      filepath: fileName,
-      webviewPath: photo.webPath,
+      filepath: '',
+      webviewPath: '',
     };
   }
 

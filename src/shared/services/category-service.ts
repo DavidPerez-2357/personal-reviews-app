@@ -180,86 +180,6 @@ export const deleteAllCategories = async (): Promise<boolean> => {
 };
 
 /**
- * Inserta categorías de prueba si la base de datos está vacía.
- * @returns Promise<string>
- */
-export const insertTestCategories = async (): Promise<string> => {
-    const db = await openDatabase();
-    if (!db) return "❌ La base de datos no está inicializada.";
-
-    try {
-        const existingCategories = await getCategories();
-        if (existingCategories.length > 0) {
-            console.log("✅ La base de datos ya contiene categorías.");
-        }
-
-        const categories: Category[] = [
-          { id: 1, name: "Electrónica", type: 1, color: "red", icon: "computer", parent_id: null },
-          { id: 2, name: "Ropa", type: 2, color: "green", icon: "shirt", parent_id: null},
-          { id: 3, name: "Hogar", type: 3, color: "blue", icon: "house", parent_id: null},
-          { id: 4, name: "Juguetes", type: 4, color: "yellow", icon: "chess-knight", parent_id: null},
-          { id: 5, name: "Deportes", type: 5, color: "gray", icon: "football", parent_id: null},
-          { id: 6, name: "Libros", type: 6, color: "darkgray", icon: "book", parent_id: null},
-          { id: 7, name: "Salud", type: 7, color: "turquoise", icon: "staff-snake", parent_id: null},
-          { id: 8, name: "Belleza", type: 8, color: "purple", icon: "bath", parent_id: null},
-          { id: 9, name: "Automóviles", type: 9, color: "red", icon: "car", parent_id: null},
-          { id: 10, name: "Oficina", type: 10, color: "darkgray", icon: "file", parent_id: null},
-          // Subcategorías
-          { id: 11, name: "Smartphones", type: 1, color: "darkgray", icon: "mobile", parent_id: 1},
-          { id: 12, name: "Portátiles", type: 1, color: "purple", icon: "laptop", parent_id: 1},
-          { id: 13, name: "Zapatillas", type: 2, color: "green", icon: "shoe-prints", parent_id: 2},
-          { id: 14, name: "Vestidos", type: 2, color: "red", icon: "person-dress", parent_id: 2},
-          { id: 15, name: "Muebles", type: 3, color: "turquoise", icon: "couch", parent_id: 3},
-          { id: 16, name: "Cocina", type: 3, color: "red", icon: "kitchen-set", parent_id: 3},
-          { id: 17, name: "Libros Infantiles", type: 6, color: "purple", icon: "book-skull", parent_id: 6},
-          { id: 18, name: "Maquillaje", type: 8, color: "green", icon: "soap", parent_id: 8},
-          { id: 19, name: "Suplementos", type: 7, color: "blue", icon: "prescription-bottle", parent_id: 7},
-          { id: 20, name: "Sillas", type: 3, color: "yellow", icon: "chair", parent_id: 3},
-        ];
-
-        const insertPromises = categories.map((category) => insertCategory(category));
-        await Promise.all(insertPromises);
-        console.log("✅ Categorías de prueba insertadas correctamente.");
-        return "✅ Categorías de prueba insertadas correctamente.";
-    } catch (error) {
-        console.error("❌ Error al insertar categorías de prueba");
-        return "❌ Error al insertar categorías de prueba.";
-    }
-};
-
-/**
- * Inserta puntuaciones de categoría de prueba si la base de datos está vacía.
- * @returns 
- */
-export const insertTestCategoryRating = async (): Promise<string> => {
-    const db = await openDatabase();
-    if (!db) return "❌ La base de datos no está inicializada.";
-
-    try {
-        const existingCategoryRatings = await getCategoryRatings();
-        if (existingCategoryRatings.length > 0) {
-            return "✅ La base de datos ya contiene puntuaciones de categoría.";
-        }
-
-        const categoryRatings: CategoryRating[] = [
-            { id: 1, name: "Calidad", category_id: 1},
-            { id: 2, name: "Precio", category_id: 1},
-            { id: 3, name: "Durabilidad", category_id: 2},
-            { id: 4, name: "Estilo", category_id: 2},
-            { id: 5, name: "Comodidad", category_id: 3},
-            { id: 6, name: "Diseño", category_id: 3}
-        ];
-
-        const insertPromises = categoryRatings.map((categoryRating) => insertCategoryRating(categoryRating));
-        await Promise.all(insertPromises);
-        return "✅ Puntuaciones de categoría de prueba insertadas correctamente.";
-    } catch (error) {
-        console.error("❌ Error al insertar puntuaciones de categoría de prueba");
-        return "❌ Error al insertar puntuaciones de categoría de prueba.";
-    }
-}
-
-/**
  * Actualiza una categoría en la base de datos.
  * 
  * @param category 
@@ -437,69 +357,109 @@ export const getCategoryRatingMixByReviewId = async (reviewId: number): Promise<
 
 export const insertDefaultCategories = async (db: any) => {
     const defaultReviewCategories = [
-    // 🍔 Comida
-    {
-        id: 1,
-        name: i18n.t('categories.food'),
-        type: 2,
-        color: 'orange',
-        icon: 'utensils',
-        parent_id: null,
-    },
-    {
-        id: 2,
-        name: i18n.t('categories.burger'),
-        type: 2,
-        color: 'red',
-        icon: 'hamburger',
-        parent_id: 1,
-    },
+        // 🍔 Comida (Padre)
+        { id: 1, name: i18n.t('categories.food'), type: 2, color: 'orange', icon: 'utensils', parent_id: null },
 
-    // 📱 Tecnología
-    {
-        id: 3,
-        name: i18n.t('categories.smartphone'),
-        type: 2,
-        color: 'cyan',
-        icon: 'mobile-alt',
-        parent_id: null,
-    },
+        // 📱 Tecnología (Padre)
+        { id: 4, name: i18n.t('categories.electronics'), type: 2, color: 'blue', icon: 'plug', parent_id: null },
 
-    // 👕 Moda
-    {
-        id: 4,
-        name: i18n.t('categories.fashion'),
-        type: 2,
-        color: 'gray',
-        icon: 'tshirt',
-        parent_id: null,
-    },
+        // 👕 Moda (Padre)
+        { id: 8, name: i18n.t('categories.fashion'), type: 2, color: 'gray', icon: 'tshirt', parent_id: null },
 
-    // 💆 Servicios personales
-    {
-        id: 5,
-        name: i18n.t('categories.personal_care'),
-        type: 2,
-        color: 'green',
-        icon: 'spa',
-        parent_id: null,
-    },
+        // 🏥 Salud (Padre)
+        { id: 9, name: i18n.t('categories.health'), type: 2, color: 'salmon', icon: 'heartbeat', parent_id: null },
 
-    // 🎬 Entretenimiento
-    {
-        id: 6,
-        name: i18n.t('categories.movie'),
-        type: 2,
-        color: 'crimson',
-        icon: 'film',
-        parent_id: null,
-    }
+        // 🎉 Entretenimiento (Padre)
+        { id: 11, name: i18n.t('categories.entertainment'), type: 2, color: 'gold', icon: 'star', parent_id: null },
+
+        // 🚗 Vehículos (Padre)
+        { id: 16, name: i18n.t('categories.vehicles'), type: 2, color: 'brown', icon: 'car', parent_id: null },
+
+        // ✈️ Viajes (Padre)
+        { id: 17, name: i18n.t('categories.travel'), type: 2, color: 'cyan', icon: 'plane', parent_id: null },
+
+        // 🏀 Deportes (Padre)
+        { id: 18, name: i18n.t('categories.sports'), type: 2, color: 'green', icon: 'basketball-ball', parent_id: null },
+
+        // 🏨 Hostelería (Padre)
+        { id: 19, name: i18n.t('categories.hostelery'), type: 2, color: 'bordeaux', icon: 'concierge-bell', parent_id: null },
     ];
+
+
+    const categoryRatings: CategoryRating[] = [
+        // 🍔 Comida
+        { id: 1, name: i18n.t('category-rating.taste'), category_id: 1 },
+        { id: 2, name: i18n.t('category-rating.quality'), category_id: 1 },
+        { id: 3, name: i18n.t('category-rating.price'), category_id: 1 },
+        { id: 4, name: i18n.t('category-rating.presentation'), category_id: 1 },
+
+        // 📱 Tecnología
+        { id: 6, name: i18n.t('category-rating.performance'), category_id: 4 },
+        { id: 7, name: i18n.t('category-rating.battery'), category_id: 4 },
+        { id: 8, name: i18n.t('category-rating.camera'), category_id: 4 },
+        { id: 9, name: i18n.t('category-rating.features'), category_id: 4 },
+        { id: 10, name: i18n.t('category-rating.design'), category_id: 4 },
+
+        // 👕 Moda
+        { id: 11, name: i18n.t('category-rating.design'), category_id: 8 },
+        { id: 12, name: i18n.t('category-rating.comfort'), category_id: 8 },
+        { id: 13, name: i18n.t('category-rating.fit'), category_id: 8 },
+        { id: 14, name: i18n.t('category-rating.quality'), category_id: 8 },
+        { id: 15, name: i18n.t('category-rating.price'), category_id: 8 },
+
+        // 🏥 Salud
+        { id: 16, name: i18n.t('category-rating.effectiveness'), category_id: 9 },
+        { id: 17, name: i18n.t('category-rating.scent'), category_id: 9 },
+        { id: 18, name: i18n.t('category-rating.ingredients'), category_id: 9 },
+        { id: 19, name: i18n.t('category-rating.price'), category_id: 9 },
+
+        // 🎉 Entretenimiento
+        { id: 20, name: i18n.t('category-rating.story'), category_id: 11 },
+        { id: 21, name: i18n.t('category-rating.visuals'), category_id: 11 },
+        { id: 22, name: i18n.t('category-rating.sound'), category_id: 11 },
+        { id: 23, name: i18n.t('category-rating.originality'), category_id: 11 },
+
+        // 🚗 Vehículos
+        { id: 24, name: i18n.t('category-rating.performance'), category_id: 16 },
+        { id: 25, name: i18n.t('category-rating.fuel_efficiency'), category_id: 16 },
+        { id: 26, name: i18n.t('category-rating.safety'), category_id: 16 },
+        { id: 27, name: i18n.t('category-rating.design'), category_id: 16 },
+
+        // ✈️ Viajes
+        { id: 28, name: i18n.t('category-rating.experience'), category_id: 17 },
+        { id: 29, name: i18n.t('category-rating.organization'), category_id: 17 },
+        { id: 30, name: i18n.t('category-rating.activities'), category_id: 17 },
+        { id: 31, name: i18n.t('category-rating.fun'), category_id: 17 },
+
+        // 🏀 Deportes
+        { id: 32, name: i18n.t('category-rating.variety'), category_id: 18 },
+        { id: 33, name: i18n.t('category-rating.fitness_benefits'), category_id: 18 },
+        { id: 34, name: i18n.t('category-rating.teamwork'), category_id: 18 },
+        { id: 35, name: i18n.t('category-rating.equipment_quality'), category_id: 18 },
+
+        // 🏨 Hostelería
+        { id: 36, name: i18n.t('category-rating.accessibility'), category_id: 19 },
+        { id: 37, name: i18n.t('category-rating.professionalism'), category_id: 19 },
+        { id: 38, name: i18n.t('category-rating.facilities'), category_id: 19 },
+        { id: 39, name: i18n.t('category-rating.cleanliness'), category_id: 19 },
+        { id: 40, name: i18n.t('category-rating.location'), category_id: 19 },
+        { id: 41, name: i18n.t('category-rating.ambience'), category_id: 19 },
+        { id: 42, name: i18n.t('category-rating.drink_quality'), category_id: 19 },
+        { id: 43, name: i18n.t('category-rating.music'), category_id: 19 }
+    ];
+
 
     for (const category of defaultReviewCategories) {
         await db.run(
             `INSERT INTO category (id, name, type, color, icon, parent_id) VALUES (?, ?, ?, ?, ?, ?)`,
             [category.id, category.name, category.type, category.color, category.icon, category.parent_id]
+        );
+    }
+
+    for (const categoryRating of categoryRatings) {
+        await db.run(
+            `INSERT INTO category_rating (id, name, category_id) VALUES (?, ?, ?)`,
+            [categoryRating.id, categoryRating.name, categoryRating.category_id]
         );
     }
 
