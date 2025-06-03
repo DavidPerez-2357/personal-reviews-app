@@ -23,6 +23,26 @@ export const insertItem = async (item: Item): Promise<number | null> => {
 };
 
 /**
+ * Convertir un ítem a un origen.
+ * @param item
+ */
+export const itemToOrigin = async (id: number) : Promise<boolean> => {
+    const db = await openDatabase();
+    if (!db) return false;
+
+    try {
+        const query = `UPDATE item SET is_origin = 1 WHERE id = ?`;
+        const values = [id];
+        await db!.run(query, values);
+        return true;
+    } catch (error) {
+        console.error("❌ Error al convertir ítem a origen", error);
+        return false;
+    }
+}
+    
+
+/**
  * obtiene un ítem por su ID.
  * @param id
  * @returns Promise<ItemFull | null>
@@ -192,3 +212,21 @@ export const getItemById = async (id: number): Promise<Item | null> => {
         return null;
     }
 }
+
+/**
+ * Elimina un ítem de la base de datos.
+ * @param id
+ */
+export const deleteItem = async (id: number): Promise<boolean> => {
+    const db = await openDatabase();
+    if (!db) return false;
+
+    try {
+        const query = `DELETE FROM item WHERE id = ?`;
+        const result = await db!.run(query, [id]);
+        return (result.changes?.changes ?? 0) > 0;
+    } catch (error) {
+        console.error("❌ Error al eliminar ítem", error);
+        return false;
+    }
+};
