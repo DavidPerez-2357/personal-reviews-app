@@ -1,5 +1,5 @@
 import { openDatabase } from "../database/database-service";
-import { Item, ItemDisplay, ItemFull, ItemOption, ItemWithCategory, Origin } from "../dto/Item";
+import { Item, ItemDisplay, ItemFull, ItemOption, ItemWithCategory, Origin } from "@dto/Item";
 
 
 /**
@@ -70,6 +70,8 @@ export const getItemsByOrigin = async (id: number): Promise<ItemDisplay[]> => {
                COUNT(r.rating) AS number_of_rewviews, 
                c.icon AS category_icon, 
                c.color AS category_color,
+               i.is_origin,
+               case when oi.origin_id is not null then oi.origin_id else null end as origin_id,
                (
                SELECT r2.rating
                FROM review r2
@@ -80,6 +82,7 @@ export const getItemsByOrigin = async (id: number): Promise<ItemDisplay[]> => {
             FROM item i
             LEFT JOIN review r ON i.id = r.item_id
             LEFT JOIN category c ON i.category_id = c.id
+            LEFT JOIN origin_item oi ON i.id = oi.item_id
             WHERE oi.origin_id = ?
             GROUP BY i.id, i.name, c.icon, c.color
         `;
@@ -88,7 +91,9 @@ export const getItemsByOrigin = async (id: number): Promise<ItemDisplay[]> => {
         return (result.values || []).map((row: ItemDisplay) => ({
             id: row.id,
             name: row.name,
-            last_review: row.last_review ? Number(new Date(row.last_review)) : 0,
+            is_origin: row.is_origin || false,
+            origin_id: row.origin_id || undefined,
+            last_review: row.last_rating ? Number(new Date(row.last_rating)) : 0,
             number_of_reviews: row.number_of_reviews,
             category_icon: row.category_icon,
             category_color: row.category_color
