@@ -66,14 +66,19 @@ const OriginCard = ({ item }: OriginCardProps) => {
   }
 
   const expandOrigin = (e: React.MouseEvent<HTMLDivElement>) => {
-    if (isOriginExpanded) {
-      return;
-    }
-
     e.stopPropagation();
     e.preventDefault();
 
+    if (isOriginExpanded) {
+      setIsOriginExpanded(false);
+      return;
+    }
+
     setIsOriginExpanded(true);
+
+    if (itemsInside.length > 0) {
+      return;
+    }
 
     getItemsByOrigin(item.id).then((items) => {
       setItemsInside(items);
