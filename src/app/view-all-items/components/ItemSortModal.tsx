@@ -39,6 +39,12 @@ const ItemSortModal = ({ isOpen, onDismiss , onApplySort }: ItemSortModalProps) 
         }
     }, [sortType]);
 
+    useEffect(() => {
+        if (sortType == "none" && sortOrder !== "none") {
+            setSortType("name");
+        }
+    }, [sortOrder]);
+
     return (
         <IonModal
             isOpen={isOpen}
