@@ -78,17 +78,17 @@ const ItemFilterModal = ({
   const handleApplyFilter = () => {
     // Determinar las categorías seleccionadas
     const selectedCategories = getSelectedCategories();
-  
+
     // Aplicar los filtros con los valores seleccionados
     applyFilters({
       category: selectedCategories,
       type: itemType
     });
-  
+
     // Cerrar el modal o panel de filtros
     onDismiss();
   };
-  
+
   /**
    * Determina qué categorías deben aplicarse como filtro,
    * según la selección del usuario y el modo de subcategorías.
@@ -98,34 +98,36 @@ const ItemFilterModal = ({
       // Caso 2: Sin categoría padre seleccionada
       return null;
     }
-  
+
     const hasNoChildren = filteredChildCategories.length === 0;
-  
+
     if (hasNoChildren) {
       // Caso 1: Categoría padre sin subcategorías
       return [selectedCategory.id];
     }
-  
+
     switch (subcategoryMode) {
       case "auto":
+        return [selectedCategory.id, ...filteredChildCategories.map((c) => c.id)];
+
       case "all":
         // Caso 3 y 5: incluir padre + todas las subcategorías
         return [];
-  
+
       case "none":
         // Caso 6: solo la categoría padre
         return [selectedCategory.id];
-  
+
       case "specific":
         // Caso 4: subcategorías específicas
         return selectedCategories.map((subcategory) => subcategory.id);
-  
+
       default:
         // Si el modo no es reconocido, devolver solo la categoría padre como fallback seguro
         console.warn(`Modo de subcategoría no reconocido: ${subcategoryMode}`);
         return [selectedCategory.id];
     }
-  };  
+  };
 
   // Handle reset button click
   const handleResetFilter = () => {
@@ -176,7 +178,7 @@ const ItemFilterModal = ({
             >
               <div className="flex items-center flex-col text-sm gap-2 w-full">
                 <Box size={30} />
-                Solo elementos
+                {t('view-all-items.only-items')}
               </div>
             </IonButton>
 
@@ -193,7 +195,7 @@ const ItemFilterModal = ({
             >
               <div className="flex items-center flex-col text-sm gap-2 w-full">
                 <Building2 size={30} />
-                Solo orígenes
+                {t('view-all-items.only-origins')}
               </div>
             </IonButton>
           </div>
@@ -227,7 +229,7 @@ const ItemFilterModal = ({
                       }`}
                       style={{ backgroundColor: CategoryColors[cat.color] }}
                     >
-                      <FontAwesomeIcon icon={cat.icon as IconName} className="fa-xl"/>
+                      <FontAwesomeIcon icon={cat.icon as IconName} className="fa-xl" color="var(--ion-color-primary-contrast)" />
                     </div>
                     <IonLabel className="truncate max-w-full text-xs">
                       {cat.name}
@@ -297,7 +299,7 @@ const ItemFilterModal = ({
                     }`}
                     style={{ backgroundColor: CategoryColors[subcategory.color] }}
                   >
-                    <FontAwesomeIcon icon={subcategory.icon as IconName} className="fa-xl"/>
+                    <FontAwesomeIcon icon={subcategory.icon as IconName} className="fa-xl" color="var(--ion-color-primary-contrast)" />
                   </div>
                   <IonLabel className="truncate max-w-full text-xs">
                     {subcategory.name}
@@ -315,7 +317,7 @@ const ItemFilterModal = ({
               size="default"
               className="flex-1 text-base"
             >
-              {t('common.clear')}
+              {t('common.reset')}
             </IonButton>
             <IonButton
               onClick={handleApplyFilter}
