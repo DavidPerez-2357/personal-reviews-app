@@ -44,18 +44,15 @@ const ItemSortModal = ({ isOpen, onDismiss , onApplySort }: ItemSortModalProps) 
             isOpen={isOpen}
             onDidDismiss={onDismiss}
             ref={modal}
-            initialBreakpoint={0.50}
-            breakpoints={[0, 0.50]}
-            className="ion-no-padding ion-no-border"
-        >
+            initialBreakpoint={0.60}
+            breakpoints={[0, 0.60, 0.70]}
+            className="ion-no-padding ion-no-border">
             <IonHeader
-                className="ion-no-border"
-            >
+                className="ion-no-border">
               <IonToolbar
-                style={{ paddingTop: 0, marginTop: 0 }}
-              >
+                style={{ paddingTop: 0, marginTop: 0 }}>
                 <IonTitle
-                  className="text-2xl font-bold text-start p-5"                >
+                  className="text-2xl font-bold text-start p-5">
                   {t("common.sort")}
                 </IonTitle>
               </IonToolbar>
@@ -66,14 +63,14 @@ const ItemSortModal = ({ isOpen, onDismiss , onApplySort }: ItemSortModalProps) 
                         <IonCol>
                             <IonButton className={"flex-1 text-base border-[var(--ion-color-tertiary)] rounded-lg" + (sortOrder === "asc" ? ' border-2' : '')} color="secondary" size="default" expand="block" onClick={() => setSortOrder("asc")}>
                                 <ArrowUp size={28} className="inline-block mr-2" />
-                                Ascendent
+                                {t("common.ascending")}
                             </IonButton>
                         </IonCol>
 
                         <IonCol>
                             <IonButton className={"flex-1 text-base border-[var(--ion-color-tertiary)] rounded-lg" + (sortOrder === "desc" ? ' border-2' : '')} color="secondary" size="default" expand="block" onClick={() => setSortOrder("desc")}>
                                 <ArrowDown size={28} className="inline-block mr-2" />
-                                Descendent
+                                {t("common.descending")}
                             </IonButton>
                         </IonCol>
                     </IonRow>
@@ -89,7 +86,7 @@ const ItemSortModal = ({ isOpen, onDismiss , onApplySort }: ItemSortModalProps) 
                             >
                                 <div className="flex items-center gap-3 px-2 py-4">
                                     <CaseUpper size={30} className="w-8" />
-                                    <span className="text-lg">By Name</span>
+                                    <span className="text-lg">{t("common.by-name")}</span>
                                 </div>
                                 <IonRippleEffect className="rounded-lg" />
                             </IonItem>
@@ -101,7 +98,7 @@ const ItemSortModal = ({ isOpen, onDismiss , onApplySort }: ItemSortModalProps) 
                             >
                                 <div className="flex items-center gap-3 px-2 py-4">
                                     <Calendar size={28} className="w-8" />
-                                    <span className="text-lg">By Date</span>
+                                    <span className="text-lg">{t("common.by-date")}</span>
                                 </div>
                                 <IonRippleEffect className="rounded-lg" />
                             </IonItem>
@@ -113,27 +110,25 @@ const ItemSortModal = ({ isOpen, onDismiss , onApplySort }: ItemSortModalProps) 
                             >
                                 <div className="flex items-center gap-3 px-2 py-4">
                                     <Star size={28} className="w-8" />
-                                    <span className="text-lg">By Rating</span>
+                                    <span className="text-lg">{t("common.by-rating")}</span>
                                 </div>
                                 <IonRippleEffect className="rounded-lg" />
                             </IonItem>
                         </IonCol>
-                        
                     </IonRow>
 
                     <IonRow>
                         <IonCol className="flex gap-4 flex-wrap h-12">
                             <IonButton className="flex-1 text-base" color="secondary" size="default" expand="block" onClick={() => clearSort()}>
-                                Clear
+                                {t("common.reset")}
                             </IonButton>
 
                             <IonButton className="flex-1 text-base" color="tertiary" size="default" expand="block" onClick={() => handleApplySort()}>
-                                Apply
+                                {t("common.apply")}
                             </IonButton>
                         </IonCol>
                     </IonRow>
-                </IonGrid> 
-                
+                </IonGrid>
             </IonContent>
         </IonModal>
     );
