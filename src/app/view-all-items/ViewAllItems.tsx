@@ -1,6 +1,5 @@
 import {
     IonButton,
-    IonCard,
     IonCol,
     IonContent,
     IonGrid,
@@ -15,10 +14,11 @@ import { useTranslation } from "react-i18next";
 import ItemFilterModal from "./components/ItemFilterModal";
 import ItemSortModal from "./components/ItemSortModal";
 import { ItemSortType, SortOrder } from "@/shared/dto/Sort";
-import { countItems, countItemsFiltered, getItemsDisplay } from "./services/item-service";
-import { ItemDisplay } from "@/shared/dto/Item";
-import ItemCard from "@/shared/components/ItemCard";
+import { countItems, countItemsFiltered, countOrigins, getItemsDisplay } from "./services/item-service";
+import { ItemDisplay, ItemTreeNode } from "@/shared/dto/Item";
 import { ItemType } from "@/shared/dto/Filter";
+import RenderItemTreeNode from "./components/RenderItemTreeNode";
+
 
 
 const ViewAllItems = () => {
@@ -31,12 +31,53 @@ const ViewAllItems = () => {
     const [sortType, setSortType] = useState<ItemSortType>("none");
     const [areItemsGrouped, setAreItemsGrouped] = useState(false);
     const [areFiltersApplied, setAreFiltersApplied] = useState(false);
-    const [numberOfItems, setNumberOfItems] = useState(0);
-    const [numberOfItemsFiltered, setNumberOfItemsFiltered] = useState(0);
-    const [items, setItems] = useState<ItemDisplay[]>([]);
     const [categoriesVisible, setCategoriesVisible] = useState<number[]>([]);
     const [itemTypeFilter, setItemTypeFilter] = useState<ItemType>("all");
+    const [itemsGrouped, setItemsGrouped] = useState<ItemTreeNode[]>([]);
+
+    const [numberOfItems, setNumberOfItems] = useState(0);
+    const [numberOfOrigins, setNumberOfOrigins] = useState(0);
+    const [numberOfItemsFiltered, setNumberOfItemsFiltered] = useState(0);
+
     const PAGE_SIZE = 10;
+
+    const [items, setItems] = useState<ItemDisplay[]>([]);
+
+
+    const buildItemTree = (items: ItemDisplay[]): ItemTreeNode[] => {
+        const map = new Map<number, ItemTreeNode>();
+        const roots: ItemTreeNode[] = [];
+
+        // Primero creamos nodos vacíos
+        items.forEach(item => {
+            map.set(item.id, {
+            level: 0,
+            item,
+            children: [],
+            });
+        });
+
+        // Ahora los conectamos en jerarquía
+        items.forEach(item => {
+            const node = map.get(item.id)!;
+            if (item.origin_id) {
+            const parent = map.get(item.origin_id);
+            if (parent) {
+                node.level = parent.level + 1;
+                parent.children.push(node);
+            }
+            } else {
+            roots.push(node); // Raíz: no tiene origin_id
+            }
+        });
+
+        return roots;
+    }
+
+    useEffect(() => {
+        setItemsGrouped(buildItemTree(items));
+    }, [items]);
+
 
     useEffect(() => {
         // Simulate fetching number of items from a service
@@ -45,6 +86,13 @@ const ViewAllItems = () => {
         }).catch((error) => {
             console.error("Error fetching number of items:", error);
             setNumberOfItems(0);
+        });
+
+        countOrigins().then((count) => {
+            setNumberOfOrigins(count);
+        }).catch((error) => {
+            console.error("Error fetching number of origins:", error);
+            setNumberOfOrigins(0);
         });
 
         // Fetch initial items
@@ -56,26 +104,19 @@ const ViewAllItems = () => {
         });
 
     }, [window.location.pathname]);
-        
+
     useEffect(() => {
         const filters = {
             category: categoriesVisible.length > 0 ? categoriesVisible : undefined,
             type: itemTypeFilter,
         }
 
-        if (
-            (categoriesVisible.length > 0 && itemTypeFilter !== "all") ||
-            (categoriesVisible.length > 0) ||
-            (itemTypeFilter !== "all") ||
-            searchTerm.trim() !== ""
-        ) {
-            countItemsFiltered(searchTerm, filters).then((count) => {
-                setNumberOfItemsFiltered(count);
-            }).catch((error) => {
+        countItemsFiltered(searchTerm, filters, areItemsGrouped).then((count) => {
+            setNumberOfItemsFiltered(count);
+        }).catch((error) => {
             console.error("Error fetching filtered item count:", error);
             setNumberOfItemsFiltered(0);
-            });
-        }
+        });
 
         fetchItems(0, PAGE_SIZE).then((fetchedItems) => {
             setItems(fetchedItems);
@@ -89,7 +130,6 @@ const ViewAllItems = () => {
     const applyFilters = (filters: { category?: number[]; type: ItemType }) => {
         if (filters) {
             setAreFiltersApplied(true);
-            console.log("Filters applied:", filters);
             setItemTypeFilter(filters.type);
             setCategoriesVisible(filters.category ? filters.category : []);
         }
@@ -114,20 +154,8 @@ const ViewAllItems = () => {
             type: itemTypeFilter,
         };
 
-        console.log("Fetching items with params:",
-            page,
-            size,
-            searchTerm,
-            sort.order,
-            sort.type,
-            filters.category,
-            filters.type,
-            areItemsGrouped
-        );
-
         return getItemsDisplay(page, size, searchTerm, sort, filters, areItemsGrouped)
             .then((fetchedItems: ItemDisplay[]) => {
-                console.log("Fetched items:", fetchedItems);
                 return fetchedItems;
             })
             .catch((error: Error) => {
@@ -153,21 +181,33 @@ const ViewAllItems = () => {
                 <IonGrid className="p-5 pb-10 flex flex-col gap-12">
                     <IonRow>
                         <IonCol className="gap-5 flex flex-col">
-                            <div className="flex flex-col items-center justify-center text-center text-[var(--ion-text-color)] p-3 border border-[var(--ion-text-color)] rounded-lg">
-                                <IonLabel className="text-4xl font-bold">
-                                    {numberOfItems}
-                                </IonLabel>
-                                <IonLabel>
-                                    {t("common.items")}
-                                </IonLabel>
+                            <div className="flex gap-4 w-full">
+                                <div className="flex flex-col  w-full items-center justify-center text-center text-[var(--ion-text-color)] p-3 border border-[var(--ion-text-color)] rounded-lg">
+                                    <IonLabel className="text-4xl font-bold">
+                                        {numberOfItems}
+                                    </IonLabel>
+                                    <IonLabel>
+                                        {t("common.items")}
+                                    </IonLabel>
+                                </div>
+
+                                <div className="flex flex-col  w-full items-center justify-center text-center text-[var(--ion-text-color)] p-3 border border-[var(--ion-text-color)] rounded-lg">
+                                    <IonLabel className="text-4xl font-bold">
+                                        {numberOfOrigins}
+                                    </IonLabel>
+                                    <IonLabel>
+                                        {t("common.origins")}
+                                    </IonLabel>
+                                </div>
                             </div>
+
                             <IonButton
                                 color="tertiary"
                                 expand="block"
                                 className="bg-primary"
                                 routerLink="/app/items/create"
                             >
-                                Crete new Item
+                                {t('view-all-items.create-item')}
                             </IonButton>
                         </IonCol>
                     </IonRow>
@@ -190,18 +230,19 @@ const ViewAllItems = () => {
                                         </IonButton>
                                         </IonInput>
                                     </IonCol>
-                                    <IonCol size="auto">
-                                        <IonButton
-                                            onClick={() => setAreItemsGrouped(!areItemsGrouped)}
-                                            size="large"
-                                            color={areItemsGrouped ? "tertiary" : "secondary"}
-                                        >
-                                            <LayoutGrid
-                                                size={20}
-                                                fill={areItemsGrouped ? "var(--ion-color-secondary)" : "none"}
-                                            />
-                                        </IonButton>
-                                    </IonCol>
+                                    {numberOfOrigins > 0 && (
+                                        <IonCol size="auto">
+                                            <IonButton
+                                                onClick={() => setAreItemsGrouped(!areItemsGrouped)}
+                                                size="large"
+                                                color={areItemsGrouped ? "tertiary" : "secondary"}>
+                                                <LayoutGrid
+                                                    size={20}
+                                                    fill={areItemsGrouped ? "var(--ion-color-secondary)" : "none"}
+                                                />
+                                            </IonButton>
+                                        </IonCol>
+                                    )}
                                 </IonRow>
 
                                 <IonRow className="ion-align-items-center gap-3">
@@ -256,10 +297,8 @@ const ViewAllItems = () => {
                     <IonRow>
                         <IonCol className="flex flex-col gap-5">
                             {items.length > 0 ? (
-                                items.map((item) => (
-                                    <ItemCard
-                                        key={item.id}
-                                        item={item} />   
+                                itemsGrouped.map((node) => (
+                                    <RenderItemTreeNode key={node.item.id} node={node} />
                                 ))
                             ) : (
                                 <div className="text-center flex flex-col items-center justify-center gap-2 text-[var(--ion-color-secondary-step-300)]">
@@ -269,11 +308,10 @@ const ViewAllItems = () => {
                             )}
 
                             {(
-                                items.length !== 0 &&
-                                ((items.length < numberOfItems) && (!areFiltersApplied && !searchTerm)) ||
-                                ((items.length < numberOfItemsFiltered) && (areFiltersApplied || searchTerm))
+                                items.length > 0 &&
+                                items.length < numberOfItemsFiltered
                             ) && (
-                                <IonButton 
+                                <IonButton
                                     expand="block"
                                     onClick={async () => {
                                         const nextPage = Math.floor(items.length / PAGE_SIZE);
