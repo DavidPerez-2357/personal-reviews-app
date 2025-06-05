@@ -292,17 +292,15 @@ const ReviewFilterModal: React.FC<FilterModalProps> = ({
               color="secondary"
               expand="block"
               size="default"
-              className="flex-1 text-base h-full"
-            >
-              {t('common.clear')}
+              className="flex-1 text-base h-full">
+              {t('common.reset')}
             </IonButton>
             <IonButton
               onClick={handleApplyFilter}
               color="tertiary"
               expand="block"
               size="default"
-              className="flex-1 text-base"
-            >
+              className="flex-1 text-base">
               {t('common.apply')}
             </IonButton>
         </div>
