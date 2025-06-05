@@ -1,56 +1,62 @@
 {
-   "config": {
+ "config": {
     "date-format": "es-ES"
-  },  
-  
-  
+  },
+
   "common": {
-        "appName": "Personal reviews",
-        "welcome": "Bienvenido a mi aplicación",
-        "loading": "Cargando...",
-        "error": "Ocurrió un error",
-        "success": "Éxito",
-        "cancel": "Cancelar",
-        "confirm": "Confirmar",
-        "yes": "Sí",
-        "no": "No",
-        "ok": "Aceptar",
-        "close": "Cerrar",
-        "more": "Más",
-        "less": "Menos",
-        "all": "Todos",
-        "save-changes": "Guardar cambios",
-        "delete": "Eliminar",
-        "replace": "Reemplazar",
-         "filter": "Filtrar",
-        "sort": "Ordenar",
-        "clear": "Limpiar",
-        "apply": "Aplicar",
-        "edit": "Editar",
-        "create": "Crear",
-        "load-more": "Cargar más",
+    "appName": "Personal reviews",
+    "welcome": "Bienvenido a mi aplicación",
+    "loading": "Cargando...",
+    "error": "Ocurrió un error",
+    "success": "Éxito",
+    "cancel": "Cancelar",
+    "confirm": "Confirmar",
+    "yes": "Sí",
+    "no": "No",
+    "ok": "Aceptar",
+    "close": "Cerrar",
+    "more": "Más",
+    "less": "Menos",
+    "all": "Todos",
+    "save-changes": "Guardar cambios",
+    "delete": "Eliminar",
+    "replace": "Reemplazar",
+    "filter": "Filtrar",
+    "sort": "Ordenar",
+    "clear": "Limpiar",
+    "reset": "Reiniciar",
+    "apply": "Aplicar",
+    "edit": "Editar",
+    "create": "Crear",
+    "load-more": "Cargar más",
+    "asceding": "Ascendente",
+    "descending": "Descendente",
 
-        "preview": "Vista previa",
+    "preview": "Vista previa",
 
-        "reviews": "Reseñas",
-        "review": "Reseña",
-        "items": "Elementos",
-        "item": "Elemento",
-        "origin": "Origen",
-        "origins": "Orígenes",
-        "comments": "Comentarios",
-        "comment": "Comentario",
-        "categories": "Categorías",
-        "category": "Categoría",
+    "reviews": "Reseñas",
+    "review": "Reseña",
+    "items": "Elementos",
+    "item": "Elemento",
+    "origin": "Origen",
+    "origins": "Orígenes",
+    "comments": "Comentarios",
+    "comment": "Comentario",
+    "categories": "Categorías",
+    "category": "Categoría",
 
-        "image": "Imagen",
-        "images": "Imágenes",
+    "image": "Imagen",
+    "images": "Imágenes",
 
-        "select-category": "Selecciona una categoría",
-        "no-categories-found": "No se encontraron categorías",
-        "no-items-found": "No se encontraron elementos",
-        "no-reviews-found": "No se encontraron reseñas"
-    },
+    "select-category": "Selecciona una categoría",
+    "no-categories-found": "No se encontraron categorías",
+    "no-items-found": "No se encontraron elementos",
+    "no-reviews-found": "No se encontraron reseñas",
+
+    "by-name": "Por nombre",
+    "by-date": "Por fecha",
+    "by-rating": "Por calificación"
+  },
 
   "manage-item-review": {
     "create-review": "Crear reseña",
@@ -86,34 +92,40 @@
             "error-deleting-review-ratings": "Error al eliminar las calificaciones de la reseña",
             "error-deleting-review-images": "Error al eliminar las imágenes de la reseña"
         }
-    },
+  },
 
-    "review-page": {
-        "search": "Buscar",
-        "search-placeholder": "Buscar reseñas...",
-        "add-review": "Crear una nueva reseña",
-        "load-more": "Ver más reseñas",
-        "filter": "Filtrar",
-        "none": "Ninguno",
-        "rating": "Calificación",
-        "reset": "Reiniciar",
-        "apply": "Aplicar",
-        "no-reviews": "No hay reseñas disponibles"
-    },
+  "review-page": {
+    "search": "Buscar",
+    "search-placeholder": "Buscar reseñas...",
+    "add-review": "Crear una nueva reseña",
+    "load-more": "Ver más reseñas",
+    "filter": "Filtrar",
+    "none": "Ninguno",
+    "rating": "Calificación",
+    "reset": "Reiniciar",
+    "apply": "Aplicar",
+    "no-reviews": "No hay reseñas disponibles"
+  },
 
-    "more-options": {
-        "more-options": "Más opciones",
-        "language": "Idioma",
-        "theme": "Tema",
-        
-        "change-theme": "Cambiar tema",
-        "dark-mode": "Modo oscuro",
-        "light-mode": "Modo claro",
+  "view-all-items": {
+    "create-item": "Crear elemento",
+    "only-items": "Solo elementos",
+    "only-origins": "Solo orígenes"
+  },
 
-        "change-language": "Cambiar idioma",
-        "spanish": "Español",
-        "english": "Inglés"
-    },
+  "more-options": {
+    "more-options": "Más opciones",
+    "language": "Idioma",
+    "theme": "Tema",
+
+    "change-theme": "Cambiar tema",
+    "dark-mode": "Modo oscuro",
+    "light-mode": "Modo claro",
+
+    "change-language": "Cambiar idioma",
+    "spanish": "Español",
+    "english": "Inglés"
+  },
 
   "categories": {
     "food": "Comida",
@@ -166,9 +178,9 @@
     "music": "Música"
   },
 
-    "view-item": {
-        "timeline": "Línea de tiempo",
-        "add-review": "Agregar reseña",
-        "to-origin": "Convertir a origen"
-    }
+  "view-item": {
+    "timeline": "Línea de tiempo",
+    "add-review": "Agregar reseña",
+    "to-origin": "Convertir a origen"
+  }
 }

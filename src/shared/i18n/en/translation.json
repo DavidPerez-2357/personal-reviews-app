@@ -2,6 +2,7 @@
   "config": {
     "date-format": "en-US"
   },
+
   "common": {
     "appName": "Personal reviews",
     "welcome": "Welcome to my app",
@@ -23,10 +24,14 @@
     "filter": "Filter",
     "sort": "Sort",
     "clear": "Clear",
+    "reset": "Reset",
     "apply": "Apply",
     "edit": "Edit",
     "create": "Create",
     "load-more": "Load more",
+    "ascending": "Ascending",
+    "descending": "Descending",
+
     "preview": "Preview",
     "reviews": "Reviews",
     "review": "Review",
@@ -40,11 +45,17 @@
     "category": "Category",
     "image": "Image",
     "images": "Images",
+
     "select-category": "Select category",
     "no-categories-found": "No categories found",
     "no-items-found": "No items found",
-    "no-reviews-found": "No reviews found"
+    "no-reviews-found": "No reviews found",
+
+    "by-name": "By name",
+    "by-date": "By date",
+    "by-rating": "By rating"
   },
+
   "manage-item-review": {
     "create-review": "Create review",
     "saving-review": "Saving review",
@@ -92,6 +103,13 @@
     "apply": "Apply",
     "no-reviews": "No reviews available"
   },
+
+  "view-all-items": {
+    "create-item": "Crear elemento",
+    "only-items": "Solo elementos",
+    "only-origins": "Solo orígenes"
+  },
+
   "more-options": {
     "more-options": "More options",
     "language": "Language",
@@ -103,6 +121,7 @@
     "spanish": "Spanish",
     "english": "English"
   },
+
   "categories": {
     "food": "Food",
     "electronics": "Electronics",
@@ -114,7 +133,7 @@
     "sports": "Sports",
     "hostelery": "Hostelry"
   },
-  
+
   "category-rating": {
     "taste": "Taste",
     "quality": "Quality",
@@ -153,6 +172,7 @@
     "drink_quality": "Drink quality",
     "music": "Music"
   },
+
   "view-item": {
     "timeline": "Timeline",
     "add-review": "Add review",
