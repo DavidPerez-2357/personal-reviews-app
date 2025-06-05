@@ -3,6 +3,7 @@ export interface Item {
     name: string;
     image: string | null;
     category_id: number;
+    is_origin: boolean;
 }
 
 export interface ItemWithCategory {
@@ -42,7 +43,14 @@ export interface ItemDisplay {
     last_rating: number;
     number_of_reviews: number;
     is_origin: boolean;
+    origin_id?: number;
 
     category_icon: string;
     category_color: string;
+}
+
+export interface ItemTreeNode {
+    level: number;
+    item: ItemDisplay;
+    children: ItemTreeNode[];
 }
