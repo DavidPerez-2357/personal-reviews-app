@@ -1,6 +1,6 @@
 import { openDatabase } from "@/shared/database/database-service";
 import { ItemType } from "@/shared/dto/Filter";
-import { Item, ItemDisplay, ItemFull, ItemOption, Origin } from "@/shared/dto/Item";
+import { ItemDisplay } from "@/shared/dto/Item";
 
 /**
  * Cuenta el número de ítems en la base de datos.
@@ -11,7 +11,8 @@ export const countItems = async (): Promise<number> => {
     if (!db) return 0;
 
     try {
-        const query = `SELECT COUNT(*) as count FROM item`;
+        const query = `SELECT COUNT(*) as count FROM item i
+                        WHERE i.is_origin = 0`; // Solo cuenta ítems que no están asociados a un origen
         const result = await db.query(query);
         return result.values[0].count as number;
     } catch (error) {
@@ -20,9 +21,25 @@ export const countItems = async (): Promise<number> => {
     }
 }
 
+export const countOrigins = async (): Promise<number> => {
+  const db = await openDatabase();
+  if (!db) return 0;
+
+  try {
+    const query = `SELECT COUNT(*) as count FROM item i
+                    WHERE i.is_origin = 1`; // Solo cuenta ítems que son orígenes
+    const result = await db.query(query);
+    return result.values[0].count as number;
+  } catch (error) {
+    console.error("❌ Error al contar orígenes", error);
+    return 0;
+  }
+}
+
 export const countItemsFiltered = async (
   searchTerm: string,
-  filters: { category?: number[]; type: ItemType }
+  filters: { category?: number[]; type: ItemType },
+  areItemsGrouped: boolean
 ): Promise<number> => {
   const db = await openDatabase();
   if (!db) return 0;
@@ -37,19 +54,26 @@ export const countItemsFiltered = async (
   }
 
   // --- Filtro por categoría
-  if (filters.category !== undefined && filters.category.length > 0) {
-    whereClauses.push(`category_id IN (?)`);
-    params.push(filters.category.join(','));
+  if (filters.category !== undefined) {
+    const placeholders = filters.category.map(() => '?').join(', ');
+    whereClauses.push(`i.category_id IN (${placeholders})`);
+    params.push(...filters.category); // <-- separa los valores individualmente
   }
 
   // --- Filtro por tipo
   if (filters.type !== 'all') {
-    whereClauses.push(`type = ?`);
-    params.push(filters.type);
+    // --- Filtro por tipo
+    whereClauses.push(`i.is_origin = ?`);
+    params.push(filters.type === 'origin' ? 1 : 0);
+  }
+
+  if (areItemsGrouped) {
+    // Si los ítems están agrupados, no se cuenta el origen
+    whereClauses.push(`oi.origin_id IS NULL`);
   }
 
   // --- Construcción de la consulta base
-  let query = `SELECT COUNT(*) as count FROM item`;
+  let query = `SELECT COUNT(*) as count FROM item i LEFT JOIN origin_item oi ON i.id = oi.item_id`;
 
   // --- Aplicar filtros
   if (whereClauses.length > 0) {
@@ -98,20 +122,30 @@ export const getItemsDisplay = async (
 
   // --- Filtro por categoría
   if (filters.category !== undefined) {
-    whereClauses.push(`i.category_id IN (?)`);
-    // Formatear el array de categorías como una cadena separada por comas
-    console.log(`Filtrando por categorías: ${filters.category}`);
-    
-    params.push(filters.category.join(','));
+    const placeholders = filters.category.map(() => '?').join(', ');
+    whereClauses.push(`i.category_id IN (${placeholders})`);
+    params.push(...filters.category); // <-- separa los valores individualmente
+  }
+
+  if (filters.type !== 'all') {
+    // --- Filtro por tipo
+    whereClauses.push(`i.is_origin = ?`);
+    params.push(filters.type === 'origin' ? 1 : 0);
+  }
+
+  if (areItemsGrouped) {
+    // Si los ítems están agrupados, no se cuenta el origen
+    whereClauses.push(`oi.origin_id IS NULL`);
   }
 
   // --- Construcción de la consulta base
   let query = `
-    SELECT 
+    SELECT
       i.id,
       i.name,
       i.is_origin,
-      COUNT(r.rating) AS number_of_reviews, 
+      case when oi.origin_id is not null then oi.origin_id else null end as origin_id,
+      COUNT(r.rating) AS number_of_reviews,
       c.icon AS category_icon,
       c.color AS category_color,
       (
@@ -120,11 +154,11 @@ export const getItemsDisplay = async (
         WHERE r2.item_id = i.id
         ORDER BY r2.created_at DESC
         LIMIT 1
-      ) AS last_rating,
+      ) AS last_rating
     FROM item i
     LEFT JOIN review r ON i.id = r.item_id
     LEFT JOIN category c ON i.category_id = c.id
-    LEFT JOIN origin o ON i.id = o.item_id
+    LEFT JOIN origin_item oi ON i.id = oi.item_id
   `;
 
   // --- Aplicar filtros
@@ -140,7 +174,7 @@ export const getItemsDisplay = async (
   if (sortType !== 'none' && sortOrder !== 'none') {
     const sortColumnMap: Record<string, string> = {
       date: 'i.created_at',
-      rating: 'last_review',
+      rating: 'last_rating',
       name: 'i.name',
     };
     const sortColumn = sortColumnMap[sortType];
@@ -150,6 +184,11 @@ export const getItemsDisplay = async (
   }else {
     // Si no hay ordenamiento, se ordena por ID por defecto
     query += ` ORDER BY i.id DESC`;
+  }
+
+  if (!areItemsGrouped) {
+    // Si los ítems están agrupados, se ordena por el ID del origen
+    query += `, oi.origin_id DESC`;
   }
 
   // --- Paginación
@@ -162,6 +201,7 @@ export const getItemsDisplay = async (
       id: row.id,
       name: row.name,
       last_rating: row.last_rating || 0,
+      origin_id: row.origin_id || null,
       number_of_reviews: row.number_of_reviews || 0,
       is_origin: row.is_origin,
       category_icon: row.category_icon,
