@@ -7,7 +7,7 @@ import { Building2, SquarePen, Star } from "lucide-react";
 import { ItemDisplay } from "../dto/Item";
 import { useTranslation } from "react-i18next";
 import { Suspense, useEffect, useState } from "react";
-import { getItemsByOrigin } from "../services/item-service";
+import { getFeaturedCategoryOfItemsInsideOfOrigin, getItemsByOrigin } from "../services/item-service";
 import Loader from "./Loader";
 import { CategoryAppearance } from "../dto/Category";
 
@@ -28,30 +28,27 @@ const OriginCard = ({ item }: OriginCardProps) => {
 
   useEffect(() => {
     if (itemsInside.length > 0) {
-      setFeaturedCategory(getFeaturedCategory(itemsInside));
+      getFeaturedCategory(itemsInside).then(setFeaturedCategory);
       setAverageRating(getAverageRating(itemsInside));
     }
   }, [itemsInside]);
 
-  const getFeaturedCategory = (items: ItemDisplay[]): CategoryAppearance => {
+  const getFeaturedCategory = async (items: ItemDisplay[]): Promise<CategoryAppearance> => {
     if (items.length === 0) {
       return {
         color: CategoryColors.default,
         icon: "xmark",
-      }
+      };
     }
 
-    const categoryCount: Record<string, number> = {};
-
-    items.forEach(item => {
-      if (item.category_color) {
-        categoryCount[item.category_color] = (categoryCount[item.category_color] || 0) + 1;
-      }
-    });
+    const category = await getFeaturedCategoryOfItemsInsideOfOrigin(item.id);
+    if (category) {
+      return category;
+    }
 
     return {
       color: "gray",
-      icon: items[0].category_icon,
+      icon: "xmark"
     };
   }
 
