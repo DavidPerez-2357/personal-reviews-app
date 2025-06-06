@@ -40,7 +40,49 @@ export const itemToOrigin = async (id: number) : Promise<boolean> => {
         return false;
     }
 }
-    
+
+/**
+ * Elimina las relaciones de origen de un ítem.
+ * @param id
+ * @return Promise<boolean>
+ */
+export const deleteOriginRelations = async (id: number): Promise<boolean> => {
+    const db = await openDatabase();
+    if (!db) return false;
+
+    try {
+        const query = `DELETE FROM origin_item WHERE origin_id = ?`;
+        const values = [id];
+        await db!.run(query, values);
+        return true;
+    } catch (error) {
+        console.error("❌ Error al eliminar relaciones de origen", error);
+        return false;
+    }
+}
+
+/**
+ * Convierte un origen a un ítem.
+ * @param id
+ * @return Promise<boolean>
+ */
+export const originToItem = async (id: number): Promise<boolean> => {
+    const db = await openDatabase();
+    if (!db) return false;
+    try {
+        const query = `UPDATE item SET is_origin = 0 WHERE id = ?`;
+        const values = [id];
+        await db!.run(query, values);-
+
+        // Eliminar relaciones de origen después de actualizar el item
+        await deleteOriginRelations(id);
+
+        return true;
+    } catch (error) {
+        console.error("❌ Error al convertir origen a ítem", error);
+        return false;
+    }
+}
 
 /**
  * obtiene un ítem por su ID.
@@ -55,6 +97,7 @@ export const getItemFull = async (id: number): Promise<ItemFull | null> => {
         const query = `select
                             i.id,
                             i.name,
+                            i.is_origin,
                             round(avg(r.rating), 2) as average_rating,
                             count(r.id) as number_of_ratings,
                             max(r.created_at) as date_last_review,
@@ -97,7 +140,7 @@ export const getItemsByOrigin = async (id: number): Promise<ItemDisplay[]> => {
                         FROM item i
                         JOIN category c ON i.category_id = c.id
                         LEFT JOIN review r ON i.id = r.item_id
-                        JOIN origin_item oi on i.id = oi.item_id 
+                        JOIN origin_item oi on i.id = oi.item_id
                         WHERE oi.origin_id = ?
                         GROUP BY i.id, i.name, c.name, c.icon, c.color`;
         const result = await db!.query(query, [id]);
