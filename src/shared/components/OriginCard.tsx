@@ -49,10 +49,8 @@ const OriginCard = ({ item }: OriginCardProps) => {
       }
     });
 
-    const maxCategoryColor = Object.keys(categoryCount).reduce((a, b) => categoryCount[a] > categoryCount[b] ? a : b);
-
     return {
-      color: maxCategoryColor,
+      color: "gray",
       icon: items[0].category_icon,
     };
   }
