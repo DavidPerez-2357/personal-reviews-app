@@ -7,10 +7,11 @@ import { Box, Ellipsis, Star } from 'lucide-react';
 
 import '@styles/FooterTabBar.css';
 import { useTranslation } from 'react-i18next';
-import ManageItemReview from '@/app/manage-review/ManageItemReview'; 
+import ManageItemReview from '@/app/manage-review/ManageItemReview';
 import ViewAllReviews from '@/app/view-all-reviews/ViewAllReviews';
-import { MoreOptions } from './more-options/moreOptions';
-import ViewItem from './view-item/ViewItem';
+import { MoreOptions } from '@/app/more-options/moreOptions';
+import ViewItem from '@/app/view-item/ViewItem';
+import ManageItem from '@/app/manage-item/ManageItem';
 
 const FooterTabBar = () => {
   const { t } = useTranslation();
@@ -25,12 +26,14 @@ const FooterTabBar = () => {
           <Route path="/app/reviews/create" component={ManageItemReview} exact={true} />
           <Route path="/app/reviews/:id/edit" component={ManageItemReview} exact={true} />
           <Route path="/app/items/:id/viewItem" component={ViewItem} exact={true} />
+          <Route path="/app/items/create" component={ManageItem} exact={true} />
+          <Route path="/app/items/:id/edit" component={ManageItem} exact={true} />
 
           <Route path="/app/items" exact={true} />
           <Route path="/app/more" exact={true} component={MoreOptions} />
           <Redirect path="/app" to="/app/reviews" exact={true} />
         </IonRouterOutlet>
-        
+
         <IonTabBar slot="bottom" className='tab-bar'>
           <IonTabButton tab="home" href="/app/reviews" onClick={() => setSelectedTab('reviews')} className='ion-activatable ripple-parent circle'>
             <Star size={selectedTab === 'reviews' ? 40 : 35} />
