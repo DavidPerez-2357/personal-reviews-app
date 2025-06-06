@@ -27,3 +27,8 @@ export interface CategoryRatingValue {
     review_id: number;
     category_rating_id: number;
 }
+
+export interface CategoryAppearance {
+    icon: string;
+    color: string;
+}

@@ -3,14 +3,14 @@ import { Star } from "lucide-react";
 
 const StatOriginView = ({ items }: { items: ItemDisplay[] }) => {
   const averageRating: number =
-    items.reduce((acc, item) => acc + item.average_rating, 0) / items.length;
+    items.reduce((acc, item) => acc + item.last_rating, 0) / items.length;
   const numberOfItems: number = items.length;
   // Generar el mapa de estrellas de 1 a 5, aunque no haya items con ese rating
   const numberStarMap: Map<number, number> = new Map<number, number>(
     Array.from({ length: 5 }, (_, i) => [i + 1, 0])
   );
   items.forEach((item) => {
-    const roundedRating = Math.round(item.average_rating);
+    const roundedRating = Math.round(item.last_rating);
     numberStarMap.set(roundedRating, (numberStarMap.get(roundedRating) || 0) + 1);
   });
 
