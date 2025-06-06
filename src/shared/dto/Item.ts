@@ -3,6 +3,7 @@ export interface Item {
     name: string;
     image: string | null;
     category_id: number;
+    is_origin: boolean;
 }
 
 export interface ItemWithCategory {
@@ -40,25 +41,17 @@ export interface ItemFull {
 export interface ItemDisplay {
     id: number;
     name: string;
-    average_rating: number;
-    number_of_ratings: number;
-    date_last_review: string;
-    category_name: string;
+    last_rating: number;
+    number_of_reviews: number;
+    is_origin: boolean;
+    origin_id?: number;
+
     category_icon: string;
     category_color: string;
 }
 
-export interface OriginDisplay {
-    id: number;
-    name: string;
-    average_rating: number;
-    average_rating_all_items?: number;
-    number_of_ratings: number;
-    date_last_review: string;
-    category_name: string;
-    category_icon: string;
-    category_color: string;
-    average_category?: string;
-    average_category_icon?: string;
-    average_category_percentage?: number;
+export interface ItemTreeNode {
+    level: number;
+    item: ItemDisplay;
+    children: ItemTreeNode[];
 }

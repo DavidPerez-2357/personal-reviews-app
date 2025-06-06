@@ -16,6 +16,7 @@ import { IconName } from "@fortawesome/fontawesome-svg-core";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { CategoryColors } from "@/shared/enums/colors";
 import { getCategories } from "@/shared/services/category-service";
+import { SubCategoryFilterMode } from "@/shared/dto/Filter";
 
 interface FilterModalProps {
   isOpen: boolean;
@@ -25,8 +26,6 @@ interface FilterModalProps {
     category?: number[] | null;
   }) => void;
 }
-
-type SubcatMode = "auto" | "all" | "none" | "specific";
 
 const ReviewFilterModal: React.FC<FilterModalProps> = ({
   isOpen,
@@ -43,7 +42,7 @@ const ReviewFilterModal: React.FC<FilterModalProps> = ({
   // Categories state
   const [allCategories, setAllCategories] = useState<Category[]>([]);
   const [selectedCategory, setSelectedCategory] = useState<Category | null>(null);
-  const [subcategoryMode, setSubcategoryMode] = useState<SubcatMode>("auto");
+  const [subcategoryMode, setSubcategoryMode] = useState<SubCategoryFilterMode>("auto");
   const [selectedCategories, setSelectedCategories] = useState<Category[]>([]);
 
   const { t } = useTranslation();
@@ -141,13 +140,15 @@ const ReviewFilterModal: React.FC<FilterModalProps> = ({
       onDidDismiss={onDismiss}
       ref={modal}
       initialBreakpoint={0.80}
-      breakpoints={[0, 0.80]}
-      className="modal-filter"
+      breakpoints={[0, 0.5, 0.8, 0.90]}
+      className="ion-no-padding ion-no-border"
     >
-      <IonHeader className="ion-no-border ion-padding-top">
-        <IonToolbar>
-          <IonTitle className="text-2xl font-bold text-start ion-padding">
-            {t("review-page.filter")}
+      <IonHeader className="ion-no-border">
+        <IonToolbar
+          style={{ paddingTop: 0, marginTop: 0 }}
+        >
+          <IonTitle className="text-2xl font-bold text-start p-5">
+            {t("common.filter")}
           </IonTitle>
         </IonToolbar>
       </IonHeader>
@@ -285,25 +286,23 @@ const ReviewFilterModal: React.FC<FilterModalProps> = ({
           </div>
         </div>
 
-        <div className="flex justify-between mt-6 gap-4">
-          <IonButton
-            onClick={handleResetFilter}
-            color="secondary"
-            expand="block"
-            size="large"
-            className="flex-1"
-          >
-            {t('review-page.reset')}
-          </IonButton>
-          <IonButton
-            onClick={handleApplyFilter}
-            color="tertiary"
-            expand="block"
-            size="large"
-            className="flex-1"
-          >
-            {t('review-page.apply')}
-          </IonButton>
+        <div className="flex justify-between gap-4 h-12 mt-10">
+            <IonButton
+              onClick={handleResetFilter}
+              color="secondary"
+              expand="block"
+              size="default"
+              className="flex-1 text-base h-full">
+              {t('common.reset')}
+            </IonButton>
+            <IonButton
+              onClick={handleApplyFilter}
+              color="tertiary"
+              expand="block"
+              size="default"
+              className="flex-1 text-base">
+              {t('common.apply')}
+            </IonButton>
         </div>
       </IonContent>
     </IonModal>

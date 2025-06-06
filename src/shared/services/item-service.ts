@@ -1,5 +1,6 @@
 import { openDatabase } from "../database/database-service";
-import { Item, ItemDisplay, ItemFull, ItemOption, ItemWithCategory, Origin } from "../dto/Item";
+import { Item, ItemDisplay, ItemFull, ItemOption, ItemWithCategory, Origin } from "@dto/Item";
+import { CategoryAppearance } from "../dto/Category";
 
 
 /**
@@ -119,7 +120,7 @@ export const getItemFull = async (id: number): Promise<ItemFull | null> => {
 }
 
 /**
- * Obtiene los items de un origen.
+ * Obtiene los items de un origen con la nueva estructura de ItemDisplay.
  * @param id
  * @returns Promise<ItemDisplay[]>
  */
@@ -128,23 +129,39 @@ export const getItemsByOrigin = async (id: number): Promise<ItemDisplay[]> => {
     if (!db) return [];
 
     try {
-        const query = `SELECT
-                            i.id,
-                            i.name,
-                            ROUND(AVG(r.rating), 2) AS average_rating,
-                            COUNT(r.id) AS number_of_ratings,
-                            MAX(r.created_at) AS date_last_review,
-                            c.name AS category_name,
-                            c.icon AS category_icon,
-                            c.color AS category_color
-                        FROM item i
-                        JOIN category c ON i.category_id = c.id
-                        LEFT JOIN review r ON i.id = r.item_id
-                        JOIN origin_item oi on i.id = oi.item_id
-                        WHERE oi.origin_id = ?
-                        GROUP BY i.id, i.name, c.name, c.icon, c.color`;
+        const query = `
+            SELECT i.id, i.name,
+               COUNT(r.rating) AS number_of_rewviews, 
+               c.icon AS category_icon, 
+               c.color AS category_color,
+               i.is_origin,
+               case when oi.origin_id is not null then oi.origin_id else null end as origin_id,
+               (
+               SELECT r2.rating
+               FROM review r2
+               WHERE r2.item_id = i.id
+               ORDER BY r2.created_at DESC
+               LIMIT 1
+               ) AS last_review
+            FROM item i
+            LEFT JOIN review r ON i.id = r.item_id
+            LEFT JOIN category c ON i.category_id = c.id
+            LEFT JOIN origin_item oi ON i.id = oi.item_id
+            WHERE oi.origin_id = ?
+            GROUP BY i.id, i.name, c.icon, c.color
+        `;
         const result = await db!.query(query, [id]);
-        return result.values as ItemDisplay[];
+        // Map fields to match ItemDisplay interface
+        return (result.values || []).map((row: ItemDisplay) => ({
+            id: row.id,
+            name: row.name,
+            is_origin: row.is_origin || false,
+            origin_id: row.origin_id || undefined,
+            last_review: row.last_rating ? Number(new Date(row.last_rating)) : 0,
+            number_of_reviews: row.number_of_reviews,
+            category_icon: row.category_icon,
+            category_color: row.category_color
+        })) as ItemDisplay[];
     } catch (error) {
         console.error("❌ Error al obtener ítems por origen", error);
         return [];
@@ -168,6 +185,38 @@ export const getItems = async (): Promise<Item[]> => {
         return [];
     }
 };
+
+export const getFeaturedCategoryOfItemsInsideOfOrigin = async (item_id: number): Promise<CategoryAppearance | null> => {
+    const db = await openDatabase();
+    if (!db) return null;
+
+    try {
+        const query = `
+            SELECT
+            c.icon,
+            c.color,
+            COUNT(*) as count
+            FROM item i
+            JOIN category c ON i.category_id = c.id
+            JOIN origin_item oi ON i.id = oi.item_id
+            WHERE oi.origin_id = ?
+            GROUP BY c.id
+            ORDER BY count DESC
+            LIMIT 1
+        `;
+        const result = await db!.query(query, [item_id]);
+        if (result.values && result.values[0]) {
+            return {
+            icon: result.values[0].icon,
+            color: result.values[0].color
+            } as CategoryAppearance;
+        }
+        return null;
+    }catch (error) {
+        console.error("❌ Error al obtener ítems");
+        return null;
+    }
+}
 
 /**
  * Inserta una relación de origen en la base de datos.
