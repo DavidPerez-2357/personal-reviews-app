@@ -220,7 +220,7 @@ const ViewAllItems = () => {
                                     <IonCol>
                                         <IonInput
                                         type="text"
-                                        placeholder="Search items..."
+                                        placeholder={t('view-all-items.search-placeholder')}
                                         value={searchTerm}
                                         onIonInput={(e) => setSearchTerm(e.detail.value ?? "")}
                                         fill="solid"
