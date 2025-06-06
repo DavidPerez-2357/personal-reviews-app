@@ -110,7 +110,8 @@
   "view-all-items": {
     "create-item": "Crear elemento",
     "only-items": "Solo elementos",
-    "only-origins": "Solo orígenes"
+    "only-origins": "Solo orígenes",
+    "search-placeholder": "Buscar elementos..."
   },
 
   "more-options": {
