@@ -20,7 +20,7 @@ import { IconName } from "@fortawesome/fontawesome-svg-core";
 import { deleteRatingValuesFromReview, getCategoryById, getCategoryRatingMixByReviewId, getCategoryRatingsByCategoryId, getChildrenCategories, getParentCategories, getParentCategory, insertCategoryRatingValue } from "@services/category-service";
 import CategorySelectorModal from "@components/CategorySelectorModal";
 import PreviewPhotoModal from "@components/PreviewPhotoModal";
-import SubcategoriesBadgeSelector from "./components/SubcategoriesBadgeSelector";
+import SubcategoriesBadgeSelector from "../../shared/components/SubcategoriesBadgeSelector";
 import { CategoryColors } from "@shared/enums/colors";
 import { useTranslation } from "react-i18next";
 import { deleteReview, deleteReviewImages, getReviewById, getReviewImagesbyId, insertReview, insertReviewImage, updateReview } from "@shared/services/review-service";
@@ -683,7 +683,7 @@ const ManageItemReview = () => {
                 </div>
               </IonRow>
 
-              <IonButton className={`z-[1000] bottom-0 right-0 right-0 mt-10 mb-5 ml-5 mr-5`}
+              <IonButton className={`z-[1000] bottom-0 right-0 mt-10 mb-5 ml-5 mr-5`}
               id="save-review" color="tertiary" expand="full" disabled={isButtonDisabled} onClick={handleSaveReview}>
                 {saveButtonText}
               </IonButton>
