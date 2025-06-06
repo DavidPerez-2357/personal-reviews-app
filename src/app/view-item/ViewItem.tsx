@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { use, useEffect, useState } from "react";
 import {
   IonContent,
   IonPage,
@@ -10,6 +10,7 @@ import {
   IonSelect,
   IonSelectOption,
   IonAlert,
+  IonToast,
 } from "@ionic/react";
 import { useParams, useHistory } from "react-router";
 import { ItemDisplay, ItemFull, OriginDisplay } from "@/shared/dto/Item";
@@ -33,6 +34,7 @@ import {
   getItemFull,
   getItemsByOrigin,
   itemToOrigin,
+  originToItem,
 } from "@/shared/services/item-service";
 import {
   deleteReview,
@@ -54,6 +56,7 @@ export const ViewItem = () => {
   const [item, setItem] = useState<ItemFull>({
     id: 0,
     name: "",
+    is_origin: false,
     image: null,
     created_at: "",
     updated_at: "",
@@ -69,46 +72,52 @@ export const ViewItem = () => {
   const [isDeleteAlertOpen, setIsDeleteAlertOpen] = useState(false);
   const [showErrorAlert, setShowErrorAlert] = useState(false);
   const [buttomDisabled, setButtomDisabled] = useState(false);
-  const {
-    savedPhotos,
-    setSavedPhotos,
-    takePhoto,
-    importPhoto,
-    savePhoto,
-    deletePhoto,
-  } = usePhotoGallery();
+  const { deletePhoto } = usePhotoGallery();
   const [errorMessage, setErrorMessage] = useState("");
+  const [isToastOpen, setIsToastOpen] = useState(false);
+  const [toastMessage, setToastMessage] = useState("");
 
   const { t } = useTranslation();
+  const initializeData = async () => {
+    try {
+      const mainItemDetailsFromDB = await getItemFull(Number(id));
+      const itemReviews = await getReviewsByItemId(Number(id));
+      const itemsOfOrigin = await getItemsByOrigin(Number(id));
 
-  useEffect(() => {
-    const initializeData = async () => {
-      try {
-        const mainItemDetailsFromDB = await getItemFull(Number(id));
-        const itemReviews = await getReviewsByItemId(Number(id));
-        const itemsOfOrigin = await getItemsByOrigin(Number(id));
-
-        if (mainItemDetailsFromDB) {
-          setItem(mainItemDetailsFromDB);
-        }
-        setReviews(
-          itemReviews.sort(
-            (a, b) =>
-              new Date(b.created_at).getTime() -
-              new Date(a.created_at).getTime()
-          )
-        );
-        setItemsOfOrigin(itemsOfOrigin);
-        // Si no hay elementos de origen, mostrar la línea temporal abierta
-        if (itemsOfOrigin.length === 0) {
-          setShowTimeline(true);
-        }
-      } catch (err) {
-        console.error("Error initializing data:", err);
+      if (mainItemDetailsFromDB) {
+        setItem(mainItemDetailsFromDB);
       }
-    };
+      setReviews(
+        itemReviews.sort(
+          (a, b) =>
+            new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
+        )
+      );
+      setItemsOfOrigin(itemsOfOrigin);
+      // Si no hay elementos de origen, mostrar la línea temporal abierta
+      if (itemsOfOrigin.length === 0) {
+        setShowTimeline(true);
+      }
+      console.log("Data initialized successfully");
+    } catch (err) {
+      console.error("Error initializing data:", err);
+    }
+  };
+  useEffect(() => {
     initializeData();
   }, [id]);
+
+  // cuando se cambie el mensaje del toast, abrirlo y reiniciar el item
+  useEffect(() => {
+    if (toastMessage) {
+      setTimeout(() => {
+        setIsToastOpen(false);
+        setToastMessage(""); // Reiniciar el mensaje del toast
+      }, 3000); // Duración del toast
+      initializeData(); // Reiniciar el item para que se actualice la vista
+    }
+    console.log("isToastOpen changed:", isToastOpen);
+  }, [isToastOpen]);
 
   const handleDeleteItem = async () => {
     setButtomDisabled(true);
@@ -172,9 +181,17 @@ export const ViewItem = () => {
     switch (value) {
       case "edit":
         history.push(`/app/items/${id}/edit`);
+        console.log("Edit item:", id);
         break;
       case "origin":
         itemToOrigin(Number(id));
+        setToastMessage(t("view-item.to-origin-success"));
+        setIsToastOpen(true);
+        break;
+      case "item":
+        originToItem(Number(id));
+        setToastMessage(t("view-item.to-item-success"));
+        setIsToastOpen(true);
         break;
       case "delete":
         setIsDeleteAlertOpen(true);
@@ -203,12 +220,17 @@ export const ViewItem = () => {
               disabled={buttomDisabled}
             >
               <IonSelectOption value="edit">{t("common.edit")}</IonSelectOption>
-              <IonSelectOption value="origin">
-                {t("view-item.to-origin")}
-              </IonSelectOption>
-              <IonSelectOption value="delete">
-                {t("common.delete")}
-              </IonSelectOption>
+              {!item.is_origin && (
+                <IonSelectOption value="origin">
+                  {t("view-item.to-origin")}
+                </IonSelectOption>
+              )}
+              {item.is_origin && (
+                <IonSelectOption value="item">
+                  {t("view-item.to-item")}
+                </IonSelectOption>
+              )}
+              <IonSelectOption value="delete">{t("common.delete")}</IonSelectOption>
             </IonSelect>
           </div>
         </IonRow>
@@ -250,12 +272,13 @@ export const ViewItem = () => {
                   <span className="text-2xl font-bold break-all text-[var(--ion-color-primary-contrast)] max-w-full">
                     {item.name}
                   </span>
-                  {itemsOfOrigin.length > 0 && (
-                    <span className="text-sm text-[var(--ion-color-primary-contrast)] flex items-center gap-1">
-                      <Building2 size={20} className="inline-block mr-1" />
-                      {t("common.origin")}
-                    </span>
-                  )}
+                  {itemsOfOrigin.length > 0 ||
+                    (item.is_origin && (
+                      <span className="text-sm text-[var(--ion-color-primary-contrast)] flex items-center gap-1">
+                        <Building2 size={20} className="inline-block mr-1" />
+                        {t("common.origin")}
+                      </span>
+                    ))}
                 </div>
               </IonCol>
             </div>
@@ -382,6 +405,14 @@ export const ViewItem = () => {
             },
           },
         ]}
+      />
+      <IonToast
+        className="safe-margin-top"
+        isOpen={isToastOpen}
+        message={toastMessage}
+        position="top"
+        onDidDismiss={() => setIsToastOpen(false)} // Hide toast when dismissed
+        duration={3000} // Set duration (e.g., 3 seconds)
       />
     </IonPage>
   );
