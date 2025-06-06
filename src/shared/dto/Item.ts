@@ -28,6 +28,7 @@ export interface ItemFull {
     id: number;
     name: string;
     image: string | null;
+    is_origin: boolean;
     created_at: string;
     updated_at: string;
     category_id: number;
