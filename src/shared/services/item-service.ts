@@ -1,5 +1,6 @@
 import { openDatabase } from "../database/database-service";
 import { Item, ItemDisplay, ItemFull, ItemOption, ItemWithCategory, Origin } from "@dto/Item";
+import { CategoryAppearance } from "../dto/Category";
 
 
 /**
@@ -121,6 +122,38 @@ export const getItems = async (): Promise<Item[]> => {
         return [];
     }
 };
+
+export const getFeaturedCategoryOfItemsInsideOfOrigin = async (item_id: number): Promise<CategoryAppearance | null> => {
+    const db = await openDatabase();
+    if (!db) return null;
+
+    try {
+        const query = `
+            SELECT
+            c.icon,
+            c.color,
+            COUNT(*) as count
+            FROM item i
+            JOIN category c ON i.category_id = c.id
+            JOIN origin_item oi ON i.id = oi.item_id
+            WHERE oi.origin_id = ?
+            GROUP BY c.id
+            ORDER BY count DESC
+            LIMIT 1
+        `;
+        const result = await db!.query(query, [item_id]);
+        if (result.values && result.values[0]) {
+            return {
+            icon: result.values[0].icon,
+            color: result.values[0].color
+            } as CategoryAppearance;
+        }
+        return null;
+    }catch (error) {
+        console.error("❌ Error al obtener ítems");
+        return null;
+    }
+}
 
 /**
  * Inserta una relación de origen en la base de datos.
