@@ -180,10 +180,9 @@ export const getItemOptions = async (search: string): Promise<ItemOption[]> => {
     if (!db) return [];
 
     try {
-        const query = `SELECT i.id, i.name, i.category_id, c.parent_id AS parent_category_id, IFNULL(p.icon, c.icon) AS parent_category_icon
+        const query = `SELECT i.id, i.name, i.category_id, c.icon AS category_icon
         FROM item i
         JOIN category c ON i.category_id = c.id
-        LEFT JOIN category p ON c.parent_id = p.id
         WHERE i.name LIKE ?
         LIMIT 5`;
         const values = [`%${search}%`];
