@@ -37,13 +37,14 @@ const FooterTabBar = () => {
           <Route path="/app/reviews" component={ViewAllReviews} exact={true} />
           <Route path="/app/reviews/create" component={ManageItemReview} exact={true} />
           <Route path="/app/reviews/:id/edit" component={ManageItemReview} exact={true} />
+          <Route path="/app/reviews/create/item/:itemId" component={ManageItemReview} exact={true} />
           <Route path="/app/items/:id/viewItem" component={ViewItem} exact={true} />
 
           <Route path="/app/items" exact={true} component={ViewAllItems} />
           <Route path="/app/more" exact={true} component={MoreOptions} />
           <Redirect path="/app" to="/app/reviews" exact={true} />
         </IonRouterOutlet>
-        
+
         <IonTabBar slot="bottom" className='tab-bar'>
           <IonTabButton tab="home" href="/app/reviews" onClick={() => setSelectedTab('reviews')} className='ion-activatable ripple-parent circle'>
             <Star size={selectedTab === 'reviews' ? 40 : 35} />

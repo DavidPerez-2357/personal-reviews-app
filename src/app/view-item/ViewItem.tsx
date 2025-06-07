@@ -186,7 +186,7 @@ export const ViewItem = () => {
             color="tertiary"
             expand="block"
             className="bg-primary mx-5 mb-5 text-lg"
-            onClick={() => history.push("/app/reviews/create", { itemId: item.id })}
+            routerLink={`/app/reviews/create/item/${id}`}
           >
             {t("view-item.add-review")}
           </IonButton>
