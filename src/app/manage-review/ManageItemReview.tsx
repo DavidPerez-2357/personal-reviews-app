@@ -243,7 +243,7 @@ const ManageItemReview = () => {
     if (!selectedOption) return;
 
     console.log("🔍 Opción seleccionada:", selectedOption.id);
-    
+
     getParentCategory(selectedOption.category_id).then((category) => {
       // Solo actualiza el estado si la categoría realmente cambió
       setParentCategory((prevCategory) => {
@@ -258,7 +258,7 @@ const ManageItemReview = () => {
         return;
       }
     });
-    
+
   }, [selectedOption]);
 
   useEffect(() => {
@@ -456,7 +456,7 @@ const ManageItemReview = () => {
 
   /** Guarda las imágenes asociadas a la review */
   const saveReviewImages = async (reviewId: number) => {
-    try {      
+    try {
         if (editMode && reviewHasPhotos) {
             console.log("🔍 Editando reseña, eliminando imágenes existentes...");
             const success = await deleteReviewImages(reviewId);
@@ -497,8 +497,9 @@ const ManageItemReview = () => {
         const item: Item = {
             id: 0,
             name: itemName,
-            image: null,
+            image: savedPhotos.length > 0 ? savedPhotos[0].filepath : '',
             category_id: getSelectedCategory()?.id || 0,
+            is_origin: false,
         };
 
         const itemId = await saveOrUpdateItem(item);
@@ -516,7 +517,7 @@ const ManageItemReview = () => {
             created_at: now,
             updated_at: now,
         };
-        
+
         const reviewId = await saveOrUpdateReview(review);
 
         if (!reviewId) {
@@ -562,7 +563,7 @@ const ManageItemReview = () => {
     } catch (error) {
       console.error("❌ Error al eliminar la foto:", error);
     }
-    
+
     handlePreviewClose();
     const newPhoto = await takePhoto(); // Save the new photo to the filesystem
     // Delete the old photo from the filesystem
@@ -596,7 +597,6 @@ const ManageItemReview = () => {
       }
     } catch (error) {
       console.error("❌ Error al eliminar las imágenes de la reseña:", error);
-      // TODO: Recuperar la reseña si no se eliminan las imágenes
     }
 
     setDeleteButtonText(t('manage-item-review.delete-review-success'));
