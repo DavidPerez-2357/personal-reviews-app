@@ -14,7 +14,7 @@ interface ItemSelectorProps {
     isInitialLoad: boolean;
 }
 
-export const ItemSelector = ({ selectedOption, setSelectedOption, itemName, setItemName, isInitialLoad }: ItemSelectorProps) => {
+export const ItemSelector = ({ selectedOption, setSelectedOption, itemName, setItemName }: ItemSelectorProps) => {
     const { t } = useTranslation();
     const [showOptions, setShowOptions] = useState(false);
     const [filteredOptions, setFilteredOptions] = useState<ItemOption[]>([]);
