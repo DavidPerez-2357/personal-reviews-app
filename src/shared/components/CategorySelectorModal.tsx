@@ -2,30 +2,32 @@ import { Category } from "@dto/Category";
 import { IconName } from "@fortawesome/fontawesome-svg-core";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { IonContent, IonHeader, IonLabel, IonModal, IonTitle, IonToolbar } from "@ionic/react";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import '@styles/CategorySelectorModal.css';
 import { useTranslation } from "react-i18next";
 import { CategoryColors } from "@/shared/enums/colors";
+import { getParentCategories } from "../services/category-service";
 
 interface CategorySelectorModalProps {
     modal: React.RefObject<HTMLIonModalElement | null>;
-    selectedCategory: Category;
-    setSelectedCategory: (category: Category) => void;
-    categories: Category[];
+    selectedCategory: Category | null;
+    setSelectedCategory: (category: Category | null) => void;
 }
 
-const CategorySelectorModal = ({ modal, selectedCategory, setSelectedCategory, categories }: CategorySelectorModalProps) => {
+const CategorySelectorModal = ({ modal, selectedCategory, setSelectedCategory }: CategorySelectorModalProps) => {
     const [t] = useTranslation();
+    const [categories, setCategories] = useState<Category[]>([]);
 
     useEffect(() => {
-        console.log('categories', categories.length);
-        console.log('selectedCategory', selectedCategory?.id);
-
-        if (selectedCategory.id === 0 && categories.length > 0) {
-            setSelectedCategory(categories[0]);
-        }
-
-    }, [categories, selectedCategory]);
+        getParentCategories()
+            .then((categories) => {
+                setCategories(categories);
+            })
+            .catch((error) => {
+                console.error("Error fetching categories:", error);
+            });
+    }
+    , []);
 
     return (
         <IonModal ref={modal} initialBreakpoint={0.5} breakpoints={[0, 0.25, 0.5, 0.75]}>

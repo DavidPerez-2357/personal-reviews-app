@@ -11,16 +11,15 @@ import {
   IonTextarea,
 } from "@ionic/react";
 import StarRating from "@components/StarRating";
-import { useEffect, useRef, useState } from "react";
+import { use, useEffect, useRef, useState } from "react";
 import "./styles/ManageItemReview.css";
 import { usePhotoGallery } from "@hooks/usePhotoGallery";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { getItemById, insertItem, updateItem, updateItemWithCategory } from "@services/item-service";
 import { IconName } from "@fortawesome/fontawesome-svg-core";
-import { deleteRatingValuesFromReview, getCategoryById, getCategoryRatingMixByReviewId, getCategoryRatingsByCategoryId, getChildrenCategories, getParentCategories, getParentCategory, insertCategoryRatingValue } from "@services/category-service";
-import CategorySelectorModal from "@components/CategorySelectorModal";
+import { deleteRatingValuesFromReview, getCategoryById, getCategoryRatingMixByReviewId, getCategoryRatingsByCategoryId, getChildrenCategories, getFirstCategory, getParentCategories, getParentCategory, insertCategoryRatingValue } from "@services/category-service";
 import PreviewPhotoModal from "@components/PreviewPhotoModal";
-import SubcategoriesBadgeSelector from "./components/SubcategoriesBadgeSelector";
+import SubcategoriesBadgeSelector from "../../shared/components/SubcategoriesBadgeSelector";
 import { CategoryColors } from "@shared/enums/colors";
 import { useTranslation } from "react-i18next";
 import { deleteReview, deleteReviewImages, getReviewById, getReviewImagesbyId, insertReview, insertReviewImage, updateReview } from "@shared/services/review-service";
@@ -34,14 +33,15 @@ import { Item, ItemOption, ItemWithCategory } from "@dto/Item";
 import { Review, ReviewImage } from "@dto/Review";
 import { init } from "i18next";
 import { Capacitor } from '@capacitor/core';
+import CategorySelectorHeader from "@/shared/components/CategorySelectorHeader";
 
 const ManageItemReview = () => {
   const { savedPhotos, setSavedPhotos, takePhoto, importPhoto, savePhoto, deletePhoto } = usePhotoGallery();
   let { id } = useParams<{ id: string }>();
+  let { itemId } = useParams<{ itemId: string }>();
   const history = useHistory();
   const { t } = useTranslation();
   const location = useLocation();
-  const itemId = location.state?.itemId;
 
   console.log("itemId", itemId);
   // Variable de no encontrar categorias
@@ -88,30 +88,16 @@ const ManageItemReview = () => {
   // Variables del fomulario
   const [isInitialLoad, setIsInitialLoad] = useState(true);
   const editMode = Boolean(id);
-  const [parentCategory, setParentCategory] = useState<Category>(notFoundAnyCategories);
-  const [childrenCategories, setChildrenCategories] = useState<Category[]>([]);
-  const [selectedSubcategory, setSelectedSubcategory] = useState<Category | null>(null);
   const [itemName, setItemName] = useState("");
   const [rating, setRating] = useState(0);
   const [categoryRatings, setCategoryRatings] = useState<CategoryRatingMix[]>([]);
   const [selectedOption, setSelectedOption] = useState<ItemOption | null>(null);
   const [comment, setComment] = useState("");
   const [reviewDeleted, setReviewDeleted] = useState(false); // Variable para saber si la reseña ha sido eliminada
+  const [selectedCategory, setSelectedCategory] = useState<Category | null>(null);
 
   // Variables para edicion
   const [reviewHasPhotos, setReviewHasPhotos] = useState(false); // Variable para saber si la reseña tiene fotos cuando se edita
-
-  // Variables de categorias
-  const [categories, setCategories] = useState<Category[]>([]);
-
-  const getSelectedCategory = () => {
-    if (selectedSubcategory) {
-      return selectedSubcategory;
-    } else if (parentCategory) {
-      return parentCategory;
-    }
-    return null;
-  }
 
   const convertToCategoryRatingMix = (categoryRatings: CategoryRating[]): CategoryRatingMix[] => {
     return categoryRatings.map((categoryRating) => ({
@@ -126,31 +112,15 @@ const ManageItemReview = () => {
     try {
         const review: Review | null = await getReviewById(reviewId);
         if (!review) throw new Error(t('manage-item-review.error-message.review-not-found'));
-
-        const item: Item | null = await getItemById(review.item_id);
-        if (!item) throw new Error(t('manage-item-review.error-message.item-not-found'));
-
-        const category: Category | null = await getCategoryById(item.category_id);
-        if (!category) throw new Error(t('manage-item-review.error-message.category-not-found'));
-
-        const parentCategory: Category = category.parent_id ? await getParentCategory(category.parent_id) || notFoundAnyCategories : category;
-
         const categoryRatingsFound: CategoryRatingMix[] = await getCategoryRatingMixByReviewId(reviewId);
         const reviewImages: ReviewImage[] = await getReviewImagesbyId(reviewId);
 
         setIsInitialLoad(true);
 
-        // Configurar los datos en el estado
-        setItemName(item.name);
         setRating(review.rating);
         setComment(review.comment || "");
-        setSelectedOption({
-            id: item.id,
-            name: item.name,
-            category_id: item.category_id,
-            parent_category_id: parentCategory.id,
-            parent_category_icon: parentCategory?.icon || '',
-        });
+        setSelectedOptionByItemId(review.item_id);
+        setCategoryRatings(convertToCategoryRatingMix(categoryRatingsFound));
 
         const photosConverted: UserPhoto[] = reviewImages.map((image) => ({
             filepath: image.image,
@@ -158,23 +128,6 @@ const ManageItemReview = () => {
         }));
         setSavedPhotos(photosConverted);
         setReviewHasPhotos(photosConverted.length > 0);
-
-        setCategoryRatings(categoryRatingsFound);
-
-        // Manejar categorías padre e hija
-        if (category.parent_id) {
-            setParentCategory(parentCategory);
-            setSelectedSubcategory(category);
-        } else {
-            setParentCategory(category);
-            setSelectedSubcategory(null);
-        }
-
-        // Cargar las subcategorías de la categoría padre
-        if (parentCategory) {
-            const children = await getChildrenCategories(parentCategory.id);
-            setChildrenCategories(children);
-        }
     } catch (error) {
         console.error(error);
         throw error; // Permitir que el efecto maneje el error
@@ -189,10 +142,8 @@ const ManageItemReview = () => {
     setComment("");
     setSavedPhotos([]);
     setSelectedOption(null);
-    setParentCategory(notFoundAnyCategories);
-    setSelectedSubcategory(null);
+    setSelectedCategory(null);
     setCategoryRatings([]);
-    setChildrenCategories([]);
 
     console.log("🔍 Cargando reseña con ID:", id);
     if (reviewDeleted) {
@@ -201,84 +152,60 @@ const ManageItemReview = () => {
     }
 
     if (editMode) {
-        const reviewId = parseInt(id);
-        setEditData(reviewId)
-            .then(() => setIsInitialLoad(false))
-            .catch((error) => {
-                console.error(error);
-                setIsInitialLoad(false);
-                history.push("/app/reviews", { toast: t('manage-item-review.error-message.review-not-found') });
-            });
-    } else {
-        setIsInitialLoad(false);
+      const reviewId = parseInt(id);
+      setEditData(reviewId)
+        .then(() => setIsInitialLoad(false))
+        .catch((error) => {
+          console.error(error);
+          setIsInitialLoad(false);
+          history.push("/app/reviews", { toast: t('manage-item-review.error-message.review-not-found') });
+        });
+      return;
     }
+
+    if (itemId) {
+      // Si se está creando una reseña desde un ítem específico
+      setSelectedOptionByItemId(parseInt(itemId));
+      return;
+    }
+
+    getFirstCategory().then((category) => {
+        if (!category) {
+            console.error("❌ No se encontró ninguna categoría");
+            setSelectedCategory(notFoundAnyCategories);
+            return;
+        }
+
+        setSelectedCategoryById(category.id);
+    }).catch((error) => {
+        console.error("❌ Error al obtener la primera categoría:", error);
+        setSelectedCategory(notFoundAnyCategories);
+    });
+    setIsInitialLoad(false);
+
   }, [window.location.pathname, id, editMode, reviewDeleted]);
 
-  useEffect(() => {
-    getParentCategories()
-        .then((data) => {
-            console.log("🔍 Categorías cargadas:", data);
-            setCategories(data);
-
-            if (data.length === 0) {
-                setParentCategory(notFoundAnyCategories);
-            } else if (parentCategory === null || parentCategory.id === 0 || !editMode) {
-                setParentCategory(data[0]);
-            }
-        })
-        .catch((error) => {
-            console.error("❌ Error al cargar categorías:", error);
-            setCategories([]);
-            setParentCategory(notFoundAnyCategories);
-        });
-  }, []);
 
   useEffect(() => {
     setSaveButtonText(editMode ? t('common.save-changes') : t('manage-item-review.create-review'));
   }, [editMode]);
 
-  // Funcion que se ejecuta cada vez que cambia la opción seleccionada
+
   useEffect(() => {
-    if (isInitialLoad) return; // No se ha cambiado el formulario por el usuario, no se actualizan los ratings
     if (!selectedOption) return;
 
-    console.log("🔍 Opción seleccionada:", selectedOption.id);
-
-    getParentCategory(selectedOption.category_id).then((category) => {
-      // Solo actualiza el estado si la categoría realmente cambió
-      setParentCategory((prevCategory) => {
-        if (prevCategory?.id !== category?.id && category) {
-          return category;
-        }
-        return prevCategory || notFoundAnyCategories;
-      });
-
-      if (!category) {
-        setChildrenCategories([]);
+    // Si el ítem seleccionado ya tiene una categoría, usarla
+    if (selectedOption.category_id && selectedOption.category_id !== 0) {
+        setSelectedCategoryById(selectedOption.category_id);
         return;
-      }
-    });
+    }
 
+    // Si no hay categoría seleccionada, buscar la categoría del ítem
+    setSelectedCategory(notFoundAnyCategories);
   }, [selectedOption]);
 
-  useEffect(() => {
-    if (!parentCategory) return;
-
-    getChildrenCategories(parentCategory.id).then((categories) => {
-        setChildrenCategories(categories);
-
-        // Mantener la subcategoría seleccionada si ya está configurada
-        if (selectedSubcategory && categories.some((cat) => cat.id === selectedSubcategory.id)) {
-            return;
-        }
-
-        // Si no hay subcategoría seleccionada o no coincide, resetear
-        setSelectedSubcategory(null);
-    });
-  }, [parentCategory]);
 
   useEffect(() => {
-    const selectedCategory = getSelectedCategory();
     if (!selectedCategory) return;
 
     // Evitar sobrescribir los ratings si estás en modo edición y ya se cargaron
@@ -291,7 +218,7 @@ const ManageItemReview = () => {
         console.error("❌ Error al obtener los ratings de la categoría seleccionada:", error);
         setCategoryRatings([]);
     });
-  }, [parentCategory, selectedSubcategory]);
+  }, [selectedCategory]);
 
   const handleTakePhoto = async () => {
     const newPhoto = await takePhoto();
@@ -299,6 +226,41 @@ const ManageItemReview = () => {
     const savedPhoto = await savePhoto(newPhoto);
     if (!savedPhoto) return;
     setSavedPhotos([...savedPhotos, savedPhoto]);
+  }
+
+  const setSelectedOptionByItemId = async (itemId: number) => {
+    try {
+      const item = await getItemById(itemId);
+      if (!item) {
+        console.error("❌ Error: Item not found");
+        return;
+      }
+
+      setSelectedOption({
+        id: item.id,
+        name: item.name,
+        category_id: item.category_id,
+        category_icon: '',
+      });
+      setItemName(item.name);
+    } catch (error) {
+      console.error("❌ Error al obtener el ítem:", error);
+    }
+  }
+
+  const setSelectedCategoryById = async (categoryId: number) => {
+    try {
+      const category = await getCategoryById(categoryId);
+
+      if (!category) {
+        console.error("❌ Error: Category not found");
+        return;
+      }
+
+      setSelectedCategory(category);
+    } catch (error) {
+      console.error("❌ Error al obtener la categoría:", error);
+    }
   }
 
   const handleGetPhotoFromGallery = async () => {
@@ -358,7 +320,7 @@ const ManageItemReview = () => {
       return false;
     }
 
-    if (parentCategory == null || parentCategory.id === 0) {
+    if (selectedCategory == null || selectedCategory.id === 0) {
       showError(t("manage-item-review.error-message.empty-category"));
       return false;
     }
@@ -387,7 +349,7 @@ const ManageItemReview = () => {
             const minItem: ItemWithCategory = {
                 id: selectedOption.id,
                 name: item.name,
-                category_id: getSelectedCategory()?.id || 0,
+                category_id: selectedCategory ? selectedCategory.id : 0,
             };
 
             const success = await updateItemWithCategory(minItem);
@@ -498,7 +460,7 @@ const ManageItemReview = () => {
             id: 0,
             name: itemName,
             image: savedPhotos.length > 0 ? savedPhotos[0].filepath : '',
-            category_id: getSelectedCategory()?.id || 0,
+            category_id: selectedCategory ? selectedCategory.id : 0,
             is_origin: false,
         };
 
@@ -609,27 +571,14 @@ const ManageItemReview = () => {
     <IonPage>
       <IonContent scrollEvents={true} onIonScroll={handleParentScroll} ref={contentRef}>
         <IonGrid>
-          <IonRow onClick={() => parentCategory && parentCategory.id != 0 && modal.current?.present()}
-            id="category-banner"
-            className="safe-area-top relative w-full px-5 py-2 grid grid-rows-[1fr_auto] gap-2"
-            style={{ backgroundColor: parentCategory? CategoryColors[parentCategory.color]: '' }}
-          >
+
+          <IonRow className="relative">
+            <CategorySelectorHeader selectedCategory={selectedCategory} setSelectedCategory={setSelectedCategory} />
             <div className="flex absolute safe-area-top top-0 p-3" onClick={goBack}>
-              <IonBackButton defaultHref="/app/reviews" color="tertiary" />
+                <IonBackButton defaultHref="/app/reviews" color="tertiary" />
             </div>
-            <div className="flex items-center justify-center pb-3 pt-5 min-h-5">
-              {parentCategory?.icon && (<FontAwesomeIcon
-                icon={parentCategory?.icon as IconName}
-                className="text-5xl text-white mt-5"
-              />)}
-            </div>
-
-            <IonLabel className="truncate max-w-[95%]">
-              {parentCategory?.name}
-            </IonLabel>
-
-            <SubcategoriesBadgeSelector subcategories={childrenCategories} selectedSubcategory={selectedSubcategory} setSelectedSubcategory={setSelectedSubcategory} />
           </IonRow>
+
 
           <IonRow className="px-5 py-10">
             <IonGrid className="flex flex-col gap-12">
@@ -732,7 +681,6 @@ const ManageItemReview = () => {
         </IonGrid>
       </IonContent>
 
-      <CategorySelectorModal modal={modal} selectedCategory={parentCategory} setSelectedCategory={setParentCategory} categories={categories} />
       <PreviewPhotoModal
         photoUrl={previewPhoto?.filepath!}
         isOpen={isPreviewOpen}

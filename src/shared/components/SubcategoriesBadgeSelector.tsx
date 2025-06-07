@@ -4,20 +4,32 @@ import { IconName } from "@fortawesome/fontawesome-svg-core";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { IonLabel } from "@ionic/react";
 import { useEffect, useRef, useState } from "react";
+import { getChildrenCategories } from "../services/category-service";
 
 interface SubcategoriesBadgeSelectorProps {
-    subcategories: Category[];
+    parentCategory: Category | null;
     selectedSubcategory: Category | null;
     setSelectedSubcategory: (subcategory: Category | null) => void;
 }
 
-const SubcategoriesBadgeSelector = ({ subcategories, selectedSubcategory, setSelectedSubcategory }: SubcategoriesBadgeSelectorProps) => {
+const SubcategoriesBadgeSelector = ({ parentCategory, selectedSubcategory, setSelectedSubcategory }: SubcategoriesBadgeSelectorProps) => {
     const [selectedSubcategoryElement, setSelectedSubcategoryElement] = useState<HTMLDivElement | null>(null);
+    const [ subcategories, setSubcategories ] = useState<Category[]>([]);
 
     // Vairables para manejar el scroll de la lista de subcategorias
     const scrollRef = useRef<HTMLDivElement>(null);
     const [isAtEnd, setIsAtEnd] = useState(false);
     const offset = 15; // Offset para el scroll
+
+    useEffect(() => {
+        getChildrenCategories(parentCategory?.id || 0)
+            .then((categories) => {
+                setSubcategories(categories);
+            })
+            .catch((error) => {
+                console.error("Error fetching subcategories:", error);
+            });
+    }, [parentCategory]);
 
     const checkScrollPosition = () => {
         const el = scrollRef.current;
@@ -28,8 +40,6 @@ const SubcategoriesBadgeSelector = ({ subcategories, selectedSubcategory, setSel
     };
 
     useEffect(() => {
-        console.log('subcategory selected', selectedSubcategory);
-        
         requestAnimationFrame(() => {
             checkScrollPosition();
 
