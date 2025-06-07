@@ -22,7 +22,6 @@ export const ItemSelector = ({ selectedOption, setSelectedOption, itemName, setI
 
     // Funcion que se ejecuta cada vez que cambia el valor del input o la opción seleccionada
     useEffect(() => {
-        if (isInitialLoad) return; // Si es la carga inicial, no hacer nada
         getItemOptions(itemName)
             .then((items) => {
                 // Quitar la opción seleccionada de la lista de opciones
@@ -89,9 +88,9 @@ export const ItemSelector = ({ selectedOption, setSelectedOption, itemName, setI
                             key={option.id}
                             onClick={() => handleOptionClick(option)}
                         >
-                            {option.parent_category_icon && (<FontAwesomeIcon
+                            {option.category_icon && (<FontAwesomeIcon
                                 icon={
-                                    option.parent_category_icon as IconName
+                                    option.category_icon as IconName
                                 }
                                 className="mb-0.5"
                             />)}
