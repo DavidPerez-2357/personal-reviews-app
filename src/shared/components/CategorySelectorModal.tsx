@@ -30,7 +30,7 @@ const CategorySelectorModal = ({ modal, selectedCategory, setSelectedCategory }:
     , []);
 
     return (
-        <IonModal ref={modal} initialBreakpoint={0.5} breakpoints={[0, 0.25, 0.5, 0.75]}>
+        <IonModal ref={modal} initialBreakpoint={0.5} breakpoints={[0, 0.25, 0.5, 1]}>
             <IonHeader className="ion-no-border ion-padding-top">
                 <IonToolbar>
                     <IonTitle className="ion-padding text-2xl text-start font-bold">{t('common.select-category')}</IonTitle>
