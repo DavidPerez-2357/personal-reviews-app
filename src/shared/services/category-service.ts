@@ -222,6 +222,19 @@ export const getCategoryFromItem = async (itemId: number): Promise<Category | nu
     }
 }
 
+export const getFirstCategory = async (): Promise<Category | null> => {
+    const db = await openDatabase();
+    if (!db) return null;
+    try {
+        const query = `SELECT * FROM category LIMIT 1`;
+        const result = await db!.query(query);
+        return result.values?.[0] as Category || null;
+    } catch (error) {
+        console.error("❌ Error al obtener la primera categoría");
+        return null;
+    }
+}
+
 /**
  * Obtiene las categorías padre de la base de datos.
  * @returns Promise<Category[]>
