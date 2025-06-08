@@ -42,6 +42,7 @@ const ManageItemReview = () => {
   const history = useHistory();
   const { t } = useTranslation();
   const location = useLocation();
+  const saveButtonRef = useRef<HTMLIonButtonElement>(null);
 
   console.log("itemId", itemId);
   // Variable de no encontrar categorias
@@ -110,27 +111,27 @@ const ManageItemReview = () => {
 
   const setEditData = async (reviewId: number) => {
     try {
-        const review: Review | null = await getReviewById(reviewId);
-        if (!review) throw new Error(t('manage-item-review.error-message.review-not-found'));
-        const categoryRatingsFound: CategoryRatingMix[] = await getCategoryRatingMixByReviewId(reviewId);
-        const reviewImages: ReviewImage[] = await getReviewImagesbyId(reviewId);
+      const review: Review | null = await getReviewById(reviewId);
+      if (!review) throw new Error(t('manage-item-review.error-message.review-not-found'));
+      const categoryRatingsFound: CategoryRatingMix[] = await getCategoryRatingMixByReviewId(reviewId);
+      const reviewImages: ReviewImage[] = await getReviewImagesbyId(reviewId);
 
-        setIsInitialLoad(true);
+      setIsInitialLoad(true);
 
-        setRating(review.rating);
-        setComment(review.comment || "");
-        setSelectedOptionByItemId(review.item_id);
-        setCategoryRatings(convertToCategoryRatingMix(categoryRatingsFound));
+      setRating(review.rating);
+      setComment(review.comment || "");
+      setSelectedOptionByItemId(review.item_id);
+      setCategoryRatings(categoryRatingsFound);
 
-        const photosConverted: UserPhoto[] = reviewImages.map((image) => ({
-            filepath: image.image,
-            webviewPath: Capacitor.convertFileSrc(image.image),
-        }));
-        setSavedPhotos(photosConverted);
-        setReviewHasPhotos(photosConverted.length > 0);
+      const photosConverted: UserPhoto[] = reviewImages.map((image) => ({
+        filepath: image.image,
+        webviewPath: Capacitor.convertFileSrc(image.image),
+      }));
+      setSavedPhotos(photosConverted);
+      setReviewHasPhotos(photosConverted.length > 0);
     } catch (error) {
-        console.error(error);
-        throw error; // Permitir que el efecto maneje el error
+      console.error(error);
+      throw error; // Permitir que el efecto maneje el error
     }
   };
 
@@ -148,7 +149,7 @@ const ManageItemReview = () => {
     console.log("🔍 Cargando reseña con ID:", id);
     if (reviewDeleted) {
       console.log("🔍 Reseña eliminada, redirigiendo a la lista de reseñas...");
-        return;
+      return;
     }
 
     if (editMode) {
@@ -170,16 +171,16 @@ const ManageItemReview = () => {
     }
 
     getFirstCategory().then((category) => {
-        if (!category) {
-            console.error("❌ No se encontró ninguna categoría");
-            setSelectedCategory(notFoundAnyCategories);
-            return;
-        }
-
-        setSelectedCategoryById(category.id);
-    }).catch((error) => {
-        console.error("❌ Error al obtener la primera categoría:", error);
+      if (!category) {
+        console.error("❌ No se encontró ninguna categoría");
         setSelectedCategory(notFoundAnyCategories);
+        return;
+      }
+
+      setSelectedCategoryById(category.id);
+    }).catch((error) => {
+      console.error("❌ Error al obtener la primera categoría:", error);
+      setSelectedCategory(notFoundAnyCategories);
     });
     setIsInitialLoad(false);
 
@@ -196,8 +197,8 @@ const ManageItemReview = () => {
 
     // Si el ítem seleccionado ya tiene una categoría, usarla
     if (selectedOption.category_id && selectedOption.category_id !== 0) {
-        setSelectedCategoryById(selectedOption.category_id);
-        return;
+      setSelectedCategoryById(selectedOption.category_id);
+      return;
     }
 
     // Si no hay categoría seleccionada, buscar la categoría del ítem
@@ -213,10 +214,10 @@ const ManageItemReview = () => {
 
     // Obtener los ratings de la categoría seleccionada
     getCategoryRatingsByCategoryId(selectedCategory.id).then((ratings) => {
-        setCategoryRatings(convertToCategoryRatingMix(ratings));
+      setCategoryRatings(convertToCategoryRatingMix(ratings));
     }).catch((error) => {
-        console.error("❌ Error al obtener los ratings de la categoría seleccionada:", error);
-        setCategoryRatings([]);
+      console.error("❌ Error al obtener los ratings de la categoría seleccionada:", error);
+      setCategoryRatings([]);
     });
   }, [selectedCategory]);
 
@@ -288,9 +289,6 @@ const ManageItemReview = () => {
    * @param event Evento de scroll personalizado de Ionic.
    */
   const handleParentScroll = async (event: CustomEvent) => {
-    const target = event.detail as HTMLIonContentElement;
-    const button = document.getElementById("save-review");
-
     if (!contentRef.current) return;
 
     const scrollEl = await contentRef.current.getScrollElement();
@@ -298,14 +296,22 @@ const ManageItemReview = () => {
     const scrollHeight = scrollEl.scrollHeight;
     const clientHeight = scrollEl.clientHeight;
 
-    // Calcula el offset para determinar si el usuario está cerca del fondo
-    const offset = button && button.style.position === "fixed" ? 20 : (button?.offsetHeight || 0) * 4;
+    const btnEl = saveButtonRef.current;
+    if (!btnEl) return;
 
-    const isAtBottom = scrollTop + clientHeight >= scrollHeight - offset;
+    // Calcular el porcentaje de scroll (0 = arriba, 1 = abajo)
+    const scrollPercent = scrollTop / (scrollHeight - clientHeight);
 
-    if (button) {
-      button.classList.toggle("downToNormal-animation-1", !isAtBottom);
-      button.style.position = isAtBottom ? "" : "fixed";
+    // Si el usuario ha hecho scroll al menos al 50%, ocultar el botón
+    const shouldHide = scrollPercent >= 0.5;
+
+    btnEl.classList.remove("downToNormal-animation-1");
+
+    if (!shouldHide) {
+      btnEl.classList.add("downToNormal-animation-1");
+      btnEl.style.display = "block";
+    }else {
+      btnEl.style.display = "none";
     }
   };
 
@@ -341,24 +347,24 @@ const ManageItemReview = () => {
   /** Guarda un nuevo ítem o actualiza uno existente */
   const saveOrUpdateItem = async (item: Item): Promise<number | null> => {
     try {
-        if (!selectedOption) {
-            const itemId = await insertItem(item);
-            if (!itemId) throw new Error(t('manage-item-review.error-message.error-creating-item'));
-            return itemId;
-        } else {
-            const minItem: ItemWithCategory = {
-                id: selectedOption.id,
-                name: item.name,
-                category_id: selectedCategory ? selectedCategory.id : 0,
-            };
+      if (!selectedOption) {
+        const itemId = await insertItem(item);
+        if (!itemId) throw new Error(t('manage-item-review.error-message.error-creating-item'));
+        return itemId;
+      } else {
+        const minItem: ItemWithCategory = {
+          id: selectedOption.id,
+          name: item.name,
+          category_id: selectedCategory ? selectedCategory.id : 0,
+        };
 
-            const success = await updateItemWithCategory(minItem);
-            if (!success) throw new Error(t('manage-item-review.error-message.error-updating-item'));
-            return selectedOption.id;
-        }
+        const success = await updateItemWithCategory(minItem);
+        if (!success) throw new Error(t('manage-item-review.error-message.error-updating-item'));
+        return selectedOption.id;
+      }
     } catch (error) {
-        showError((error as Error).message);
-        return null;
+      showError((error as Error).message);
+      return null;
     }
   };
 
@@ -386,64 +392,66 @@ const ManageItemReview = () => {
     if (categoryRatings.length === 0) return; // No hay ratings para guardar
 
     try {
-        if (editMode) {
-            const success = await deleteRatingValuesFromReview(reviewId);
-            if (!success) {
-                console.error("❌ Error al eliminar los valores de puntuación existentes.");
-                throw new Error(t('manage-item-review.error-message.error-saving-review-ratings'));
-            }
+      if (editMode) {
+        const success = await deleteRatingValuesFromReview(reviewId);
+        if (!success) {
+          console.error("❌ Error al eliminar los valores de puntuación existentes.");
+          throw new Error(t('manage-item-review.error-message.error-saving-review-ratings'));
+        }
+      }
+
+      for (const rating of categoryRatings) {
+        if (rating.value < 0 || rating.value > 10) {
+          throw new Error(t('manage-item-review.error-message.invalid-rating-value'));
         }
 
-        for (const rating of categoryRatings) {
-            if (rating.value < 0 || rating.value > 10) {
-                throw new Error(t('manage-item-review.error-message.invalid-rating-value'));
-            }
+        console.log("🔍 Guardando rating:", rating.id);
 
-            const categoryRatingValue: CategoryRatingValue = {
-                id: 0,
-                review_id: reviewId,
-                category_rating_id: rating.id,
-                value: rating.value,
-            };
-            const success = await insertCategoryRatingValue(categoryRatingValue);
-            if (!success) throw new Error(t('manage-item-review.error-message.error-saving-review-ratings'));
-        }
+        const categoryRatingValue: CategoryRatingValue = {
+          id: 0,
+          review_id: reviewId,
+          category_rating_id: rating.id,
+          value: rating.value,
+        };
+        const success = await insertCategoryRatingValue(categoryRatingValue);
+        if (!success) throw new Error(t('manage-item-review.error-message.error-saving-review-ratings'));
+      }
 
-        return true;
+      return true;
     } catch (error) {
-        showError((error as Error).message);
-        return false;
+      showError((error as Error).message);
+      return false;
     }
   };
 
   /** Guarda las imágenes asociadas a la review */
   const saveReviewImages = async (reviewId: number) => {
     try {
-        if (editMode && reviewHasPhotos) {
-            console.log("🔍 Editando reseña, eliminando imágenes existentes...");
-            const success = await deleteReviewImages(reviewId);
-            if (!success) throw new Error(t('manage-item-review.error-message.error-saving-review-images'));
-        }
+      if (editMode && reviewHasPhotos) {
+        console.log("🔍 Editando reseña, eliminando imágenes existentes...");
+        const success = await deleteReviewImages(reviewId);
+        if (!success) throw new Error(t('manage-item-review.error-message.error-saving-review-images'));
+      }
 
-        if (savedPhotos.length === 0) return true; // No hay fotos para guardar
+      if (savedPhotos.length === 0) return true; // No hay fotos para guardar
 
-        for (const photo of savedPhotos) {
-            console.log("🔍 Revisando foto:", photo);
+      for (const photo of savedPhotos) {
+        console.log("🔍 Revisando foto:", photo);
 
-            const reviewImage: ReviewImage = {
-                review_id: reviewId,
-                image: photo.filepath!,
-            };
+        const reviewImage: ReviewImage = {
+          review_id: reviewId,
+          image: photo.filepath!,
+        };
 
-            const success = await insertReviewImage(reviewImage);
-            if (!success) throw new Error(t('manage-item-review.error-message.error-saving-review-images'));
-        }
+        const success = await insertReviewImage(reviewImage);
+        if (!success) throw new Error(t('manage-item-review.error-message.error-saving-review-images'));
+      }
 
-        return true;
+      return true;
     } catch (error) {
-        console.error("❌ Error al guardar las imágenes:", error);
-        showError((error as Error).message);
-        return false;
+      console.error("❌ Error al guardar las imágenes:", error);
+      showError((error as Error).message);
+      return false;
     }
   };
 
@@ -456,48 +464,48 @@ const ManageItemReview = () => {
     setSaveButtonText(t('manage-item-review.saving-review'));
 
     try {
-        const item: Item = {
-            id: 0,
-            name: itemName,
-            image: savedPhotos.length > 0 ? savedPhotos[0].filepath : '',
-            category_id: selectedCategory ? selectedCategory.id : 0,
-            is_origin: false,
-        };
+      const item: Item = {
+        id: 0,
+        name: itemName,
+        image: savedPhotos.length > 0 ? savedPhotos[0].filepath : '',
+        category_id: selectedCategory ? selectedCategory.id : 0,
+        is_origin: false,
+      };
 
-        const itemId = await saveOrUpdateItem(item);
+      const itemId = await saveOrUpdateItem(item);
 
-        if (!itemId) {
-            throw new Error(t('manage-item-review.error-message.error-saving-item'));
-        }
+      if (!itemId) {
+        throw new Error(t('manage-item-review.error-message.error-saving-item'));
+      }
 
-        const now = new Date().toISOString();
-        const review: Review = {
-            id: 0,
-            item_id: itemId,
-            rating,
-            comment,
-            created_at: now,
-            updated_at: now,
-        };
+      const now = new Date().toISOString();
+      const review: Review = {
+        id: 0,
+        item_id: itemId,
+        rating,
+        comment,
+        created_at: now,
+        updated_at: now,
+      };
 
-        const reviewId = await saveOrUpdateReview(review);
+      const reviewId = await saveOrUpdateReview(review);
 
-        if (!reviewId) {
-            throw new Error(t('manage-item-review.error-message.error-saving-review'));
-        }
+      if (!reviewId) {
+        throw new Error(t('manage-item-review.error-message.error-saving-review'));
+      }
 
-        await saveCategoryRatings(reviewId);
+      await saveCategoryRatings(reviewId);
 
-        await saveReviewImages(reviewId);
+      await saveReviewImages(reviewId);
 
-        // Si todo se guarda correctamente
-        setSaveButtonText(t('manage-item-review.saving-review-success'));
-        setTimeout(() => {
-            history.push('/app/reviews', { toast: t('manage-item-review.saving-review-success') });
-        }, 500);
+      // Si todo se guarda correctamente
+      setSaveButtonText(t('manage-item-review.saving-review-success'));
+      setTimeout(() => {
+        history.push('/app/reviews', { toast: t('manage-item-review.saving-review-success') });
+      }, 500);
     } catch (error) {
-        showError((error as Error).message);
-        resetButtonStates();
+      showError((error as Error).message);
+      resetButtonStates();
     }
   };
 
@@ -554,7 +562,7 @@ const ManageItemReview = () => {
 
     // Delete review images from filesystem
     try {
-       for (const photo of savedPhotos) {
+      for (const photo of savedPhotos) {
         await deletePhoto(photo); // Delete the photo from the filesystem
       }
     } catch (error) {
@@ -575,7 +583,7 @@ const ManageItemReview = () => {
           <IonRow className="relative">
             <CategorySelectorHeader selectedCategory={selectedCategory} setSelectedCategory={setSelectedCategory} />
             <div className="flex absolute safe-area-top top-0 p-3" onClick={goBack}>
-                <IonBackButton defaultHref="/app/reviews" color="tertiary" />
+              <IonBackButton defaultHref="/app/reviews" color="tertiary" />
             </div>
           </IonRow>
 
@@ -630,11 +638,11 @@ const ManageItemReview = () => {
                 <IonLabel className="section-title">{t("common.images")}</IonLabel>
 
                 <div className={`gap-x-3 gap-y-6 w-full grid grid-cols-[repeat(auto-fit,minmax(100px,max-content))] items-center`}>
-                  <div className="w-25 h-25 rounded-lg bg-[var(--ion-color-secondary)] flex items-center justify-center" onClick={async () => {handleTakePhoto();}}>
+                  <div className="w-25 h-25 rounded-lg bg-[var(--ion-color-secondary)] flex items-center justify-center" onClick={async () => { handleTakePhoto(); }}>
                     <Camera size={40} />
                   </div>
 
-                  <div className="w-25 h-25 rounded-lg bg-[var(--ion-color-secondary)] flex items-center justify-center" onClick={async () => {handleGetPhotoFromGallery();}}>
+                  <div className="w-25 h-25 rounded-lg bg-[var(--ion-color-secondary)] flex items-center justify-center" onClick={async () => { handleGetPhotoFromGallery(); }}>
                     <Images size={40} />
                   </div>
 
@@ -650,31 +658,41 @@ const ManageItemReview = () => {
                 </div>
               </IonRow>
 
-                <div className="flex flex-col gap-4">
-                  <IonButton
-                    className="z-[1000] bottom-0 right-0 mt-10 mb-5 ml-5 mr-5"
-                    id="save-review"
-                    color="tertiary"
-                    expand="full"
-                    disabled={isSaveButtonDisabled}
-                    onClick={handleSaveReview}
-                  >
-                    {saveButtonText}
-                  </IonButton>
+              <div className="flex flex-col gap-4">
+                <IonButton
+                  className="z-[1000] bottom-0 right-0 mt-10 mb-5 ml-5 mr-5 fixed"
+                  ref={saveButtonRef}
+                  id="save-review"
+                  color="tertiary"
+                  expand="full"
+                  disabled={isSaveButtonDisabled}
+                  onClick={handleSaveReview}
+                >
+                  {saveButtonText}
+                </IonButton>
 
-                  {editMode && (
-                    <IonButton
+                <IonButton
+                  id="save-review"
+                  color="tertiary"
+                  expand="full"
+                  disabled={isSaveButtonDisabled}
+                  onClick={handleSaveReview}
+                >
+                  {saveButtonText}
+                </IonButton>
+
+                {editMode && (
+                  <IonButton
                     id="delete-review"
                     color="danger"
                     expand="full"
-                    className="ml-5 mr-5"
                     onClick={() => setIsDeleteAlertOpen(true)}
                     disabled={isDeleteButtonDisabled}
-                    >
+                  >
                     {deleteButtonText}
-                    </IonButton>
-                  )}
-                </div>
+                  </IonButton>
+                )}
+              </div>
             </IonGrid>
 
           </IonRow>
@@ -695,7 +713,7 @@ const ManageItemReview = () => {
         isOpen={showErrorAlert}
         setIsOpen={setShowErrorAlert}
         buttons={[t("common.ok")]}
-        onDidDismiss={() => resetButtonStates() }
+        onDidDismiss={() => resetButtonStates()}
       />
 
       <IonAlert
