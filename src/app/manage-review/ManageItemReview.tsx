@@ -184,7 +184,7 @@ const ManageItemReview = () => {
     });
     setIsInitialLoad(false);
 
-  }, [window.location.pathname, id, editMode, reviewDeleted]);
+  }, [location.pathname, id, editMode, reviewDeleted]);
 
 
   useEffect(() => {
