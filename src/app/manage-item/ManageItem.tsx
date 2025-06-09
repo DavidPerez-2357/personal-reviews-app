@@ -1,7 +1,10 @@
 import { usePhotoGallery } from "@/hooks/usePhotoGallery";
 import SubcategoriesBadgeSelector from "@/shared/components/SubcategoriesBadgeSelector";
 import { Category } from "@/shared/dto/Category";
+import { Item } from "@/shared/dto/Item";
 import { CategoryColors } from "@/shared/enums/colors";
+import { getCategoryById, getChildrenCategories, getParentCategory } from "@/shared/services/category-service";
+import { getItemById } from "@/shared/services/item-service";
 import { IconName } from "@fortawesome/fontawesome-svg-core";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
@@ -10,9 +13,10 @@ import {
   IonContent,
   IonGrid,
   IonLabel,
+  IonPage,
   IonRow,
 } from "@ionic/react";
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useHistory, useLocation, useParams } from "react-router";
 
@@ -64,12 +68,100 @@ console.log("ManageItem component loaded");
     window.history.back();
   };
 
-  const setEditData = async (categoryId: number) => {
+    const setEditData = async (reviewId: number) => {
+      try {
+        // Datos de prueba estáticos
+        // const item: Item = {
+        //   id: reviewId,
+        //   name: "iPhone 13 Pro",
+        //   image: "https://example.com/items/iphone13pro.jpg",
+        //   category_id: 2,
+        //   is_origin: true,
+        // };
+        // const category: Category = {
+        //   id: 2,
+        //   name: "Móviles",
+        //   icon: "mobile",
+        //   color: "green",
+        //   type: 1,
+        //   parent_id: 1,
+        // };
+        // const parentCategory: Category = {
+        //   id: 1,
+        //   name: "Tecnología",
+        //   icon: "laptop",
+        //   color: "blue",
+        //   type: 1,
+        //   parent_id: null,
+        // };
+        // const children = [
+        //   {
+        //     id: 2,
+        //     name: "Móviles",
+        //     icon: "mobile",
+        //     color: "green",
+        //     type: 1,
+        //     parent_id: 1,
+        //   },
+        //   {
+        //     id: 3,
+        //     name: "Portátiles",
+        //     icon: "laptop",
+        //     color: "purple",
+        //     type: 1,
+        //     parent_id: 1,
+        //   },
+        // ];
 
-  }
+        // Comentado: llamadas reales a la base de datos
+        const item: Item | null = await getItemById(reviewId);
+        if (!item) throw new Error(t('manage-item-review.error-message.review-not-found'));
+        const category: Category | null = await getCategoryById(item.category_id);
+        if (!category) throw new Error(t('manage-item-review.error-message.category-not-found'));
+        const parentCategory: Category = category.parent_id ? await getParentCategory(category.parent_id) || notFoundAnyCategories : category;
+        if (category.parent_id) {
+          setParentCategory(parentCategory);
+          setSelectedSubcategory(category);
+        } else {
+          setParentCategory(category);
+          setSelectedSubcategory(null);
+        }
+        if (parentCategory) {
+          const children = await getChildrenCategories(parentCategory.id);
+          setChildrenCategories(children);
+        }
+
+        // Manejar categorías padre e hija
+        if (category.parent_id) {
+          setParentCategory(parentCategory);
+          setSelectedSubcategory(category);
+        } else {
+          setParentCategory(category);
+          setSelectedSubcategory(null);
+        }
+      } catch (error) {
+        console.error(error);
+        throw error;
+      }
+    };
+
+  // Cargar datos de edición si estamos en modo edición
+  useEffect(() => {
+    if (editMode && id) {
+      setEditData(parseInt(id)).catch((error) => {
+        console.error("Error al cargar los datos de edición:", error);
+        history.replace("/app/items");
+      });
+    } else {
+      // Si no estamos en modo edición, inicializar las categorías
+      setParentCategory(notFoundAnyCategories);
+      setChildrenCategories([]);
+      setSelectedSubcategory(null);
+    }
+  }, [editMode, id, history]);
 
   return (
-    <IonApp>
+    <IonPage>
       <IonContent>
         <IonGrid>
           <IonRow
@@ -90,7 +182,7 @@ console.log("ManageItem component loaded");
               className="flex absolute safe-area-top top-0 p-3"
               onClick={goBack}
             >
-              <IonBackButton defaultHref="/app/reviews" color="tertiary" />
+              <IonBackButton defaultHref="/app/items" color="tertiary" />
             </div>
             <div className="flex items-center justify-center pb-3 pt-5 min-h-5">
               {parentCategory?.icon && (
@@ -111,9 +203,16 @@ console.log("ManageItem component loaded");
               setSelectedSubcategory={setSelectedSubcategory}
             />
           </IonRow>
+          <IonRow className="flex flex-col items-center justify-center">
+            <span className="text-2xl font-bold">
+              {editMode && selectedSubcategory && selectedSubcategory.type === 2
+              ? t("manage-item-review.origin")
+              : t("manage-item-review.item")}
+            </span>
+          </IonRow>
         </IonGrid>
       </IonContent>
-    </IonApp>
+    </IonPage>
   );
 };
 
