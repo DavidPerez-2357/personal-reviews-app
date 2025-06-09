@@ -45,7 +45,6 @@ export interface ItemDisplay {
     number_of_reviews: number;
     is_origin: boolean;
     origin_id?: number;
-
     category_icon: string;
     category_color: string;
 }
