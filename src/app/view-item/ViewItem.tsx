@@ -1,4 +1,4 @@
-import React, { use, useEffect, useState } from "react";
+import React, { use, useEffect, useState, useRef } from "react";
 import {
   IonContent,
   IonPage,
@@ -13,7 +13,7 @@ import {
   IonToast,
 } from "@ionic/react";
 import { useParams, useHistory } from "react-router";
-import { ItemDisplay, ItemFull, OriginDisplay } from "@/shared/dto/Item";
+import { ItemDisplay, ItemFull } from "@/shared/dto/Item";
 import {
   Building2,
   ChevronDown,
@@ -46,6 +46,7 @@ import { useTranslation } from "react-i18next";
 import "./styles/viewItem.css";
 import { usePhotoGallery } from "@/hooks/usePhotoGallery";
 import ErrorAlert from "@/shared/components/ErrorAlert";
+import CustomActionMenu from "./components/CustomActionMenu";
 
 export const ViewItem = () => {
   const { id } = useParams<{ id: string }>();
@@ -78,15 +79,81 @@ export const ViewItem = () => {
   const [toastMessage, setToastMessage] = useState("");
 
   const { t } = useTranslation();
+  const selectRef = useRef<HTMLIonSelectElement>(null);
+
   const initializeData = async () => {
     try {
+      // Datos de prueba estáticos
+      // const mainItemDetailsFromDB: ItemFull = {
+      //   id: 1,
+      //   name: "iPhone 13 Pro",
+      //   is_origin: true,
+      //   image: "https://example.com/items/iphone13pro.jpg",
+      //   created_at: "2024-08-10T14:23:00Z",
+      //   updated_at: "2024-08-10T14:23:00Z",
+      //   category_id: 3,
+      //   category_name: "Móviles",
+      //   category_icon: "mobile",
+      //   category_color: "green",
+      // };
+      // const itemReviews: Review[] = [
+      //   {
+      //     id: 201,
+      //     rating: 4,
+      //     comment: "Muy buen móvil, pero caro.",
+      //     item_id: 1,
+      //     created_at: "2024-08-10T14:23:00Z",
+      //     updated_at: "2024-08-10T14:23:00Z",
+      //   },
+      //   {
+      //     id: 202,
+      //     rating: 5,
+      //     comment: "Excelente cámara y batería.",
+      //     item_id: 1,
+      //     created_at: "2024-08-12T10:00:00Z",
+      //     updated_at: "2024-08-12T10:00:00Z",
+      //   },
+      // ];
+      // const itemsOfOrigin: ItemDisplay[] = [
+      //   {
+      //     id: 1,
+      //     name: "iPhone 13 Pro",
+      //     last_rating: 4,
+      //     number_of_reviews: 1,
+      //     is_origin: true,
+      //     category_icon: "mobile",
+      //     category_color: "green",
+      //   },
+      //   {
+      //     id: 2,
+      //     name: "Samsung Galaxy S22",
+      //     last_rating: 2,
+      //     number_of_reviews: 1,
+      //     is_origin: false,
+      //     origin_id: 1,
+      //     category_icon: "mobile",
+      //     category_color: "green",
+      //   },
+      //   {
+      //     id: 3,
+      //     name: "MacBook Air M2",
+      //     last_rating: 5,
+      //     number_of_reviews: 1,
+      //     is_origin: true,
+      //     category_icon: "laptop",
+      //     category_color: "blue",
+      //   },
+      // ];
+
+      // Comentado: llamadas reales a la base de datos
       const mainItemDetailsFromDB = await getItemFull(Number(id));
       const itemReviews = await getReviewsByItemId(Number(id));
       const itemsOfOrigin = await getItemsByOrigin(Number(id));
-
       if (mainItemDetailsFromDB) {
         setItem(mainItemDetailsFromDB);
       }
+      setReviews(itemReviews);
+      setItemsOfOrigin(itemsOfOrigin);
       setReviews(
         itemReviews.sort(
           (a, b) =>
@@ -94,7 +161,6 @@ export const ViewItem = () => {
         )
       );
       setItemsOfOrigin(itemsOfOrigin);
-      // Si no hay elementos de origen, mostrar la línea temporal abierta
       if (itemsOfOrigin.length === 0) {
         setShowTimeline(true);
       }
@@ -112,9 +178,9 @@ export const ViewItem = () => {
     if (toastMessage) {
       setTimeout(() => {
         setIsToastOpen(false);
-        setToastMessage(""); // Reiniciar el mensaje del toast
-      }, 3000); // Duración del toast
-      initializeData(); // Reiniciar el item para que se actualice la vista
+        setToastMessage("");
+      }, 3000);
+      initializeData();
     }
     console.log("isToastOpen changed:", isToastOpen);
   }, [isToastOpen]);
@@ -272,13 +338,12 @@ export const ViewItem = () => {
                   <span className="text-2xl font-bold break-all text-[var(--ion-color-primary-contrast)] max-w-full">
                     {item.name}
                   </span>
-                  {itemsOfOrigin.length > 0 ||
-                    (item.is_origin && (
-                      <span className="text-sm text-[var(--ion-color-primary-contrast)] flex items-center gap-1">
-                        <Building2 size={20} className="inline-block mr-1" />
-                        {t("common.origin")}
-                      </span>
-                    ))}
+                  {item.is_origin ? (
+                    <span className="text-sm text-[var(--ion-color-primary-contrast)] flex items-center gap-1">
+                      <Building2 size={20} className="inline-block mr-1" />
+                      {t("common.origin")}
+                    </span>
+                  ) : ''}
                 </div>
               </IonCol>
             </div>
@@ -350,7 +415,7 @@ export const ViewItem = () => {
                       />
                     ))}
                     {/* Extending the timeline line to the bottom */}
-                    <div className="absolute left-0 top-0 w-0.5 h-full bg-[var(--ion-color-tertiary)]"></div>
+                    <div className="absolute left-0 top-0 w-0.5 h-full bg-[var(--ion-color-tertiary]"></div>
                   </div>
                 </div>
               )}
