@@ -12,6 +12,7 @@ import ViewAllReviews from '@/app/view-all-reviews/ViewAllReviews';
 import { MoreOptions } from '@/app/more-options/moreOptions';
 import ViewItem from '@/app/view-item/ViewItem';
 import ManageItem from '@/app/manage-item/ManageItem';
+import ViewAllItems from './view-all-items/ViewAllItems';
 
 const FooterTabBar = () => {
   const { t } = useTranslation();
