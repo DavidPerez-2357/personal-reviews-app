@@ -21,9 +21,15 @@ const FooterTabBar = () => {
   const [selectedTab, setSelectedTab] = useState(location.pathname.split('/')[2] || 'reviews');
 
   useEffect(() => {
-    const path = location.pathname.split('/')[2];
-    setSelectedTab(path || 'reviews');
+    if (location.pathname.startsWith('/app/reviews')) {
+      setSelectedTab('reviews');
+    } else if (location.pathname.startsWith('/app/items')) {
+      setSelectedTab('items');
+    } else if (location.pathname.startsWith('/app/more')) {
+      setSelectedTab('more');
+    }
   }, [location]);
+
 
   return (
     <IonReactRouter>
@@ -32,6 +38,7 @@ const FooterTabBar = () => {
           <Route path="/app/reviews" component={ViewAllReviews} exact={true} />
           <Route path="/app/reviews/create" component={ManageItemReview} exact={true} />
           <Route path="/app/reviews/:id/edit" component={ManageItemReview} exact={true} />
+          <Route path="/app/reviews/create/item/:itemId" component={ManageItemReview} exact={true} />
           <Route path="/app/items/:id/viewItem" component={ViewItem} exact={true} />
           <Route path="/app/items/create" component={ManageItem} exact={true} />
           <Route path="/app/items/:id/edit" component={ManageItem} exact={true} />
