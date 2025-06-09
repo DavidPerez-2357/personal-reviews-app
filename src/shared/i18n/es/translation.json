@@ -19,6 +19,7 @@
     "less": "Menos",
     "all": "Todos",
     "save-changes": "Guardar cambios",
+    "name": "Nombre",
     "delete": "Eliminar",
     "replace": "Reemplazar",
     "filter": "Filtrar",
@@ -44,6 +45,10 @@
     "comment": "Comentario",
     "categories": "Categorías",
     "category": "Categoría",
+    "subcategories": "Subcategorías",
+    "subcategory": "Subcategoría",
+    "rating": "Calificación",
+    "ratings": "Calificaciones",
 
     "image": "Imagen",
     "images": "Imágenes",
@@ -183,5 +188,41 @@
     "timeline": "Línea de tiempo",
     "add-review": "Agregar reseña",
     "to-origin": "Convertir a origen"
+  },
+
+  "manage-category": {
+    "select-icon": "Seleccionar icono",
+    "searh-icon-placeholder": "Buscar icono...",
+    "all-icons-are-from-fontawesome": "Todos los iconos son de FontAwesome",
+    "all-icons-are-in-english": "Todos los nombres de iconos están en inglés",
+    "scroll-to-selected-icon": "Scroll al icono seleccionado",
+    "create-category-info": "Puedes crear subcategorías después de crear esta categoría",
+    "this-subcategory-belongs-to": "Esta subcategoría pertenece a",
+    "category-input-placeholder": "Escribe el nombre de la categoría...",
+    "create-category": "Crear categoría",
+    "saving-category": "Guardando categoría",
+    "saving-category-success": "Categoría guardada con éxito",
+    "saving-category-error": "Error al guardar la categoría",
+    "delete-category": "Eliminar categoría",
+    "delete-category-confirm": "¿Estás seguro de que deseas eliminar esta categoría? SE ELIMINARÁN TODAS LAS SUBCATEGORÍAS Y ELEMENTOS Y RESEÑAS ASOCIADAS",
+    "delete-category-success": "Categoría eliminada con éxito",
+    "deleting-category": "Eliminando categoría",
+    "create-subcategory": "Crear subcategoría",
+    "add-rating": "Agregar calificación",
+    "no-ratings": "No se han creado calificaciones para esta categoría",
+    "delete-rating-confirm": "¿Estás seguro de que deseas eliminar la calificación {{ratingName}}?",
+    "create-rating": "Crear calificación",
+    "rating-name-placeholder": "Escribe el nombre de la calificación...",
+
+    "error-message": {
+      "error-creating-category": "Error al crear la categoría",
+      "error-saving-category": "Error al guardar la categoría",
+      "error-deleting-category": "Error al eliminar la categoría",
+      "category-not-found": "Categoría no encontrada",
+      "subcategory-not-found": "Subcategoría no encontrada",
+      "error-creating-subcategory": "Error al crear la subcategoría",
+      "error-saving-subcategory": "Error al guardar la subcategoría",
+      "category-name-empty": "El nombre de la categoría no puede estar vacío"
+    }
   }
 }
