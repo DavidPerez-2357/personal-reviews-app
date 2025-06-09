@@ -177,6 +177,10 @@
   "view-item": {
     "timeline": "Timeline",
     "add-review": "Add review",
-    "to-origin": "Convert to origin"
+    "delete-item-success": "Item deleted successfully",
+    "to-origin": "Convert to origin",
+    "to-item": "Convert to item",
+    "to-origin-success": "Origin created successfully",
+    "to-item-success": "Item created successfully"
   }
 }

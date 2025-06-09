@@ -182,6 +182,10 @@
   "view-item": {
     "timeline": "Línea de tiempo",
     "add-review": "Agregar reseña",
-    "to-origin": "Convertir a origen"
+    "delete-item-success": "Elemento eliminado con éxito",
+    "to-origin": "Convertir a origen",
+    "to-item": "Convertir a elemento",
+    "to-item-success": "Elemento convertido con éxito",
+    "to-origin-success": "Origen creado con éxito"
   }
 }
