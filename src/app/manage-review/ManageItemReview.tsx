@@ -11,16 +11,12 @@ import {
   IonTextarea,
 } from "@ionic/react";
 import StarRating from "@components/StarRating";
-import { use, useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import "./styles/ManageItemReview.css";
 import { usePhotoGallery } from "@hooks/usePhotoGallery";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { getItemById, insertItem, updateItem, updateItemWithCategory } from "@services/item-service";
-import { IconName } from "@fortawesome/fontawesome-svg-core";
-import { deleteRatingValuesFromReview, getCategoryById, getCategoryRatingMixByReviewId, getCategoryRatingsByCategoryId, getChildrenCategories, getFirstCategory, getParentCategories, getParentCategory, insertCategoryRatingValue } from "@services/category-service";
+import { deleteRatingValuesFromReview, getCategoryById, getCategoryRatingMixByReviewId, getCategoryRatingsByCategoryId, getFirstCategory, insertCategoryRatingValue } from "@services/category-service";
 import PreviewPhotoModal from "@components/PreviewPhotoModal";
-import SubcategoriesBadgeSelector from "../../shared/components/SubcategoriesBadgeSelector";
-import { CategoryColors } from "@shared/enums/colors";
 import { useTranslation } from "react-i18next";
 import { deleteReview, deleteReviewImages, getReviewById, getReviewImagesbyId, insertReview, insertReviewImage, updateReview } from "@shared/services/review-service";
 import { useHistory, useLocation, useParams } from "react-router-dom";
@@ -31,7 +27,6 @@ import { UserPhoto } from "@/shared/dto/Photo";
 import { Category, CategoryRating, CategoryRatingMix, CategoryRatingValue } from "@dto/Category";
 import { Item, ItemOption, ItemWithCategory } from "@dto/Item";
 import { Review, ReviewImage } from "@dto/Review";
-import { init } from "i18next";
 import { Capacitor } from '@capacitor/core';
 import CategorySelectorHeader from "@/shared/components/CategorySelectorHeader";
 
@@ -44,7 +39,6 @@ const ManageItemReview = () => {
   const location = useLocation();
   const saveButtonRef = useRef<HTMLIonButtonElement>(null);
 
-  console.log("itemId", itemId);
   // Variable de no encontrar categorias
   const notFoundAnyCategories: Category = {
     id: 0,
