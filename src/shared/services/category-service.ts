@@ -181,9 +181,9 @@ export const deleteAllCategories = async (): Promise<boolean> => {
 
 /**
  * Actualiza una categoría en la base de datos.
- * 
- * @param category 
- * @returns 
+ *
+ * @param category
+ * @returns
  */
 export const updateCategory = async (category: Category): Promise<boolean> => {
     const db = await openDatabase();
@@ -203,9 +203,9 @@ export const updateCategory = async (category: Category): Promise<boolean> => {
 
 /**
  * Obtiene la categoría de un item a partir de su ID.
- * 
- * @param itemId 
- * @returns 
+ *
+ * @param itemId
+ * @returns
  */
 export const getCategoryFromItem = async (itemId: number): Promise<Category | null> => {
     const db = await openDatabase();
@@ -255,9 +255,9 @@ export const getParentCategories = async (): Promise<Category[]> => {
 
 /**
  * Obtiene la categoría padre de una categoría a partir de su ID, si esa categoria es padre, la devuelve. En cambio, si no lo es, devuelve la categoría padre.
- * 
- * @param categoryId 
- * @returns 
+ *
+ * @param categoryId
+ * @returns
  */
 export const getParentCategory = async (categoryId: number): Promise<Category | null> => {
     const db = await openDatabase();
@@ -326,9 +326,9 @@ export const getCategoryById = async (categoryId: number): Promise<Category | nu
 
 /**
  * Elimina los valores de puntuación de categoría de una reseña a partir de su ID.
- * 
- * @param reviewId 
- * @returns 
+ *
+ * @param reviewId
+ * @returns
  */
 export const deleteRatingValuesFromReview = async (reviewId: number): Promise<boolean> => {
     const db = await openDatabase();
@@ -348,9 +348,9 @@ export const deleteRatingValuesFromReview = async (reviewId: number): Promise<bo
 
 /**
  * Obtiene los valores de puntuación de categoría de una reseña a partir de su ID.
- * 
- * @param reviewId 
- * @returns 
+ *
+ * @param reviewId
+ * @returns
  */
 export const getCategoryRatingMixByReviewId = async (reviewId: number): Promise<CategoryRatingMix[]> => {
     const db = await openDatabase();
