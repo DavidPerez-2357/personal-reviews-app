@@ -46,7 +46,6 @@ import { useTranslation } from "react-i18next";
 import "./styles/viewItem.css";
 import { usePhotoGallery } from "@/hooks/usePhotoGallery";
 import ErrorAlert from "@/shared/components/ErrorAlert";
-import CustomActionMenu from "./components/CustomActionMenu";
 
 export const ViewItem = () => {
   const { id } = useParams<{ id: string }>();
