@@ -207,9 +207,13 @@
     "create-subcategory": "Create subcategory",
     "add-rating": "Add rating",
     "no-ratings": "No ratings have been created for this category",
-    "delete-rating-confirm": "Are you sure you want to delete the rating '{{ratingName}}'?",
+    "delete-rating-confirm": "Are you sure you want to delete the existing rating '{{ratingName}}'? ",
     "create-rating": "Create rating",
     "rating-name-placeholder": "Write the rating name...",
+    "rating-already-exists": "That rating name already exists",
+    "rating-name-empty": "Rating name cannot be empty",
+    "no-subcategories": "No subcategories found",
+    "unknown-parent-category": "Unknown parent category",
 
     "error-message": {
       "error-creating-category": "Error creating category",
@@ -220,7 +224,10 @@
       "error-deleting-subcategory": "Error deleting subcategory",
       "subcategory-not-found": "Subcategory not found",
       "category-not-found": "Category not found",
-      "category-name-empty": "Category name cannot be empty"
+      "category-name-empty": "Category name cannot be empty",
+      "error-saving-category-ratings": "Error saving category ratings",
+      "error-fetching-subcategories": "Error fetching subcategories",
+      "error-fetching-parent-category": "Error fetching parent category"
     }
   }
 }

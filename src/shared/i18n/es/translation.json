@@ -210,9 +210,13 @@
     "create-subcategory": "Crear subcategoría",
     "add-rating": "Agregar calificación",
     "no-ratings": "No se han creado calificaciones para esta categoría",
-    "delete-rating-confirm": "¿Estás seguro de que deseas eliminar la calificación {{ratingName}}?",
+    "delete-rating-confirm": "¿Estás seguro de que deseas eliminar la calificación existente {{ratingName}}?",
     "create-rating": "Crear calificación",
     "rating-name-placeholder": "Escribe el nombre de la calificación...",
+    "rating-already-exists": "Ese nombre de calificación ya existe",
+    "rating-name-empty": "El nombre de la calificación no puede estar vacío",
+    "no-subcategories": "No se han encontrado subcategorías",
+    "unknown-parent-category": "Categoría principal desconocida",
 
     "error-message": {
       "error-creating-category": "Error al crear la categoría",
@@ -222,7 +226,10 @@
       "subcategory-not-found": "Subcategoría no encontrada",
       "error-creating-subcategory": "Error al crear la subcategoría",
       "error-saving-subcategory": "Error al guardar la subcategoría",
-      "category-name-empty": "El nombre de la categoría no puede estar vacío"
+      "category-name-empty": "El nombre de la categoría no puede estar vacío",
+      "error-saving-category-ratings": "Error al guardar las calificaciones de la categoría",
+      "error-fetching-subcategories": "Error al obtener las subcategorías",
+      "error-fetching-parent-category": "Error al obtener la categoría principal"
     }
   }
 }
