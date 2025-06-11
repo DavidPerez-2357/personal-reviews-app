@@ -39,6 +39,7 @@ export interface ItemFull {
 export interface ItemDisplay {
     id: number;
     name: string;
+    image: string | null;
     last_rating: number;
     number_of_reviews: number;
     is_origin: boolean;
