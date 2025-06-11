@@ -73,7 +73,7 @@ const SelectIconModal = ({ isOpen, setIsOpen, selectedIcon, setSelectedIcon }: S
                         onIonInput={(e) => {
                             setIconSearch(e.detail.value!);
                         }}
-                        placeholder={t("manage-category.searh-icon-placeholder")}
+                        placeholder={t("manage-category.search-icon-placeholder")}
                         className="w-full"
                         fill="solid"
                     />

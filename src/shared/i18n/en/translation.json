@@ -189,7 +189,7 @@
 
   "manage-category": {
     "select-icon": "Select icon",
-    "searh-icon-placeholder": "Search icon...",
+    "search-icon-placeholder": "Search icon...",
     "all-icons-are-from-fontawesome": "All icons are from FontAwesome",
     "all-icons-are-in-english": "All icons names are in English",
     "scroll-to-selected-icon": "Scroll to selected icon",

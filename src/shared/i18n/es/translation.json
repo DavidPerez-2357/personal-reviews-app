@@ -192,7 +192,7 @@
 
   "manage-category": {
     "select-icon": "Seleccionar icono",
-    "searh-icon-placeholder": "Buscar icono...",
+    "search-icon-placeholder": "Buscar icono...",
     "all-icons-are-from-fontawesome": "Todos los iconos son de FontAwesome",
     "all-icons-are-in-english": "Todos los nombres de iconos están en inglés",
     "scroll-to-selected-icon": "Scroll al icono seleccionado",
