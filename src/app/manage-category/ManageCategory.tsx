@@ -8,8 +8,8 @@ import { useEffect, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useHistory, useLocation, useParams } from "react-router";
 import SelectIconModal from "./components/SelectIconModal";
-import { Category } from "@/shared/dto/Category";
-import { getCategoryById, insertCategory, updateCategory } from "@/shared/services/category-service";
+import { Category, CategoryRating } from "@/shared/dto/Category";
+import { deleteCategoryById, deleteCategoryRating, getCategoryById, getCategoryRatingsByCategoryId, getChildrenCategories, insertCategory, insertCategoryRating, updateCategory } from "@/shared/services/category-service";
 import ErrorAlert from "@/shared/components/ErrorAlert";
 import { trash } from 'ionicons/icons';
 import CreateRatingModal from "./components/CreateRatingModal";
@@ -30,13 +30,11 @@ const ManageCategory = () => {
   const selectedColorElement = useRef<HTMLDivElement | null>(null);
   const saveButtonRef = useRef<HTMLIonButtonElement | null>(null);
   const contentRef = useRef<HTMLIonContentElement | null>(null);
-  const [ratings, setRatings] = useState<string[]>([
-    "5 stars",
-    "4 stars",
-    "3 stars",
-    "2 stars",
-    "1 star"
-  ]);
+  const [ratings, setRatings] = useState<string[]>([]);
+  const [existingRatings, setExistingRatings] = useState<CategoryRating[]>([]);
+  const [subcategories, setSubcategories] = useState<Category[]>([]);
+  const [parentCategoryName, setParentCategoryName] = useState('');
+  const [parentCategoryId, setParentCategoryId] = useState<number | null>(null);
 
   // State for buttons
   const [isSaveButtonDisabled, setIsSaveButtonDisabled] = useState(false);
@@ -67,16 +65,8 @@ const ManageCategory = () => {
   }, [id]);
 
   useEffect(() => {
-    if (location.pathname.includes('/edit')) {
-      setEditMode(true);
-    } else {
-      setEditMode(false);
-    }
-
-    // Check if the current path indicates a subcategory
-    if (location.pathname.includes('/subcategories')) {
-      setIsSubcategory(true);
-    }
+    setEditMode(location.pathname.includes('/edit'));
+    setIsSubcategory(location.pathname.includes('/subcategories'));
   }, [location.pathname]);
 
   useEffect(() => {
@@ -85,11 +75,15 @@ const ManageCategory = () => {
     setIcon("burger");
     setCategoryName('');
     setSelectedColor(Object.keys(CategoryColors)[0]);
+    setRatings([]);
+    setExistingRatings([]);
+    setSubcategories([]);
+    setParentCategoryId(null);
 
-    if (editMode && id) {
+    if ((editMode || isSubcategory) && id) {
       setEditData(parseInt(id));
     }
-  }, [editMode, id]);
+  }, [editMode, id, isSubcategory]);
 
   const scrollToSelectedColor = () => {
     if (selectedColorElement.current) {
@@ -107,16 +101,51 @@ const ManageCategory = () => {
 
   const setEditData = async (categoryId: number) => {
     const category = await getCategoryById(categoryId);
+    const existingRatings = await getCategoryRatingsByCategoryId(categoryId);
 
-    if (category) {
-      setCategoryName(category.name);
-      setIcon(category.icon as IconName);
-      setSelectedColor(category.color);
-      setIsSubcategory(category.parent_id !== null);
-    } else {
-      console.error("Category not found");
+    if (!category) {
+      showError(t('manage-category.error-message.category-not-found'));
+      return;
     }
+
+    if (category.parent_id) {
+      setIsSubcategory(true);
+      await getCategoryById(category.parent_id).then(parentCategory => {
+        if (parentCategory) {
+          setParentCategoryName(parentCategory.name);
+        } else {
+          setParentCategoryName(t('manage-category.unknown-parent-category'));
+        }
+      }).catch((error) => {
+        showError(t('manage-category.error-message.error-fetching-parent-category'));
+      });
+    }
+
+    if (!isSubcategory || category.parent_id) {
+      setCategoryName(category.name);
+      setExistingRatings(existingRatings);
+      setParentCategoryId(category.parent_id || null);
+    }else {
+      setParentCategoryId(category.id);
+      setParentCategoryName(category.name);
+      setCategoryName('');
+      setExistingRatings([]);
+    }
+
+    setIcon(category.icon as IconName);
+    setSelectedColor(category.color);
+    setRatings(existingRatings.map(r => r.name));
   }
+
+  useEffect(() => {
+    // Get subcategories if the current category is not a subcategory
+    if (editMode && !isSubcategory && id) {
+      getChildrenCategories(parseInt(id)).then(setSubcategories).catch((error) => {
+        console.error("Error fetching subcategories:", error);
+        showError(t('manage-category.error-message.error-fetching-subcategories'));
+      });
+    }
+  }, [editMode, isSubcategory, id, location.pathname]);
 
 
   const resetButtonStates = () => {
@@ -126,29 +155,83 @@ const ManageCategory = () => {
     setDeleteButtonText(t('manage-category.delete-category'));
   }
 
-  const createOrUpdateCategory = (category: Category) => {
-    if (editMode) {
-      // Update existing category
-      updateCategory(category).then(() => {
-        console.log("Category updated:", category);
-        resetButtonStates();
-      }).catch((error) => {
-        console.error("Error updating category:", error);
-        setShowErrorAlert(true);
-      });
-    } else {
-      // Create new category
-      insertCategory(category).then(() => {
-        console.log("Category created:", category);
-        resetButtonStates();
-      }).catch((error) => {
-        console.error("Error creating category:", error);
-        setShowErrorAlert(true);
-      });
+  const addCategoryRating = (ratingName: string) => {
+    if (!ratingName.trim()) {
+      showError(t('manage-category.rating-name-empty'));
+      return;
+    }
+
+    if (ratings.includes(ratingName)) {
+      showError(t('manage-category.rating-already-exists'));
+      return;
+    }
+    setRatings([...ratings, ratingName]);
+    setIsCreateRatingModalOpen(false);
+    console.log("Rating added:", ratingName);
+  }
+
+  const createOrUpdateCategory = async (category: Category): Promise<number> => {
+    try {
+      if (editMode) {
+        const success = await updateCategory(category);
+        if (!success) {
+          throw new Error();
+        }
+        return category.id;
+      }
+
+      console.log("Category created:", category.id, category.name, category.icon, category.color, category.type, category.parent_id);
+      return await insertCategory(category);
+    } catch (error) {
+      console.error(editMode ? "Error updating category:" : "Error creating category:", error);
+      return 0;
     }
   }
 
-  const handleSavecategory = () => {
+  const updateCategoryRatings = (categoryId: number, ratings: string[]) => {
+    // Delete ratings that are not in the new list but exist in the category
+    const existingRatingsSet = new Set(existingRatings.map(r => r.name));
+    const ratingsToDelete = existingRatings.filter(r => !ratings.includes(r.name));
+
+    try {
+      if (ratingsToDelete.length > 0) {
+        ratingsToDelete.forEach(async (rating) => {
+          const success = await deleteCategoryRating(rating);
+          if (!success) {
+            throw new Error();
+          }
+          console.log("Rating deleted:", rating.name);
+        });
+      }
+
+      // Insert new ratings that are not already in the category
+      const newRatings = ratings.filter(r => !existingRatingsSet.has(r));
+
+      if (newRatings.length > 0) {
+        newRatings.forEach(async (rating) => {
+          const newRating: CategoryRating = {
+            id: 0,
+            category_id: categoryId,
+            name: rating
+          };
+
+          const success = await insertCategoryRating(newRating);
+          if (!success) {
+            throw new Error();
+          }
+          console.log("Rating added:", rating);
+        });
+      }
+
+      return true;
+
+    } catch (error) {
+      console.error("Error deleting ratings:", error);
+      return false;
+    }
+  }
+
+  const handleSavecategory = async () => {
     console.log("Saving category:");
     setSaveButtonText(t('manage-category.saving-category'));
     setIsSaveButtonDisabled(true);
@@ -160,23 +243,67 @@ const ManageCategory = () => {
       icon: icon,
       color: selectedColor,
       type: 0,
-      parent_id: isSubcategory ? parseInt(id) : null // If it's a subcategory, set parent_id to the current category id
+      parent_id: parentCategoryId || null,
     }
 
     if (!categoryName.trim()) {
-      showError(t('manage-category.category-name-empty'));
+      showError(t('manage-category.error-message.category-name-empty'));
       return;
     }
 
-    createOrUpdateCategory(category);
-    setSaveButtonText(t('manage-category.category-saved'));
+    const categoryId = await createOrUpdateCategory(category);
+
+    if (!categoryId) {
+      showError(editMode ? t('manage-category.error-message.error-saving-category') : t('manage-category.error-message.error-creating-category'));
+      return;
+    }
+
+    if (ratings.length > 0 || existingRatings.length > 0) {
+      if (!updateCategoryRatings(categoryId, ratings)) {
+        showError(t('manage-category.error-message.error-saving-category-ratings'));
+        return;
+      }
+    }
+
+    setSaveButtonText(t('manage-category.saving-category-success'));
     setTimeout(() => {
-      history.push('/app/reviews', { toast: t('manage-item-review.saving-review-success') });
+      if (isSubcategory) {
+        history.goBack();
+      }else {
+        history.push('/app/more/categories', { toast: t('manage-category.saving-category-success') });
+      }
     }, 500);
   };
 
   const handleDeleteCategory = async () => {
-    console.log("Deleting category:", id);
+    setIsDeleteButtonDisabled(true);
+    setDeleteButtonText(t('manage-category.deleting-category'));
+
+    try {
+      if (id) {
+        const success = await deleteCategoryById(parseInt(id));
+        if (!success) {
+          throw new Error();
+        }
+        console.log("Category deleted:", id);
+      }
+
+      setDeleteButtonText(t('manage-category.deleting-category-success'));
+      if (isSubcategory && parentCategoryId) {
+        setTimeout(() => {
+          history.goBack();
+        }, 500);
+      } else {
+        setTimeout(() => {
+          history.push('/app/more/categories', { toast: t('manage-category.deleting-category-success') });
+        }, 500);
+      }
+    } catch (error) {
+      console.error("Error deleting category:", error);
+      showError(t('manage-category.error-message.error-deleting-category'));
+    } finally {
+      resetButtonStates();
+    }
   }
 
   const showError = (message: string) => {
@@ -187,16 +314,21 @@ const ManageCategory = () => {
   }
 
   const handleDeleteRating = async (index: number) => {
-    const { value } = await Dialog.confirm({
-      title: t('common.confirm'),
-      message: t('manage-category.delete-rating-confirm', { ratingName: ratings[index] }),
-    });
+    const ratingName = ratings[index];
+    const isExisting = existingRatings.some(r => r.name === ratingName);
 
-    if (value) {
-      const newRatings = [...ratings];
-      newRatings.splice(index, 1);
-      setRatings(newRatings);
+    if (isExisting) {
+      const { value } = await Dialog.confirm({
+      title: t('common.confirm'),
+      message: t('manage-category.delete-rating-confirm', { ratingName }),
+      });
+
+      if (!value) return;
     }
+
+    const newRatings = [...ratings];
+    newRatings.splice(index, 1);
+    setRatings(newRatings);
   }
 
   const handleParentScroll = async (event: CustomEvent) => {
@@ -214,7 +346,7 @@ const ManageCategory = () => {
     const scrollPercent = scrollTop / (scrollHeight - clientHeight);
 
     // Si el usuario ha hecho scroll al menos al 50%, ocultar el botón
-    const shouldHide = scrollPercent >= 0.5;
+    const shouldHide = scrollPercent >= 0.6;
 
     btnEl.classList.remove("downToNormal-animation-1");
 
@@ -318,15 +450,19 @@ const ManageCategory = () => {
               <IonButton color="tertiary" fill="solid" className="w-full" routerLink={`/app/more/categories/${id}/subcategories/create`}>
                 {t('manage-category.create-subcategory')}
               </IonButton>
-              <div className="w-full flex flex-col gap-2 pt-5">
-                <CategoryCard category={{
-                  id: 1,
-                  name: "Subcategory Example",
-                  icon: "cat" as any, // Replace with actual icon
-                  color: selectedColor,
-                  type: 0,
-                  parent_id: null
-                }} />
+              <div className="w-full flex flex-col gap-4 pt-5">
+                {subcategories.length > 0 ? (
+                  subcategories.map((subcategory) => (
+                    <CategoryCard
+                      key={subcategory.id}
+                      category={subcategory}
+                    />
+                  ))
+                ) : (
+                  <IonLabel className="text-lg" color="secondary">
+                    {t('manage-category.no-subcategories')}
+                  </IonLabel>
+                )}
               </div>
             </IonRow>
           )}
@@ -353,12 +489,9 @@ const ManageCategory = () => {
 
               <IonCol className="w-full">
                 <IonLabel className="text-lg">
-                  {
-                    // TODO: Replace with actual parent category name
-                  }
                   {t("manage-category.this-subcategory-belongs-to")}
                   <span className="text-[var(--ion-color-primary)] ml-2 font-semibold">
-                    PONER ALGO AQUI
+                    {parentCategoryName || t('manage-category.unknown-parent-category')}
                   </span>
                 </IonLabel>
               </IonCol>
@@ -460,7 +593,7 @@ const ManageCategory = () => {
         />
 
         <SelectIconModal isOpen={isIconModalOpen} setIsOpen={setIsIconModalOpen} selectedIcon={icon} setSelectedIcon={setIcon} />
-        <CreateRatingModal isOpen={isCreateRatingModalOpen} setIsOpen={setIsCreateRatingModalOpen} />
+        <CreateRatingModal isOpen={isCreateRatingModalOpen} setIsOpen={setIsCreateRatingModalOpen} onSubmit={addCategoryRating} />
       </IonContent>
     </IonPage>
   );
