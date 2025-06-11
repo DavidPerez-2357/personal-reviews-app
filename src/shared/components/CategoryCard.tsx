@@ -19,14 +19,15 @@ const CategoryCard = ({ category }: CategoryCardProps) => {
             <IonLabel className="text-2xl font-semibold w-full break-words whitespace-normal">
                 {category.name}
             </IonLabel>
-            <IonLabel className=" text-sm absolute bottom-1 right-2">
-                28 {t("common.items")}
-            </IonLabel>
+            {/* <IonLabel className=" text-sm absolute bottom-1 right-2">
+                EXAMPLE {t("common.items")}
+            </IonLabel> */}
             <div className="absolute top-1 right-2">
                 <IonButton
                     color={"tertiary"}
                     className="aspect-square edit-button m-0"
-                    routerLink={`/app/more/categories/${12}/edit`}
+                    routerLink={`/app/more/categories/${category.id}/edit`}
+                    onClick={e => e.stopPropagation()}
                 >
                     <SquarePen size={17}></SquarePen>
                 </IonButton>
