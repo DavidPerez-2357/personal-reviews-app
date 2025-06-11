@@ -1,14 +1,19 @@
 import { IonButton, IonContent, IonHeader, IonInput, IonLabel, IonModal, IonTitle, IonToolbar } from "@ionic/react";
 import { X } from "lucide-react";
+import { useEffect, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 
 interface CreateRatingModalProps {
     isOpen: boolean;
     setIsOpen: (isOpen: boolean) => void;
+    onSubmit: (name: string) => void;
 }
 
-const CreateRatingModal = ({ isOpen, setIsOpen }: CreateRatingModalProps) => {
+const CreateRatingModal = ({ isOpen, setIsOpen, onSubmit }: CreateRatingModalProps) => {
     const { t } = useTranslation();
+    const [name, setName] = useState('');
+    const input = useRef<HTMLIonInputElement>(null);
+
     return (
         <IonModal
             isOpen={isOpen}
@@ -36,6 +41,9 @@ const CreateRatingModal = ({ isOpen, setIsOpen }: CreateRatingModalProps) => {
                         placeholder={t('manage-category.rating-name-placeholder')}
                         type="text"
                         fill="solid"
+                        value={name}
+                        ref={input}
+                        onIonInput={(e) => setName(e.detail.value!)}
                         required
                     />
                     <IonButton
@@ -45,6 +53,8 @@ const CreateRatingModal = ({ isOpen, setIsOpen }: CreateRatingModalProps) => {
                         onClick={() => {
                             // Handle the creation of the rating here
                             setIsOpen(false);
+                            onSubmit(name);
+                            setName('');
                         }}
                     >
                         {t('common.create')}
