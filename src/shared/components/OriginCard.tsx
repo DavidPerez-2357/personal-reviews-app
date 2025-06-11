@@ -121,7 +121,11 @@ const OriginCard = ({ item }: OriginCardProps) => {
             <IonButton
               color={"tertiary"}
               className="aspect-square edit-button"
-              routerLink={`/app/item/${item.id}/edit`}
+              routerLink={`/app/items/${item.id}/edit`}
+              onClick={(e) => {
+                e.stopPropagation();
+                e.preventDefault();
+              }}
             >
               <SquarePen size={20}></SquarePen>
             </IonButton>
