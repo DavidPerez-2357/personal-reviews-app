@@ -67,7 +67,7 @@ export const getItemsByOrigin = async (id: number): Promise<ItemDisplay[]> => {
 
     try {
         const query = `
-            SELECT i.id, i.name,
+            SELECT i.id, i.name, i.image,
                COUNT(r.rating) AS number_of_rewviews, 
                c.icon AS category_icon, 
                c.color AS category_color,
@@ -92,6 +92,7 @@ export const getItemsByOrigin = async (id: number): Promise<ItemDisplay[]> => {
         return (result.values || []).map((row: ItemDisplay) => ({
             id: row.id,
             name: row.name,
+            image: row.image || null,
             is_origin: row.is_origin || false,
             origin_id: row.origin_id || undefined,
             last_review: row.last_rating ? Number(new Date(row.last_rating)) : 0,
