@@ -131,7 +131,7 @@ const OriginCard = ({ item }: OriginCardProps) => {
         {!isOriginExpanded && (
           <div className="flex pt-2 items-center text-base gap-2 text-[var(--ion-color-secondary-step-800)]" onClick={expandOrigin}>
             <IonLabel className="text-[var(--ion-color-secondary-step-800)] underline w-full text-center">
-              Show more
+              {t("common.show-more")}
             </IonLabel>
           </div>
         )}
