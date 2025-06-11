@@ -143,6 +143,7 @@ export const getItemsDisplay = async (
     SELECT
       i.id,
       i.name,
+      i.image,
       i.is_origin,
       case when oi.origin_id is not null then oi.origin_id else null end as origin_id,
       COUNT(r.rating) AS number_of_reviews,
@@ -200,6 +201,7 @@ export const getItemsDisplay = async (
     return result.values.map((row: any) => ({
       id: row.id,
       name: row.name,
+      image: row.image || null,
       last_rating: row.last_rating || 0,
       origin_id: row.origin_id || null,
       number_of_reviews: row.number_of_reviews || 0,

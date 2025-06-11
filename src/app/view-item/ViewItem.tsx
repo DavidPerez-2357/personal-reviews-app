@@ -25,6 +25,7 @@ import { getItemFull, getItemsByOrigin } from "@/shared/services/item-service";
 import { getReviewsByItemId } from "@/shared/services/review-service";
 import { useTranslation } from "react-i18next";
 import "./styles/viewItem.css";
+import ItemOrOrigin from "@/shared/components/ItemOrOrigin";
 
 export const ViewItem = () => {
   const { id } = useParams<{ id: string }>();
@@ -249,7 +250,7 @@ export const ViewItem = () => {
               <IonGrid className="gap-4 mt-2">
                 <div className="flex flex-col gap-7">
                     {itemsOfOrigin.map((item) => (
-                    <ItemCard key={item.id} item={item} />
+                      <ItemOrOrigin key={item.id} item={item} />
                     ))}
                 </div>
               </IonGrid>
