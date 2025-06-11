@@ -48,7 +48,7 @@ const FooterTabBar = () => {
 
           <Route path="/app/items" exact={true} component={ViewAllItems} />
           <Route path="/app/more" exact={true} component={MoreOptions} />
-          <Redirect path="/app" to="/app/more/categories/create" exact={true} />
+          <Redirect path="/app" to="/app/reviews" exact={true} />
         </IonRouterOutlet>
 
         <IonTabBar slot="bottom" className='tab-bar'>
