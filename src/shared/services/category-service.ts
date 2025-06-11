@@ -34,7 +34,7 @@ export const insertCategory = async (category: Category): Promise<number> => {
         const values = [category.name, category.type, category.color, category.icon, category.parent_id];
 
         const result = await db!.run(query, values);
-        return result.changes?.lastId || null;
+        return result.changes?.lastId || 0;
     } catch (error) {
         console.error("❌ Error al insertar categoría");
         return 0;
@@ -389,6 +389,8 @@ export const deleteCategoryById = async (categoryId: number): Promise<boolean> =
     if (!db) return false;
 
     try {
+        await db.beginTransaction();
+
         // Elimina los valores de puntuación de categoría asociados a la categoría
         const deleteValuesQuery = `DELETE FROM category_rating_value WHERE category_rating_id IN (SELECT id FROM category_rating WHERE category_id = ?)`;
         await db.run(deleteValuesQuery, [categoryId]);
@@ -411,8 +413,11 @@ export const deleteCategoryById = async (categoryId: number): Promise<boolean> =
         // Finalmente, elimina la categoría
         const deleteCategoryQuery = `DELETE FROM category WHERE id = ?`;
         await db.run(deleteCategoryQuery, [categoryId]);
+
+        await db.commitTransaction();
     } catch (err) {
         console.error("❌ Error al eliminar categoría:", err);
+        await db.rollbackTransaction();
         return false;
     }
 
