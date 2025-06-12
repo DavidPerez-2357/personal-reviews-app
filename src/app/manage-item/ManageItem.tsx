@@ -14,6 +14,7 @@ import { getItemById } from "@/shared/services/item-service";
 import { Capacitor } from "@capacitor/core";
 import {
   IonBackButton,
+  IonButton,
   IonContent,
   IonGrid,
   IonInput,
@@ -21,16 +22,17 @@ import {
   IonPage,
   IonRow,
 } from "@ionic/react";
-import { Box, Building2, Camera, Images } from "lucide-react";
+import { Box, Building2, Camera, Images, Plus } from "lucide-react";
 import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useHistory, useLocation, useParams } from "react-router";
+import ItemsSelectorModal from "./components/ItemsSelectorModal";
 
 const ManageItem = () => {
-
+  // Estado para saber si es la primera carga del componente
   const [isInitialLoad, setIsInitialLoad] = useState(true);
 
-  // Photo gallery hooks
+  // Hooks para la galería de fotos (tomar, importar, guardar, eliminar fotos)
   const {
     savedPhotos,
     setSavedPhotos,
@@ -40,6 +42,9 @@ const ManageItem = () => {
     deletePhoto,
   } = usePhotoGallery();
 
+  /**
+   * Toma una foto usando la cámara, la guarda y la añade al estado.
+   */
   const handleTakePhoto = async () => {
     const newPhoto = await takePhoto();
     if (!newPhoto) return;
@@ -48,6 +53,9 @@ const ManageItem = () => {
     setSavedPhotos([...savedPhotos, savedPhoto]);
   };
 
+  /**
+   * Importa una foto desde la galería, la guarda y la añade al estado.
+   */
   const handleGetPhotoFromGallery = async () => {
     const newPhoto = await importPhoto();
     if (!newPhoto) return;
@@ -56,6 +64,9 @@ const ManageItem = () => {
     setSavedPhotos([...savedPhotos, savedPhoto]);
   };
 
+  /**
+   * Elimina una foto seleccionada del estado y del sistema de archivos.
+   */
   const handleDeletePhoto = async (photo: UserPhoto) => {
     handlePreviewClose();
 
@@ -99,10 +110,18 @@ const ManageItem = () => {
 
   // Category and item state
   const [item, setItem] = useState<Item | null>(null);
-  const [parentCategory, setParentCategory] = useState<Category>(notFoundAnyCategories);
+  const [parentCategory, setParentCategory] = useState<Category>(
+    notFoundAnyCategories
+  );
   const [childrenCategories, setChildrenCategories] = useState<Category[]>([]);
-  const [selectedCategory, setSelectedCategory] = useState<Category | null>(null);
-  const [selectedSubcategory, setSelectedSubcategory] = useState<Category | null>(null);
+  const [selectedCategory, setSelectedCategory] = useState<Category | null>(
+    null
+  );
+  const [selectedSubcategory, setSelectedSubcategory] =
+    useState<Category | null>(null);
+  const [itemOptions, setItemOptions] = useState<ItemOption[]>([]);
+  // Modal state
+  const [isItemsSelectorModalOpen, setItemsSelectorModalOpen] = useState(false);
 
   // Photo preview state
   const [previewPhoto, setPreviewPhoto] = useState<UserPhoto | null>(null);
@@ -119,6 +138,9 @@ const ManageItem = () => {
   // Edit mode flag
   const editMode = Boolean(id);
 
+  /**
+   * Busca y selecciona una categoría por su ID.
+   */
   const setSelectedCategoryById = async (categoryId: number) => {
     try {
       const category = await getCategoryById(categoryId);
@@ -134,52 +156,11 @@ const ManageItem = () => {
     }
   };
 
+  /**
+   * Carga los datos del item a editar, incluyendo su categoría y foto.
+   */
   const setEditData = async (itemId: number) => {
     try {
-      // Datos de prueba estáticos
-      // const item: Item = {
-      //   id: itemId,
-      //   name: "iPhone 13 Pro",
-      //   image: "https://example.com/items/iphone13pro.jpg",
-      //   category_id: 2,
-      //   is_origin: true,
-      // };
-      // const parentCategory: Category = {
-      //   id: 1,
-      //   name: "Tecnología",
-      //   icon: "laptop",
-      //   color: "blue",
-      //   type: 1,
-      //   parent_id: null,
-      // };
-      // const children = [
-      //   {
-      //     id: 2,
-      //     name: "Móviles",
-      //     icon: "mobile",
-      //     color: "green",
-      //     type: 1,
-      //     parent_id: 1,
-      //   },
-      //   {
-      //     id: 3,
-      //     name: "Portátiles",
-      //     icon: "laptop",
-      //     color: "purple",
-      //     type: 1,
-      //     parent_id: 1,
-      //   },
-      // ];
-
-      // const category: Category = {
-      //   id: 2,
-      //   name: "Móviles",
-      //   icon: "mobile",
-      //   color: "green",
-      //   type: 1,
-      //   parent_id: 1,
-      // };
-
       const item: Item | null = await getItemById(itemId);
       setItem(item);
       if (!item) throw new Error(t("manage-item.error-message.item-not-found"));
@@ -210,21 +191,7 @@ const ManageItem = () => {
         setSelectedSubcategory(null);
       }
 
-      const setSelectedCategoryById = async (categoryId: number) => {
-        try {
-          const category = await getCategoryById(categoryId);
-
-          if (!category) {
-            console.error("❌ Error: Category not found");
-            return;
-          }
-
-          setSelectedCategory(category);
-        } catch (error) {
-          console.error("❌ Error al obtener la categoría:", error);
-        }
-      };
-
+      // Carga la foto del item si existe
       const photoSrc: string | undefined = item.image
         ? Capacitor.convertFileSrc(item.image)
         : undefined;
@@ -241,49 +208,72 @@ const ManageItem = () => {
     }
   };
 
+  /**
+   * Reemplaza una foto existente por una nueva tomada con la cámara.
+   */
   const handleReplacePhoto = async (photo: UserPhoto) => {
     try {
-      await deletePhoto(photo); // Delete the photo from the filesystem
+      await deletePhoto(photo); // Elimina la foto anterior
     } catch (error) {
       console.error("❌ Error al eliminar la foto:", error);
     }
 
-    handlePreviewClose();
-    const newPhoto = await takePhoto(); // Save the new photo to the filesystem
-    // Delete the old photo from the filesystem
+    if (isPreviewOpen) {
+      handlePreviewClose();
+    }
+
+    const newPhoto = await takePhoto(); // Toma la nueva foto
     if (!newPhoto) return;
-    const savedPhoto = await savePhoto(newPhoto); // Save the new photo to the filesystem
+    const savedPhoto = await savePhoto(newPhoto); // Guarda la nueva foto
     if (!savedPhoto) return;
     setSavedPhotos(
       savedPhotos.map((p) => (p.filepath === photo.filepath ? savedPhoto : p))
     );
   };
 
-  // Cargar datos de edición si estamos en modo edición
+  /**
+   * useEffect principal:
+   * Si está en modo edición, carga los datos del item a editar.
+   * Si no, selecciona la primera categoría y crea un item por defecto.
+   */
   useEffect(() => {
-
     if (editMode && id) {
       setEditData(parseInt(id)).catch((error) => {
         console.error("Error al cargar los datos de edición:", error);
         history.replace("/app/items");
       });
     } else {
-    getFirstCategory().then((category) => {
-      if (!category) {
-        console.error("❌ No se encontró ninguna categoría");
-        setSelectedCategory(notFoundAnyCategories);
-        return;
-      }
+      getFirstCategory()
+        .then((category) => {
+          if (!category) {
+            console.error("❌ No se encontró ninguna categoría");
+            setSelectedCategory(notFoundAnyCategories);
+            return;
+          }
 
-      setSelectedCategoryById(category.id);
-    }).catch((error) => {
-      console.error("❌ Error al obtener la primera categoría:", error);
-      setSelectedCategory(notFoundAnyCategories);
-    });
-    setIsInitialLoad(false);
+          setSelectedCategoryById(category.id);
+        })
+        .catch((error) => {
+          console.error("❌ Error al obtener la primera categoría:", error);
+          setSelectedCategory(notFoundAnyCategories);
+        });
+      setIsInitialLoad(false);
+
+      // Iniciamos el item por defecto
+      setItem({
+        id: 0,
+        name: "",
+        category_id: 0,
+        is_origin: false,
+        image: ""
+      });
     }
   }, [editMode, id, history]);
 
+  /**
+   * useEffect para actualizar la categoría padre y subcategoría
+   * cuando cambia la categoría seleccionada.
+   */
   useEffect(() => {
     // Evitar sobrescribir los ratings si estás en modo edición y ya se cargaron
     if (editMode && isInitialLoad) return;
@@ -313,6 +303,10 @@ const ManageItem = () => {
     }
   }, [selectedCategory]);
 
+  /**
+   * useEffect para mantener sincronizada la categoría seleccionada
+   * con la subcategoría o la categoría padre.
+   */
   useEffect(() => {
     if (selectedSubcategory) {
       setSelectedCategory(selectedSubcategory);
@@ -323,6 +317,9 @@ const ManageItem = () => {
     }
   }, [parentCategory, selectedSubcategory]);
 
+  /**
+   * useEffect para limpiar la subcategoría si la categoría padre cambia.
+   */
   useEffect(() => {
     if (
       !parentCategory ||
@@ -332,6 +329,9 @@ const ManageItem = () => {
     }
   }, [parentCategory]);
 
+  /**
+   * Navega hacia atrás en el historial del navegador.
+   */
   const goBack = (event: React.MouseEvent<HTMLDivElement>) => {
     event.stopPropagation();
     window.history.back();
@@ -340,7 +340,7 @@ const ManageItem = () => {
   return (
     <IonPage>
       <IonContent>
-        <IonGrid>
+        <IonGrid className="flex flex-col gap-12">
           <IonRow>
             <CategorySelectorHeader
               selectedCategory={selectedCategory}
@@ -353,16 +353,16 @@ const ManageItem = () => {
               <IonBackButton defaultHref="/app/items" color="tertiary" />
             </div>
           </IonRow>
-          <IonRow className="flex flex-col gap-2 px-5 py-10">
+          <IonRow className="flex flex-col gap-2 px-5">
             <span className="text-2xl font-bold flex gap-2 items-center">
               {item?.is_origin ? (
                 <>
-                  <Building2 size={24} />
+                  <Building2 size={30} />
                   {t("common.origin")}
                 </>
               ) : (
                 <>
-                  <Box size={24} />
+                  <Box size={30} />
                   {t("common.item")}
                 </>
               )}
@@ -402,7 +402,7 @@ const ManageItem = () => {
                 </div>
               </div>
             ) : (
-              // Si hay foto, mostrar la imagen y botón para reemplazarla
+              // Si hay foto, mostrar la imagen y los botones para reemplazarla
               <div className="relative flex gap-2 mb-10">
                 <img
                   src={Capacitor.convertFileSrc(savedPhotos[0].filepath!)}
@@ -430,6 +430,71 @@ const ManageItem = () => {
                 </div>
               </div>
             )}
+          </IonRow>
+
+          <IonRow className="flex flex-col gap-2 mx-5">
+            <IonLabel className="section-title">
+              {t("manage-item.change-is_origin")}
+            </IonLabel>
+            <div className="flex gap-2">
+              <IonButton
+                fill={item?.is_origin ? "solid" : "outline"}
+                color={item?.is_origin ? "success" : "medium"}
+                onClick={() => {
+                  console.log("Botón SÍ pulsado");
+                  if (item && !item.is_origin) {
+                    setItem({ ...item, is_origin: true });
+                    console.log("item.is_origin cambiado a true", {
+                      ...item,
+                      is_origin: true,
+                    });
+                  } else {
+                    console.log("item ya era origen o no existe", item);
+                  }
+                }}
+              >
+                {t("common.yes")}
+              </IonButton>
+              <IonButton
+                fill={!item?.is_origin ? "solid" : "outline"}
+                color={!item?.is_origin ? "danger" : "medium"}
+                onClick={() => {
+                  console.log("Botón NO pulsado");
+                  if (item && item.is_origin) {
+                    setItem({ ...item, is_origin: false });
+                    console.log("item.is_origin cambiado a false", {
+                      ...item,
+                      is_origin: false,
+                    });
+                  } else {
+                    console.log("item ya no era origen o no existe", item);
+                  }
+                }}
+              >
+                {t("common.no")}
+              </IonButton>
+            </div>
+          </IonRow>
+
+          <IonRow className="flex gap-2 mx-5">
+            <IonLabel className="section-title">
+              {t("manage-item.item-origin")} {item?.name}
+            </IonLabel>
+
+            <IonButton
+              fill="solid"
+              color="secondary"
+              onClick={() => {
+                setItemsSelectorModalOpen(true);
+              }}
+            >
+              <Plus size={20} />
+            </IonButton>
+            <ItemsSelectorModal
+              isOpen={isItemsSelectorModalOpen}
+              onDismiss={() => setItemsSelectorModalOpen(false)}
+              isOrigin={item?.is_origin || false}
+            />
           </IonRow>
         </IonGrid>
       </IonContent>
