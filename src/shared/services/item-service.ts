@@ -135,11 +135,11 @@ export const getItemsByOrigin = async (id: number): Promise<ItemDisplay[]> => {
   const db = await openDatabase();
   if (!db) return [];
 
-  try {
-    const query = `
-            SELECT i.id, i.name,
-               COUNT(r.rating) AS number_of_rewviews,
-               c.icon AS category_icon,
+    try {
+        const query = `
+            SELECT i.id, i.name, i.image,
+               COUNT(r.rating) AS number_of_rewviews, 
+               c.icon AS category_icon, 
                c.color AS category_color,
                i.is_origin,
                case when oi.origin_id is not null then oi.origin_id else null end as origin_id,
@@ -157,23 +157,24 @@ export const getItemsByOrigin = async (id: number): Promise<ItemDisplay[]> => {
             WHERE oi.origin_id = ?
             GROUP BY i.id, i.name, c.icon, c.color
         `;
-    const result = await db!.query(query, [id]);
-    // Map fields to match ItemDisplay interface
-    return (result.values || []).map((row: ItemDisplay) => ({
-      id: row.id,
-      name: row.name,
-      is_origin: row.is_origin || false,
-      origin_id: row.origin_id || undefined,
-      last_review: row.last_rating ? Number(new Date(row.last_rating)) : 0,
-      number_of_reviews: row.number_of_reviews,
-      category_icon: row.category_icon,
-      category_color: row.category_color,
-    })) as ItemDisplay[];
-  } catch (error) {
-    console.error("❌ Error al obtener ítems por origen", error);
-    return [];
-  }
-};
+        const result = await db!.query(query, [id]);
+        // Map fields to match ItemDisplay interface
+        return (result.values || []).map((row: ItemDisplay) => ({
+            id: row.id,
+            name: row.name,
+            image: row.image || null,
+            is_origin: row.is_origin || false,
+            origin_id: row.origin_id || undefined,
+            last_review: row.last_rating ? Number(new Date(row.last_rating)) : 0,
+            number_of_reviews: row.number_of_reviews,
+            category_icon: row.category_icon,
+            category_color: row.category_color
+        })) as ItemDisplay[];
+    } catch (error) {
+        console.error("❌ Error al obtener ítems por origen", error);
+        return [];
+    }
+}
 
 /**
  * Obtiene todos los ítems de la base de datos.

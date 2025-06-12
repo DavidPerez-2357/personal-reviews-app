@@ -10,6 +10,7 @@ import { Suspense, useEffect, useState } from "react";
 import { getFeaturedCategoryOfItemsInsideOfOrigin, getItemsByOrigin } from "../services/item-service";
 import Loader from "./Loader";
 import { CategoryAppearance } from "../dto/Category";
+import { Capacitor } from "@capacitor/core";
 
 interface OriginCardProps {
   item: ItemDisplay;
@@ -91,16 +92,35 @@ const OriginCard = ({ item }: OriginCardProps) => {
         </div>
 
         <div className="bg-[var(--ion-color-secondary)] items-center gap-4 flex cursor-pointer">
-          <div
-            className="flex items-center justify-center size-16 rounded-md p-2"
-            style={{ backgroundColor: CategoryColors[item.category_color] }}
-          >
-            <FontAwesomeIcon
-              icon={item.category_icon as IconName}
-              className="fa-2xl"
-              color="var(--ion-color-primary-contrast)"
-            />
-          </div>
+          {item.image ? (
+            <div className="flex relative items-center justify-center size-18 rounded-md overflow-hidden">
+              <img
+                src={Capacitor.convertFileSrc(item.image)}
+                alt={item.name}
+                className="object-cover w-full h-full"
+              />
+
+              <div className="absolute bottom-0 right-0 size-9 rounded-md flex items-center justify-center p-1"
+                style={{ backgroundColor: CategoryColors[item.category_color] }}
+              >
+                <FontAwesomeIcon
+                  icon={item.category_icon as IconName}
+                  className="fa-xl text-[var(--ion-color-primary-contrast)]"
+                />
+              </div>
+            </div>
+          )
+            : (
+              <div
+                className="flex items-center justify-center size-18 rounded-md p-2"
+                style={{ backgroundColor: CategoryColors[item.category_color] }}
+              >
+                <FontAwesomeIcon
+                  icon={item.category_icon as IconName}
+                  className="fa-2xl text-[var(--ion-color-primary-contrast)]"
+                />
+              </div>
+            )}
 
           <div className="flex flex-col">
             <span className="text-lg">
@@ -121,7 +141,11 @@ const OriginCard = ({ item }: OriginCardProps) => {
             <IonButton
               color={"tertiary"}
               className="aspect-square edit-button"
-              routerLink={`/app/item/${item.id}/edit`}
+              routerLink={`/app/items/${item.id}/edit`}
+              onClick={(e) => {
+                e.stopPropagation();
+                e.preventDefault();
+              }}
             >
               <SquarePen size={20}></SquarePen>
             </IonButton>
@@ -131,7 +155,7 @@ const OriginCard = ({ item }: OriginCardProps) => {
         {!isOriginExpanded && (
           <div className="flex pt-2 items-center text-base gap-2 text-[var(--ion-color-secondary-step-800)]" onClick={expandOrigin}>
             <IonLabel className="text-[var(--ion-color-secondary-step-800)] underline w-full text-center">
-              Show more
+              {t("common.show-more")}
             </IonLabel>
           </div>
         )}

@@ -13,6 +13,7 @@ import { MoreOptions } from '@/app/more-options/moreOptions';
 import ViewItem from '@/app/view-item/ViewItem';
 import ManageItem from '@/app/manage-item/ManageItem';
 import ViewAllItems from './view-all-items/ViewAllItems';
+import ManageCategory from './manage-category/ManageCategory';
 
 const FooterTabBar = () => {
   const { t } = useTranslation();
@@ -39,9 +40,14 @@ const FooterTabBar = () => {
           <Route path="/app/reviews/create" component={ManageItemReview} exact={true} />
           <Route path="/app/reviews/:id/edit" component={ManageItemReview} exact={true} />
           <Route path="/app/reviews/create/item/:itemId" component={ManageItemReview} exact={true} />
+
           <Route path="/app/items/:id/viewItem" component={ViewItem} exact={true} />
           <Route path="/app/items/create" component={ManageItem} exact={true} />
           <Route path="/app/items/:id/edit" component={ManageItem} exact={true} />
+
+          <Route path="/app/more/categories/create" component={ManageCategory} exact={true} />
+          <Route path="/app/more/categories/:id/edit" component={ManageCategory} exact={true} />
+          <Route path="/app/more/categories/:id/subcategories/create" component={ManageCategory} exact={true} />
 
           <Route path="/app/items" exact={true} component={ViewAllItems} />
           <Route path="/app/more" exact={true} component={MoreOptions} />

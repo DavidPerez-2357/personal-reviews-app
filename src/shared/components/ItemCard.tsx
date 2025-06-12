@@ -5,6 +5,9 @@ import { IconName } from "@fortawesome/fontawesome-svg-core";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { IonButton, IonCard } from "@ionic/react";
 import { SquarePen } from "lucide-react";
+import { Filesystem } from '@capacitor/filesystem';
+import { useEffect, useState } from "react";
+import { Capacitor } from "@capacitor/core";
 
 const ItemCard = ({ item }: { item: ItemDisplay }) => {
 
@@ -15,16 +18,35 @@ const ItemCard = ({ item }: { item: ItemDisplay }) => {
       routerLink={`/app/items/${item.id}/viewItem`}
     >
       <div className="gap-4 w-full flex flex-row items-center">
-        <div
-          className="flex items-center justify-center size-16 rounded-md p-2"
+        {item.image ? (
+          <div className="flex relative items-center justify-center size-18 rounded-md overflow-hidden">
+            <img
+              src={Capacitor.convertFileSrc(item.image)}
+              alt={item.name}
+              className="object-cover w-full h-full"
+            />
+
+            <div className="absolute bottom-0 right-0 size-9 rounded-md flex items-center justify-center p-1"
+              style={{ backgroundColor: CategoryColors[item.category_color] }}
+            >
+              <FontAwesomeIcon
+                icon={item.category_icon as IconName}
+                className="fa-xl text-[var(--ion-color-primary-contrast)]"
+              />
+            </div>
+          </div>
+        )
+        : (
+          <div
+          className="flex items-center justify-center size-18 rounded-md p-2"
           style={{ backgroundColor: CategoryColors[item.category_color] }}
         >
           <FontAwesomeIcon
             icon={item.category_icon as IconName}
-            className="fa-2xl text-white"
+            className="fa-2xl text-[var(--ion-color-primary-contrast)]"
           />
         </div>
-
+        )}
         <div className="flex flex-col">
           <span className="text-lg text-[var(--ion-text-color)] break-all pr-9">
             {item.name}
@@ -46,7 +68,11 @@ const ItemCard = ({ item }: { item: ItemDisplay }) => {
           <IonButton
             color={"tertiary"}
             className="aspect-square edit-button"
-            routerLink={`/app/item/${item.id}/edit`}
+            routerLink={`/app/items/${item.id}/edit`}
+            onClick={(e) => {
+              e.stopPropagation();
+              e.preventDefault();
+            }}
           >
             <SquarePen size={17}></SquarePen>
           </IonButton>

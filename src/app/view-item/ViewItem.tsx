@@ -44,8 +44,7 @@ import {
 } from "@/shared/services/review-service";
 import { useTranslation } from "react-i18next";
 import "./styles/viewItem.css";
-import { usePhotoGallery } from "@/hooks/usePhotoGallery";
-import ErrorAlert from "@/shared/components/ErrorAlert";
+import ItemOrOrigin from "@/shared/components/ItemOrOrigin";
 
 export const ViewItem = () => {
   const { id } = useParams<{ id: string }>();
@@ -427,9 +426,9 @@ export const ViewItem = () => {
               <StatOriginView items={itemsOfOrigin} />
               <IonGrid className="gap-4 mt-2">
                 <div className="flex flex-col gap-7">
-                  {itemsOfOrigin.map((item) => (
-                    <ItemCard key={item.id} item={item} />
-                  ))}
+                    {itemsOfOrigin.map((item) => (
+                      <ItemOrOrigin key={item.id} item={item} />
+                    ))}
                 </div>
               </IonGrid>
             </div>

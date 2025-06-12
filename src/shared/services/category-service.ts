@@ -25,19 +25,19 @@ export const getCategories = async (): Promise<Category[]> => {
  * @param category
  * @returns Promise<number | null>
  */
-export const insertCategory = async (category: Category): Promise<number | null | unknown> => {
+export const insertCategory = async (category: Category): Promise<number> => {
     const db = await openDatabase();
-    if (!db) return null;
+    if (!db) return 0;
 
     try {
         const query = `INSERT INTO category (name, type, color, icon, parent_id) VALUES (?, ?, ?, ?, ?)`;
         const values = [category.name, category.type, category.color, category.icon, category.parent_id];
 
         const result = await db!.run(query, values);
-        return result.changes?.lastId || null;
+        return result.changes?.lastId || 0;
     } catch (error) {
         console.error("❌ Error al insertar categoría");
-        return error;
+        return 0;
     }
 };
 
@@ -235,6 +235,22 @@ export const getFirstCategory = async (): Promise<Category | null> => {
     }
 }
 
+export const deleteCategoryRating = async (categoryRating: CategoryRating): Promise<boolean> => {
+    const db = await openDatabase();
+    if (!db) return false;
+
+    try {
+        const query = `DELETE FROM category_rating WHERE id = ?`;
+        const values = [categoryRating.id];
+
+        await db!.run(query, values);
+        return true;
+    } catch (error) {
+        console.error("❌ Error al eliminar puntuación de categoría");
+        return false;
+    }
+}
+
 /**
  * Obtiene las categorías padre de la base de datos.
  * @returns Promise<Category[]>
@@ -366,6 +382,47 @@ export const getCategoryRatingMixByReviewId = async (reviewId: number): Promise<
         console.error("❌ Error al obtener valores de puntuación de categoría de la reseña");
         return [];
     }
+}
+
+export const deleteCategoryById = async (categoryId: number): Promise<boolean> => {
+    const db = await openDatabase();
+    if (!db) return false;
+
+    try {
+        await db.beginTransaction();
+
+        // Elimina los valores de puntuación de categoría asociados a la categoría
+        const deleteValuesQuery = `DELETE FROM category_rating_value WHERE category_rating_id IN (SELECT id FROM category_rating WHERE category_id = ?)`;
+        await db.run(deleteValuesQuery, [categoryId]);
+
+        // Elimina las puntuaciones de categoría asociadas a la categoría
+        const deleteRatingsQuery = `DELETE FROM category_rating WHERE category_id = ?`;
+        await db.run(deleteRatingsQuery, [categoryId]);
+
+        // Elimina las reseñas asociadas a los items de la categoría
+        const deleteReviewsQuery = `
+        DELETE FROM review
+        WHERE item_id IN (SELECT id FROM item WHERE category_id = ?)
+        `;
+        await db.run(deleteReviewsQuery, [categoryId]);
+
+        // Elimina los items asociados a la categoría
+        const deleteItemsQuery = `DELETE FROM item WHERE category_id = ?`;
+        await db.run(deleteItemsQuery, [categoryId]);
+
+        // Finalmente, elimina la categoría
+        const deleteCategoryQuery = `DELETE FROM category WHERE id = ?`;
+        await db.run(deleteCategoryQuery, [categoryId]);
+
+        await db.commitTransaction();
+    } catch (err) {
+        console.error("❌ Error al eliminar categoría:", err);
+        await db.rollbackTransaction();
+        return false;
+    }
+
+    console.log("✅ Categoría eliminada correctamente.");
+    return true;
 }
 
 export const insertDefaultCategories = async (db: any) => {

@@ -1,7 +1,7 @@
 import { Category } from "@dto/Category"
 
 
-export const CategoryColors: Record<Category['color'], string> = {
+export const CategoryColors: Record<string, string> = {
     'red': '#B50000',
     'crimson': '#DC143C',
     'bordeaux': '#9D3050',

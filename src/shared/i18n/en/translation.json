@@ -18,7 +18,9 @@
     "more": "More",
     "less": "Less",
     "all": "All",
+    "show-more": "Show more",
     "save-changes": "Save changes",
+    "name": "Name",
     "delete": "Delete",
     "replace": "Replace",
     "filter": "Filter",
@@ -43,8 +45,14 @@
     "comment": "Comment",
     "categories": "Categories",
     "category": "Category",
+    "subcategories": "Subcategories",
+    "subcategory": "Subcategory",
+    "rating": "Rating",
+    "ratings": "Ratings",
+
     "image": "Image",
     "images": "Images",
+    "color": "Color",
 
     "select-category": "Select category",
     "select-item": "Select item",
@@ -183,5 +191,48 @@
     "to-item": "Convert to item",
     "to-origin-success": "Origin created successfully",
     "to-item-success": "Item created successfully"
+  }
+    "manage-category": {
+    "select-icon": "Select icon",
+    "search-icon-placeholder": "Search icon...",
+    "all-icons-are-from-fontawesome": "All icons are from FontAwesome",
+    "all-icons-are-in-english": "All icons names are in English",
+    "scroll-to-selected-icon": "Scroll to selected icon",
+    "create-category-info": "You can create subcategories after creating this category",
+    "this-subcategory-belongs-to": "This subcategory belongs to",
+    "category-input-placeholder": "Write the category name...",
+    "create-category": "Create category",
+    "saving-category": "Saving category",
+    "saving-category-success": "Category saved successfully",
+    "saving-category-error": "Error saving category",
+    "delete-category": "Delete category",
+    "delete-category-confirm": "Are you sure you want to delete this category? SUBCATEGORIES AND LINKED ITEMS AND REVIEWS WILL BE DELETED",
+    "delete-category-success": "Category deleted successfully",
+    "deleting-category": "Deleting category",
+    "create-subcategory": "Create subcategory",
+    "add-rating": "Add rating",
+    "no-ratings": "No ratings have been created for this category",
+    "delete-rating-confirm": "Are you sure you want to delete the existing rating '{{ratingName}}'? ",
+    "create-rating": "Create rating",
+    "rating-name-placeholder": "Write the rating name...",
+    "rating-already-exists": "That rating name already exists",
+    "rating-name-empty": "Rating name cannot be empty",
+    "no-subcategories": "No subcategories found",
+    "unknown-parent-category": "Unknown parent category",
+
+    "error-message": {
+      "error-creating-category": "Error creating category",
+      "error-saving-category": "Error saving category",
+      "error-deleting-category": "Error deleting category",
+      "error-creating-subcategory": "Error creating subcategory",
+      "error-saving-subcategory": "Error saving subcategory",
+      "error-deleting-subcategory": "Error deleting subcategory",
+      "subcategory-not-found": "Subcategory not found",
+      "category-not-found": "Category not found",
+      "category-name-empty": "Category name cannot be empty",
+      "error-saving-category-ratings": "Error saving category ratings",
+      "error-fetching-subcategories": "Error fetching subcategories",
+      "error-fetching-parent-category": "Error fetching parent category"
+    }
   }
 }
