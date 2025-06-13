@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import {
   IonContent,
   IonPage,
@@ -26,14 +26,15 @@ import { getReviewsByItemId } from "@/shared/services/review-service";
 import { useTranslation } from "react-i18next";
 import "./styles/viewItem.css";
 import ItemOrOrigin from "@/shared/components/ItemOrOrigin";
+import { Capacitor } from "@capacitor/core";
 
 export const ViewItem = () => {
   const { id } = useParams<{ id: string }>();
   const history = useHistory();
 
-  const [showTimeline, setShowTimeline] = React.useState(false);
+  const [showTimeline, setShowTimeline] = useState(false);
 
-  const [item, setItem] = React.useState<ItemFull>({
+  const [item, setItem] = useState<ItemFull>({
     id: 0,
     name: "",
     image: null,
@@ -45,9 +46,9 @@ export const ViewItem = () => {
     category_color: "",
   });
 
-  const [reviews, setReviews] = React.useState<Review[]>([]);
-  const [itemsOfOrigin, setItemsOfOrigin] = React.useState<ItemDisplay[]>([]);
-  const [imageError, setImageError] = React.useState(false);
+  const [reviews, setReviews] = useState<Review[]>([]);
+  const [itemsOfOrigin, setItemsOfOrigin] = useState<ItemDisplay[]>([]);
+  const [imageError, setImageError] = useState(false);
 
   const { t } = useTranslation();
 
@@ -79,6 +80,11 @@ export const ViewItem = () => {
     };
     initializeData();
   }, [id]);
+
+  useEffect(() => {
+    // Reset image error state when item changes
+    setImageError(false);
+  }, [item]);
 
 
   //según el value del IonSelect, redirigir a la página correspondiente
@@ -119,25 +125,24 @@ export const ViewItem = () => {
             <IonSelectOption value="origin">{t("view-item.to-origin")}</IonSelectOption>
             <IonSelectOption value="delete">{t("common.delete")}</IonSelectOption>
           </IonSelect>
-          </div>  
+          </div>
         </IonRow>
         <div className="flex flex-col gap-12 pb-10">
           <div className="flex flex-col gap-7">
             {/* Mostrar el contenedor solo si hay imagen y no hay error, y quitar h-48 si no hay imagen o hay error */}
             <div
-              className={`bg-cover bg-center flex items-center justify-center${
-                item.image && !imageError ? " h-48" : ""
+              className={`bg-cover bg-center flex items-center justify-center ${
+                item.image && !imageError ? " h-56" : ""
               }`}
               style={
                 item.image && !imageError
-                  ? { backgroundImage: `url(${item.image})` }
+                  ? { backgroundImage: `url(${Capacitor.convertFileSrc(item.image)}` }
                   : {}
               }
             >
-              {/* Imagen invisible para detectar error de carga */}
               {item.image && !imageError && (
                 <img
-                  src={item.image}
+                  src={Capacitor.convertFileSrc(item.image)}
                   alt=""
                   style={{ display: "none" }}
                   onError={() => setImageError(true)}
