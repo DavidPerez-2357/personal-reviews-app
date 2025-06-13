@@ -191,7 +191,20 @@
     "to-item": "Convert to item",
     "to-origin-success": "Origin created successfully",
     "to-item-success": "Item created successfully"
-  }
+  },
+  "manage-item": {
+    "saving-item-success": "Item saved successfully",
+    "saving-item-error": "Error saving item",
+    "item-input-placeholder": "Write the item name...",
+    "item-name-empty": "Item name cannot be empty",
+    "delete-item": "Delete item",
+    "delete-item-confirm": "Are you sure you want to delete this item? ALL LINKED REVIEWS WILL BE DELETED",
+    "delete-item-success": "Item deleted successfully",
+    "change-is_origin": "Do you want to add items?",
+    "item-origin": "Add items to",
+    "origin-item": "Which item does it belong to?",
+    "no-origin-items": "No selected items found"
+  },
     "manage-category": {
     "select-icon": "Select icon",
     "search-icon-placeholder": "Search icon...",

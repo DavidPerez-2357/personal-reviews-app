@@ -195,6 +195,19 @@
     "to-item-success": "Elemento convertido con éxito",
     "to-origin-success": "Origen creado con éxito"
   },
+  "manage-item": {
+    "saving-item-success": "Elemento guardado con éxito",
+    "saving-item-error": "Error al guardar el elemento",
+    "item-input-placeholder": "Escribe el nombre del elemento...",
+    "item-name-empty": "El nombre del elemento no puede estar vacío",
+    "delete-item": "Eliminar elemento",
+    "delete-item-confirm": "¿Estás seguro de que deseas eliminar este elemento? SE ELIMINARÁN TODAS LAS RESEÑAS ASOCIADAS",
+    "delete-item-success": "Elemento eliminado con éxito",
+    "change-is_origin": "¿Quieres añadir elementos?",
+    "item-origin":"Añadir elementos a",
+    "origin-items": "¿A que elemento pertenece?",
+    "no-origin-items": "No se seleccionaron elementos"
+  },
     "manage-category": {
     "select-icon": "Seleccionar icono",
     "search-icon-placeholder": "Buscar icono...",
