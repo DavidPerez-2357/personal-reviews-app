@@ -36,6 +36,7 @@ export const getItemFull = async (id: number): Promise<ItemFull | null> => {
         const query = `select
                             i.id,
                             i.name,
+                            i.image,
                             round(avg(r.rating), 2) as average_rating,
                             count(r.id) as number_of_ratings,
                             max(r.created_at) as date_last_review,
