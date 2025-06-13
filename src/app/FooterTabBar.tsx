@@ -7,12 +7,13 @@ import { Box, Ellipsis, Star } from 'lucide-react';
 
 import '@styles/FooterTabBar.css';
 import { useTranslation } from 'react-i18next';
-import ManageItemReview from '@/app/manage-review/ManageItemReview'; 
+import ManageItemReview from '@/app/manage-review/ManageItemReview';
 import ViewAllReviews from '@/app/view-all-reviews/ViewAllReviews';
 import { MoreOptions } from './more-options/moreOptions';
 import ViewItem from './view-item/ViewItem';
 import ViewAllItems from './view-all-items/ViewAllItems';
 import ManageCategory from './manage-category/ManageCategory';
+import ViewAllCategories from './view-all-categories/ViewAllCategories';
 
 const FooterTabBar = () => {
   const { t } = useTranslation();
@@ -42,6 +43,7 @@ const FooterTabBar = () => {
 
           <Route path="/app/items/:id/viewItem" component={ViewItem} exact={true} />
 
+          <Route path="/app/more/categories" component={ViewAllCategories} exact={true} />
           <Route path="/app/more/categories/create" component={ManageCategory} exact={true} />
           <Route path="/app/more/categories/:id/edit" component={ManageCategory} exact={true} />
           <Route path="/app/more/categories/:id/subcategories/create" component={ManageCategory} exact={true} />
