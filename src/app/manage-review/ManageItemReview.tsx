@@ -14,8 +14,8 @@ import StarRating from "@components/StarRating";
 import { useEffect, useRef, useState } from "react";
 import "./styles/ManageItemReview.css";
 import { usePhotoGallery } from "@hooks/usePhotoGallery";
-import { getItemById, insertItem, updateItem, updateItemWithCategory } from "@services/item-service";
-import { deleteRatingValuesFromReview, getCategoryById, getCategoryRatingMixByReviewId, getCategoryRatingsByCategoryId, getFirstCategory, insertCategoryRatingValue } from "@services/category-service";
+import { getItemById, insertItem, updateItemWithCategory } from "@services/item-service";
+import { deleteRatingValuesFromReview, getCategoryById, getCategoryRatingMixByReviewId, getCategoryRatingsByCategoryId, getChildrenCategories, getFirstCategory, getParentCategories, getParentCategory, insertCategoryRatingValue } from "@services/category-service";
 import PreviewPhotoModal from "@components/PreviewPhotoModal";
 import { useTranslation } from "react-i18next";
 import { deleteReview, deleteReviewImages, getReviewById, getReviewImagesbyId, insertReview, insertReviewImage, updateReview } from "@shared/services/review-service";
@@ -29,6 +29,7 @@ import { Item, ItemOption, ItemWithCategory } from "@dto/Item";
 import { Review, ReviewImage } from "@dto/Review";
 import { Capacitor } from '@capacitor/core';
 import CategorySelectorHeader from "@/shared/components/CategorySelectorHeader";
+import { useToast } from "../ToastContext";
 
 const ManageItemReview = () => {
   const { savedPhotos, setSavedPhotos, takePhoto, importPhoto, savePhoto, deletePhoto } = usePhotoGallery();
@@ -38,6 +39,7 @@ const ManageItemReview = () => {
   const { t } = useTranslation();
   const location = useLocation();
   const saveButtonRef = useRef<HTMLIonButtonElement>(null);
+  const { showToast } = useToast();
 
   // Variable de no encontrar categorias
   const notFoundAnyCategories: Category = {
@@ -153,7 +155,8 @@ const ManageItemReview = () => {
         .catch((error) => {
           console.error(error);
           setIsInitialLoad(false);
-          history.push("/app/reviews", { toast: t('manage-item-review.error-message.review-not-found') });
+          history.push("/app/reviews");
+          showToast(t('manage-item-review.error-message.review-not-found'));
         });
       return;
     }
@@ -307,11 +310,6 @@ const ManageItemReview = () => {
     }else {
       btnEl.style.display = "none";
     }
-  };
-
-  const goBack = (event: React.MouseEvent<HTMLDivElement>) => {
-    event.stopPropagation();
-    window.history.back();
   };
 
   const validateForm = () => {
@@ -495,7 +493,8 @@ const ManageItemReview = () => {
       // Si todo se guarda correctamente
       setSaveButtonText(t('manage-item-review.saving-review-success'));
       setTimeout(() => {
-        history.push('/app/reviews', { toast: t('manage-item-review.saving-review-success') });
+        history.push('/app/reviews');
+        showToast(t('manage-item-review.saving-review-success'));
       }, 500);
     } catch (error) {
       showError((error as Error).message);
@@ -565,7 +564,8 @@ const ManageItemReview = () => {
 
     setDeleteButtonText(t('manage-item-review.delete-review-success'));
     setTimeout(() => {
-      history.push('/app/reviews', { toast: t('manage-item-review.delete-review-success') });
+      history.push('/app/reviews');
+      showToast(t('manage-item-review.delete-review-success'));
     }, 500);
   }
 
@@ -576,7 +576,7 @@ const ManageItemReview = () => {
 
           <IonRow className="relative">
             <CategorySelectorHeader selectedCategory={selectedCategory} setSelectedCategory={setSelectedCategory} />
-            <div className="flex absolute safe-area-top top-0 p-3" onClick={goBack}>
+            <div className="flex absolute safe-area-top top-0 p-3">
               <IonBackButton defaultHref="/app/reviews" color="tertiary" />
             </div>
           </IonRow>

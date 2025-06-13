@@ -103,7 +103,7 @@ const ViewAllItems = () => {
             setItems([]);
         });
 
-    }, [window.location.pathname]);
+    }, [location.pathname]);
 
     useEffect(() => {
         const filters = {
@@ -111,7 +111,7 @@ const ViewAllItems = () => {
             type: itemTypeFilter,
         }
 
-        countItemsFiltered(searchTerm, filters, areItemsGrouped).then((count) => {
+        countItemsFiltered(searchTerm.trim(), filters, areItemsGrouped).then((count) => {
             setNumberOfItemsFiltered(count);
         }).catch((error) => {
             console.error("Error fetching filtered item count:", error);
@@ -154,7 +154,7 @@ const ViewAllItems = () => {
             type: itemTypeFilter,
         };
 
-        return getItemsDisplay(page, size, searchTerm, sort, filters, areItemsGrouped)
+        return getItemsDisplay(page, size, searchTerm.trim(), sort, filters, areItemsGrouped)
             .then((fetchedItems: ItemDisplay[]) => {
                 return fetchedItems;
             })

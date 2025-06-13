@@ -9,11 +9,12 @@ import { useTranslation } from "react-i18next";
 import { useHistory, useLocation, useParams } from "react-router";
 import SelectIconModal from "./components/SelectIconModal";
 import { Category, CategoryRating } from "@/shared/dto/Category";
-import { deleteCategoryById, deleteCategoryRating, getCategoryById, getCategoryRatingsByCategoryId, getChildrenCategories, insertCategory, insertCategoryRating, updateCategory } from "@/shared/services/category-service";
+import { deleteCategory, deleteCategoryRating, getCategoryById, getCategoryRatingsByCategoryId, getChildrenCategories, insertCategory, insertCategoryRating, updateCategory } from "@/shared/services/category-service";
 import ErrorAlert from "@/shared/components/ErrorAlert";
 import { trash } from 'ionicons/icons';
 import CreateRatingModal from "./components/CreateRatingModal";
 import { Dialog } from "@capacitor/dialog";
+import { useToast } from "../ToastContext";
 
 
 const ManageCategory = () => {
@@ -21,6 +22,7 @@ const ManageCategory = () => {
   let { id } = useParams<{ id: string }>();
   const location = useLocation();
   const history = useHistory();
+  const { showToast } = useToast();
 
   const [isSubcategory, setIsSubcategory] = useState(false);
   const [editMode, setEditMode] = useState(!!id);
@@ -47,6 +49,7 @@ const ManageCategory = () => {
   const [showErrorAlert, setShowErrorAlert] = useState(false);
   const [isCreateRatingModalOpen, setIsCreateRatingModalOpen] = useState(false);
   const [isDeleteAlertOpen, setIsDeleteAlertOpen] = useState(false);
+  const [categoryDeleted, setCategoryDeleted] = useState(false);
 
   useEffect(() => {
     if (icon) {
@@ -71,6 +74,8 @@ const ManageCategory = () => {
 
   useEffect(() => {
     setSaveButtonText(editMode ? t('common.save-changes') : t('manage-category.create-category'));
+    setIsSaveButtonDisabled(false);
+    setIsDeleteButtonDisabled(false);
     setDeleteButtonText(t('manage-category.delete-category'));
     setIcon("burger");
     setCategoryName('');
@@ -80,10 +85,14 @@ const ManageCategory = () => {
     setSubcategories([]);
     setParentCategoryId(null);
 
+    if (categoryDeleted) {
+      return;
+    }
+
     if ((editMode || isSubcategory) && id) {
       setEditData(parseInt(id));
     }
-  }, [editMode, id, isSubcategory]);
+  }, [location.pathname, editMode, isSubcategory, id]);
 
   const scrollToSelectedColor = () => {
     if (selectedColorElement.current) {
@@ -270,7 +279,8 @@ const ManageCategory = () => {
       if (isSubcategory) {
         history.goBack();
       }else {
-        history.push('/app/more/categories', { toast: t('manage-category.saving-category-success') });
+        history.push('/app/more/categories');
+        showToast(t('manage-category.saving-category-success'));
       }
     }, 500);
   };
@@ -281,11 +291,12 @@ const ManageCategory = () => {
 
     try {
       if (id) {
-        const success = await deleteCategoryById(parseInt(id));
+        const success = await deleteCategory(parseInt(id));
         if (!success) {
           throw new Error();
         }
         console.log("Category deleted:", id);
+        setCategoryDeleted(true);
       }
 
       setDeleteButtonText(t('manage-category.deleting-category-success'));
@@ -295,7 +306,8 @@ const ManageCategory = () => {
         }, 500);
       } else {
         setTimeout(() => {
-          history.push('/app/more/categories', { toast: t('manage-category.deleting-category-success') });
+          history.push('/app/more/categories');
+          showToast(t('manage-category.deleting-category-success'));
         }, 500);
       }
     } catch (error) {

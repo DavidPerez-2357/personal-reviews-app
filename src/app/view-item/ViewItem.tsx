@@ -45,6 +45,7 @@ import {
 import { useTranslation } from "react-i18next";
 import "./styles/viewItem.css";
 import ItemOrOrigin from "@/shared/components/ItemOrOrigin";
+import { Capacitor } from "@capacitor/core";
 
 export const ViewItem = () => {
   const { id } = useParams<{ id: string }>();
@@ -68,13 +69,6 @@ export const ViewItem = () => {
   const [reviews, setReviews] = useState<Review[]>([]);
   const [itemsOfOrigin, setItemsOfOrigin] = useState<ItemDisplay[]>([]);
   const [imageError, setImageError] = useState(false);
-  const [isDeleteAlertOpen, setIsDeleteAlertOpen] = useState(false);
-  const [showErrorAlert, setShowErrorAlert] = useState(false);
-  const [buttomDisabled, setButtomDisabled] = useState(false);
-  const { deletePhoto } = usePhotoGallery();
-  const [errorMessage, setErrorMessage] = useState("");
-  const [isToastOpen, setIsToastOpen] = useState(false);
-  const [toastMessage, setToastMessage] = useState("");
 
   const { t } = useTranslation();
   const selectRef = useRef<HTMLIonSelectElement>(null);
@@ -171,73 +165,11 @@ export const ViewItem = () => {
     initializeData();
   }, [id]);
 
-  // cuando se cambie el mensaje del toast, abrirlo y reiniciar el item
   useEffect(() => {
-    if (toastMessage) {
-      setTimeout(() => {
-        setIsToastOpen(false);
-        setToastMessage("");
-      }, 3000);
-      initializeData();
-    }
-    console.log("isToastOpen changed:", isToastOpen);
-  }, [isToastOpen]);
+    // Reset image error state when item changes
+    setImageError(false);
+  }, [item]);
 
-  const handleDeleteItem = async () => {
-    setButtomDisabled(true);
-    try {
-      // 1. Eliminar imágenes y reseñas asociadas
-      for (const review of reviews) {
-        // Obtener imágenes de la reseña
-        const reviewImages = await getReviewImagesbyId(review.id);
-        // Eliminar cada imagen del sistema de archivos
-        for (const img of reviewImages) {
-          try {
-            await deletePhoto({ filepath: img.image });
-          } catch (e) {
-            console.warn(
-              "No se pudo eliminar la imagen del sistema de archivos:",
-              img.image,
-              e
-            );
-          }
-        }
-        // Eliminar imágenes de la base de datos
-        await deleteReviewImages(review.id);
-        // Eliminar la reseña
-        await deleteReview(review.id);
-      }
-
-      // 2. Eliminar imagen del ítem si existe
-      if (item.image) {
-        try {
-          await deletePhoto({ filepath: item.image });
-        } catch (e) {
-          console.warn(
-            "No se pudo eliminar la imagen del ítem:",
-            item.image,
-            e
-          );
-        }
-      }
-
-      // 3. Eliminar el ítem
-      const success = await deleteItem(item.id);
-      if (!success) {
-        setShowErrorAlert(true);
-        setButtomDisabled(true);
-        return;
-      }
-      setIsDeleteAlertOpen(false);
-      history.push("/app/items", {
-        toast: t("manage-item-review.delete-item-success"),
-      });
-    } catch (error) {
-      console.error("Error deleting item:", error);
-      setShowErrorAlert(true);
-      setButtomDisabled(true);
-    }
-  };
 
   //según el value del IonSelect, redirigir a la página correspondiente
   const handleSelectChange = (event: CustomEvent) => {
@@ -272,49 +204,35 @@ export const ViewItem = () => {
         <IonRow className="flex justify-between items-center ion-padding">
           <IonBackButton defaultHref="/app/items" />
           <div className="relative">
-            <EllipsisVertical
-              color="var(--ion-text-color)"
-              className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 pointer-events-none z-10"
-            />
-            <IonSelect
-              interface="popover"
-              className="pr-10 w-full [&::part(icon)]:hidden"
-              style={{ minWidth: 0, width: "2.5rem" }}
-              onIonChange={handleSelectChange}
-              disabled={buttomDisabled}
-            >
-              <IonSelectOption value="edit">{t("common.edit")}</IonSelectOption>
-              {!item.is_origin && (
-                <IonSelectOption value="origin">
-                  {t("view-item.to-origin")}
-                </IonSelectOption>
-              )}
-              {item.is_origin && (
-                <IonSelectOption value="item">
-                  {t("view-item.to-item")}
-                </IonSelectOption>
-              )}
-              <IonSelectOption value="delete">{t("common.delete")}</IonSelectOption>
-            </IonSelect>
+            <EllipsisVertical color="var(--ion-text-color)" className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 pointer-events-none z-10"/>
+          <IonSelect
+            interface="popover"
+            className="pr-10 w-full [&::part(icon)]:hidden" 
+            style={{ minWidth: 0, width: "2.5rem" }}
+            onIonChange={handleSelectChange}
+          >
+            <IonSelectOption value="edit">{t("common.edit")}</IonSelectOption>
+            <IonSelectOption value="origin">{t("view-item.to-origin")}</IonSelectOption>
+            <IonSelectOption value="delete">{t("common.delete")}</IonSelectOption>
+          </IonSelect>
           </div>
         </IonRow>
         <div className="flex flex-col gap-12 pb-10">
           <div className="flex flex-col gap-7">
             {/* Mostrar el contenedor solo si hay imagen y no hay error, y quitar h-48 si no hay imagen o hay error */}
             <div
-              className={`bg-cover bg-center flex items-center justify-center${
-                item.image && !imageError ? " h-48" : ""
+              className={`bg-cover bg-center flex items-center justify-center ${
+                item.image && !imageError ? " h-56" : ""
               }`}
               style={
                 item.image && !imageError
-                  ? { backgroundImage: `url(${item.image})` }
+                  ? { backgroundImage: `url(${Capacitor.convertFileSrc(item.image)}` }
                   : {}
               }
             >
-              {/* Imagen invisible para detectar error de carga */}
               {item.image && !imageError && (
                 <img
-                  src={item.image}
+                  src={Capacitor.convertFileSrc(item.image)}
                   alt=""
                   style={{ display: "none" }}
                   onError={() => setImageError(true)}
@@ -333,7 +251,7 @@ export const ViewItem = () => {
                   />
                 </div>
                 <div className="flex flex-col gap-2">
-                  <span className="text-2xl font-bold break-all text-[var(--ion-color-primary-contrast)] max-w-full">
+                  <span className="text-2xl font-bold w-full break-words whitespace-normal text-[var(--ion-color-primary-contrast)] max-w-full">
                     {item.name}
                   </span>
                   {item.is_origin ? (

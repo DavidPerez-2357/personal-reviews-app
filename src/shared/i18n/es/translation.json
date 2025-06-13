@@ -30,6 +30,7 @@
     "apply": "Aplicar",
     "edit": "Editar",
     "create": "Crear",
+    "search": "Buscar",
     "load-more": "Cargar más",
     "ascending": "Ascendente",
     "descending": "Descendente",
@@ -249,5 +250,10 @@
       "error-fetching-subcategories": "Error al obtener las subcategorías",
       "error-fetching-parent-category": "Error al obtener la categoría principal"
     }
+  },
+
+  "view-all-categories": {
+    "create-category": "Crear categoría",
+    "search-placeholder": "Buscar categorías..."
   }
 }

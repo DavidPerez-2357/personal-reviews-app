@@ -57,74 +57,10 @@ export const ReviewPage: React.FC = () => {
   const { t } = useTranslation();
 
   useEffect(() => {
-    async function initializeData() {
-      try {
-        // Datos de prueba estáticos
-        // const reviewsFromDB: ReviewFull[] = [
-        //   {
-        //     id: 101,
-        //     comment: "El iPhone 13 Pro tiene una cámara espectacular, pero es caro.",
-        //     rating: 4,
-        //     created_at: "2024-08-10T14:23:00Z",
-        //     updated_at: "2024-08-10T14:23:00Z",
-        //     images: ["https://example.com/reviews/101-img1.jpg"],
-        //     category_id: 3,
-        //     category: "Reseñas positivas",
-        //     icon: "https://example.com/icons/thumbs-up.svg",
-        //     item_id: 1,
-        //     item: "iPhone 13 Pro",
-        //   },
-        //   {
-        //     id: 102,
-        //     comment: "La batería del Galaxy S22 se agota muy rápido. No lo recomiendo.",
-        //     rating: 2,
-        //     created_at: "2024-09-05T10:00:00Z",
-        //     updated_at: "2024-09-06T11:30:00Z",
-        //     images: ["https://example.com/reviews/102-img1.jpg", "https://example.com/reviews/102-img2.jpg"],
-        //     category_id: 4,
-        //     category: "Reseñas negativas",
-        //     icon: "https://example.com/icons/thumbs-down.svg",
-        //     item_id: 2,
-        //     item: "Samsung Galaxy S22",
-        //   },
-        //   {
-        //     id: 103,
-        //     comment: "El nuevo MacBook es rápido, ligero y tiene excelente batería.",
-        //     rating: 5,
-        //     created_at: "2024-10-12T09:15:00Z",
-        //     updated_at: "2024-10-12T09:15:00Z",
-        //     images: [],
-        //     category_id: 3,
-        //     category: "Reseñas positivas",
-        //     icon: "https://example.com/icons/thumbs-up.svg",
-        //     item_id: 3,
-        //     item: "MacBook Air M2",
-        //   },
-        // ];
-
-        // Comentado: llamada real a la base de datos
-        const reviewsFromDB = await getReviewsCards();
-        setReviews(reviewsFromDB);
-      } catch (err) {
-        console.error("Error initializing data:", err);
-      }
-    }
-    initializeData();
-
-    // Check for toast message in location state when component mounts or location changes
-
-    if (location.state?.toast) {
-      setToastMessage(location.state.toast);
-      setIsToastOpen(true);
-
-      if (location.pathname === "/app/reviews") {
-        (async () => {
-          const reviewsFromDB = await getReviewsCards();
-          setReviews(reviewsFromDB);
-        })();
-      }
-    }
-  }, [location.state, history, location.pathname]);
+      getReviewsCards().then((reviews) => {
+      setReviews(reviews);
+      });
+    }, [location.pathname]);
 
   const filteredReviews = useMemo(() => {
     const lowerSearchTerm = (searchTerm ?? "").toLowerCase().trim();
@@ -422,16 +358,6 @@ export const ReviewPage: React.FC = () => {
           applyFilters={handleApplyFilters}
         />
       </IonContent>
-
-      {/* Update IonToast to be controlled by state */}
-      <IonToast
-        className="safe-margin-top"
-        isOpen={isToastOpen}
-        message={toastMessage}
-        position="top"
-        onDidDismiss={() => setIsToastOpen(false)} // Hide toast when dismissed
-        duration={3000} // Set duration (e.g., 3 seconds)
-      />
     </IonPage>
   );
 };

@@ -14,6 +14,7 @@ import ViewItem from '@/app/view-item/ViewItem';
 import ManageItem from '@/app/manage-item/ManageItem';
 import ViewAllItems from './view-all-items/ViewAllItems';
 import ManageCategory from './manage-category/ManageCategory';
+import ViewAllCategories from './view-all-categories/ViewAllCategories';
 
 const FooterTabBar = () => {
   const { t } = useTranslation();
@@ -45,6 +46,7 @@ const FooterTabBar = () => {
           <Route path="/app/items/create" component={ManageItem} exact={true} />
           <Route path="/app/items/:id/edit" component={ManageItem} exact={true} />
 
+          <Route path="/app/more/categories" component={ViewAllCategories} exact={true} />
           <Route path="/app/more/categories/create" component={ManageCategory} exact={true} />
           <Route path="/app/more/categories/:id/edit" component={ManageCategory} exact={true} />
           <Route path="/app/more/categories/:id/subcategories/create" component={ManageCategory} exact={true} />

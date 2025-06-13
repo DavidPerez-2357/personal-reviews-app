@@ -17,9 +17,9 @@ export const insertItem = async (item: Item): Promise<number | null> => {
   const db = await openDatabase();
   if (!db) return null;
 
-  try {
-    const query = `INSERT INTO item (name, image, category_id) VALUES (?, ?, ?)`;
-    const values = [item.name, item.image, item.category_id];
+    try {
+        const query = `INSERT INTO item (name, image, category_id) VALUES (?, ?, ?)`;
+        const values = [item.name.trim(), item.image, item.category_id];
 
     const result = await db!.run(query, values);
     return result.changes?.lastId as number;
@@ -105,7 +105,7 @@ export const getItemFull = async (id: number): Promise<ItemFull | null> => {
     const query = `select
                             i.id,
                             i.name,
-                            i.is_origin,
+                            i.image,
                             round(avg(r.rating), 2) as average_rating,
                             count(r.id) as number_of_ratings,
                             max(r.created_at) as date_last_review,
@@ -289,9 +289,9 @@ export const updateItemWithCategory = async (
   const db = await openDatabase();
   if (!db) return false;
 
-  try {
-    const query = `UPDATE item SET name = ?, category_id = ? WHERE id = ?`;
-    const values = [item.name, item.category_id, item.id];
+    try {
+        const query = `UPDATE item SET name = ?, category_id = ? WHERE id = ?`;
+        const values = [item.name.trim, item.category_id, item.id];
 
     await db!.run(query, values);
     return true;

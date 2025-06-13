@@ -6,7 +6,7 @@ CREATE TABLE IF NOT EXISTS category (
     color CHAR(7) NOT NULL,
     icon VARCHAR(25) NOT NULL,
     parent_id INTEGER,
-    FOREIGN KEY (parent_id) REFERENCES category(id) ON DELETE SET NULL
+    FOREIGN KEY (parent_id) REFERENCES category(id) ON DELETE CASCADE
 );
 
 CREATE TABLE IF NOT EXISTS item (
