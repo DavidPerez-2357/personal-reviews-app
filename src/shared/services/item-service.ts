@@ -138,8 +138,8 @@ export const getItemsByOrigin = async (id: number): Promise<ItemDisplay[]> => {
     try {
         const query = `
             SELECT i.id, i.name, i.image,
-               COUNT(r.rating) AS number_of_rewviews, 
-               c.icon AS category_icon, 
+               COUNT(r.rating) AS number_of_rewviews,
+               c.icon AS category_icon,
                c.color AS category_color,
                i.is_origin,
                case when oi.origin_id is not null then oi.origin_id else null end as origin_id,
