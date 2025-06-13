@@ -24,14 +24,14 @@ const ReviewCard = ({ review }: { review: ReviewFull }) => {
           <div className="grid grid-cols-[1fr_auto] items-center">
             <div className="flex flex-row items-center gap-3">
               <FontAwesomeIcon icon={review.icon as IconName} className="fa-xl" />
-                <IonButton
-                  fill="clear"
-                  color="text-color"
-                  className="font-semibold text-md"
-                  routerLink={`/app/items/${review.item_id}/viewItem`}
-                >
-                  {review.item}
-                </IonButton>
+              <IonButton
+                fill="clear"
+                color="primary"
+                className="font-semibold text-md w-full break-words whitespace-normal text-start"
+                routerLink={`/app/items/${review.item_id}/viewItem`}
+              >
+                {review.item}
+              </IonButton>
             </div>
             <IonButton
               color={"tertiary"}
@@ -63,12 +63,14 @@ const ReviewCard = ({ review }: { review: ReviewFull }) => {
               <StarRating
                 size={35}
                 rating={review.rating}
-                setRating={() => {}}
+                setRating={() => { }}
                 canEdit={false}
                 classes="pointer-events-none"
               />
             </div>
-            <span className="text-base">{review.comment}</span>
+            <span className="text-base w-full break-words whitespace-normal">
+              {review.comment}
+            </span>
           </div>
         </div>
       </IonCard>

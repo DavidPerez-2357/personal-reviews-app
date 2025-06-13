@@ -17,7 +17,7 @@ const ItemCard = ({ item }: { item: ItemDisplay }) => {
       className="bg-[var(--ion-color-secondary)] px-4 py-5 relative"
       routerLink={`/app/items/${item.id}/viewItem`}
     >
-      <div className="gap-4 w-full flex flex-row items-center">
+      <div className="gap-4 w-full grid grid-cols-[auto_1fr] items-center">
         {item.image ? (
           <div className="flex relative items-center justify-center size-18 rounded-md overflow-hidden">
             <img
@@ -48,7 +48,7 @@ const ItemCard = ({ item }: { item: ItemDisplay }) => {
         </div>
         )}
         <div className="flex flex-col">
-          <span className="text-lg text-[var(--ion-text-color)] break-all pr-9">
+          <span className="text-lg text-[var(--ion-text-color)] w-full break-words whitespace-normal pr-9">
             {item.name}
           </span>
           <div className="flex items-center gap-2">
