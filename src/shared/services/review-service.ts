@@ -157,7 +157,7 @@ export const updateReview = async (review: Review): Promise<boolean> => {
                            comment = ?,
                            item_id = ?
                        WHERE id = ?`;
-        const values = [review.rating, review.comment.trim() ?? null, review.item_id, review.id];
+        const values = [review.rating, review.comment?.trim() ?? null, review.item_id, review.id];
 
         const result = await db!.run(query, values);
         return (result.changes?.changes ?? 0) > 0;
