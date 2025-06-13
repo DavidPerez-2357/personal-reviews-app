@@ -91,7 +91,7 @@ const OriginCard = ({ item }: OriginCardProps) => {
           </span>
         </div>
 
-        <div className="bg-[var(--ion-color-secondary)] items-center gap-4 flex cursor-pointer">
+        <div className="bg-[var(--ion-color-secondary)] gap-4 w-full grid grid-cols-[auto_1fr] items-center">
           {item.image ? (
             <div className="flex relative items-center justify-center size-18 rounded-md overflow-hidden">
               <img
@@ -123,7 +123,7 @@ const OriginCard = ({ item }: OriginCardProps) => {
             )}
 
           <div className="flex flex-col">
-            <span className="text-lg">
+            <span className="text-lg w-full break-words whitespace-normal">
               {item.name}
             </span>
             <div className="flex items-center gap-2">

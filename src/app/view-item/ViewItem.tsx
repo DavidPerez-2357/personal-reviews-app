@@ -156,7 +156,7 @@ export const ViewItem = () => {
                   />
                 </div>
                 <div className="flex flex-col gap-2">
-                  <span className="text-2xl font-bold break-all text-[var(--ion-color-primary-contrast)] max-w-full">
+                  <span className="text-2xl font-bold w-full break-words whitespace-normal text-[var(--ion-color-primary-contrast)] max-w-full">
                     {item.name}
                   </span>
                   {itemsOfOrigin.length > 0 && (
