@@ -11,16 +11,12 @@ import {
   IonTextarea,
 } from "@ionic/react";
 import StarRating from "@components/StarRating";
-import { use, useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import "./styles/ManageItemReview.css";
 import { usePhotoGallery } from "@hooks/usePhotoGallery";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { getItemById, insertItem, updateItem, updateItemWithCategory } from "@services/item-service";
-import { IconName } from "@fortawesome/fontawesome-svg-core";
+import { getItemById, insertItem, updateItemWithCategory } from "@services/item-service";
 import { deleteRatingValuesFromReview, getCategoryById, getCategoryRatingMixByReviewId, getCategoryRatingsByCategoryId, getChildrenCategories, getFirstCategory, getParentCategories, getParentCategory, insertCategoryRatingValue } from "@services/category-service";
 import PreviewPhotoModal from "@components/PreviewPhotoModal";
-import SubcategoriesBadgeSelector from "../../shared/components/SubcategoriesBadgeSelector";
-import { CategoryColors } from "@shared/enums/colors";
 import { useTranslation } from "react-i18next";
 import { deleteReview, deleteReviewImages, getReviewById, getReviewImagesbyId, insertReview, insertReviewImage, updateReview } from "@shared/services/review-service";
 import { useHistory, useLocation, useParams } from "react-router-dom";
@@ -31,9 +27,9 @@ import { UserPhoto } from "@/shared/dto/Photo";
 import { Category, CategoryRating, CategoryRatingMix, CategoryRatingValue } from "@dto/Category";
 import { Item, ItemOption, ItemWithCategory } from "@dto/Item";
 import { Review, ReviewImage } from "@dto/Review";
-import { init } from "i18next";
 import { Capacitor } from '@capacitor/core';
 import CategorySelectorHeader from "@/shared/components/CategorySelectorHeader";
+import { useToast } from "../ToastContext";
 
 const ManageItemReview = () => {
   const { savedPhotos, setSavedPhotos, takePhoto, importPhoto, savePhoto, deletePhoto } = usePhotoGallery();
@@ -43,6 +39,7 @@ const ManageItemReview = () => {
   const { t } = useTranslation();
   const location = useLocation();
   const saveButtonRef = useRef<HTMLIonButtonElement>(null);
+  const { showToast } = useToast();
 
   console.log("itemId", itemId);
   // Variable de no encontrar categorias
@@ -159,7 +156,8 @@ const ManageItemReview = () => {
         .catch((error) => {
           console.error(error);
           setIsInitialLoad(false);
-          history.push("/app/reviews", { toast: t('manage-item-review.error-message.review-not-found') });
+          history.push("/app/reviews");
+          showToast(t('manage-item-review.error-message.review-not-found'));
         });
       return;
     }
@@ -313,11 +311,6 @@ const ManageItemReview = () => {
     }else {
       btnEl.style.display = "none";
     }
-  };
-
-  const goBack = (event: React.MouseEvent<HTMLDivElement>) => {
-    event.stopPropagation();
-    window.history.back();
   };
 
   const validateForm = () => {
@@ -501,7 +494,8 @@ const ManageItemReview = () => {
       // Si todo se guarda correctamente
       setSaveButtonText(t('manage-item-review.saving-review-success'));
       setTimeout(() => {
-        history.push('/app/reviews', { toast: t('manage-item-review.saving-review-success') });
+        history.push('/app/reviews');
+        showToast(t('manage-item-review.saving-review-success'));
       }, 500);
     } catch (error) {
       showError((error as Error).message);
@@ -571,7 +565,8 @@ const ManageItemReview = () => {
 
     setDeleteButtonText(t('manage-item-review.delete-review-success'));
     setTimeout(() => {
-      history.push('/app/reviews', { toast: t('manage-item-review.delete-review-success') });
+      history.push('/app/reviews');
+      showToast(t('manage-item-review.delete-review-success'));
     }, 500);
   }
 
@@ -582,7 +577,7 @@ const ManageItemReview = () => {
 
           <IonRow className="relative">
             <CategorySelectorHeader selectedCategory={selectedCategory} setSelectedCategory={setSelectedCategory} />
-            <div className="flex absolute safe-area-top top-0 p-3" onClick={goBack}>
+            <div className="flex absolute safe-area-top top-0 p-3">
               <IonBackButton defaultHref="/app/reviews" color="tertiary" />
             </div>
           </IonRow>

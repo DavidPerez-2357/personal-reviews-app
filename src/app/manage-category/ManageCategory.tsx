@@ -14,6 +14,7 @@ import ErrorAlert from "@/shared/components/ErrorAlert";
 import { trash } from 'ionicons/icons';
 import CreateRatingModal from "./components/CreateRatingModal";
 import { Dialog } from "@capacitor/dialog";
+import { useToast } from "../ToastContext";
 
 
 const ManageCategory = () => {
@@ -21,6 +22,7 @@ const ManageCategory = () => {
   let { id } = useParams<{ id: string }>();
   const location = useLocation();
   const history = useHistory();
+  const { showToast } = useToast();
 
   const [isSubcategory, setIsSubcategory] = useState(false);
   const [editMode, setEditMode] = useState(!!id);
@@ -277,7 +279,8 @@ const ManageCategory = () => {
       if (isSubcategory) {
         history.goBack();
       }else {
-        history.push('/app/more/categories', { toast: t('manage-category.saving-category-success') });
+        history.push('/app/more/categories');
+        showToast(t('manage-category.saving-category-success'));
       }
     }, 500);
   };
@@ -303,7 +306,8 @@ const ManageCategory = () => {
         }, 500);
       } else {
         setTimeout(() => {
-          history.push('/app/more/categories', { toast: t('manage-category.deleting-category-success') });
+          history.push('/app/more/categories');
+          showToast(t('manage-category.deleting-category-success'));
         }, 500);
       }
     } catch (error) {

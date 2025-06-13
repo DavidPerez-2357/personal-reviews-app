@@ -14,6 +14,7 @@ import { library } from '@fortawesome/fontawesome-svg-core'
 import { fas } from '@fortawesome/free-solid-svg-icons';
 import Loader from '@/shared/components/Loader';
 import { openDatabase } from '@/shared/database/database-service';
+import { ToastProvider } from './ToastContext';
 
 library.add(fas);
 
@@ -74,14 +75,16 @@ const App: React.FC = () => {
 
   return (
     <IonApp>
-      <IonReactRouter>
-        <IonRouterOutlet>
-          <Route path="/app" component={FooterTabBar} />
-          <Route exact path="/">
-            <Redirect to="/app" />
-          </Route>
-        </IonRouterOutlet>
-      </IonReactRouter>
+      <ToastProvider>
+        <IonReactRouter>
+          <IonRouterOutlet>
+            <Route path="/app" component={FooterTabBar} />
+            <Route exact path="/">
+              <Redirect to="/app" />
+            </Route>
+          </IonRouterOutlet>
+        </IonReactRouter>
+      </ToastProvider>
     </IonApp>
   );
 };
