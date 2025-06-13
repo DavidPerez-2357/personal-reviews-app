@@ -2,7 +2,7 @@ import { usePhotoGallery } from "@/hooks/usePhotoGallery";
 import CategorySelectorHeader from "@/shared/components/CategorySelectorHeader";
 import PreviewPhotoModal from "@/shared/components/PreviewPhotoModal";
 import { Category } from "@/shared/dto/Category";
-import { Item, ItemOption } from "@/shared/dto/Item";
+import { Item, ItemFull, ItemOption } from "@/shared/dto/Item";
 import { UserPhoto } from "@/shared/dto/Photo";
 import {
   getCategoryById,
@@ -18,15 +18,20 @@ import {
   IonContent,
   IonGrid,
   IonInput,
+  IonItem,
   IonLabel,
+  IonList,
   IonPage,
   IonRow,
 } from "@ionic/react";
-import { Box, Building2, Camera, Images, Plus } from "lucide-react";
+import { Box, Building2, Camera, Images, Plus, Search } from "lucide-react";
 import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useHistory, useLocation, useParams } from "react-router";
 import ItemsSelectorModal from "./components/ItemsSelectorModal";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { IconName } from "@fortawesome/fontawesome-svg-core";
+import { CategoryColors } from "@/shared/enums/colors";
 
 const ManageItem = () => {
   // Estado para saber si es la primera carga del componente
@@ -231,6 +236,11 @@ const ManageItem = () => {
     );
   };
 
+  // Estado para los items seleccionados en el modal
+  const [selectedOriginItems, setSelectedOriginItems] = useState<ItemFull[]>(
+    []
+  );
+
   /**
    * useEffect principal:
    * Si está en modo edición, carga los datos del item a editar.
@@ -265,7 +275,7 @@ const ManageItem = () => {
         name: "",
         category_id: 0,
         is_origin: false,
-        image: ""
+        image: "",
       });
     }
   }, [editMode, id, history]);
@@ -370,8 +380,8 @@ const ManageItem = () => {
             <IonInput
               fill="solid"
               value={item?.name || ""}
-              placeholder={t("manage-item.placeholder.item-name")}
-              onIonChange={(e) => {
+              placeholder={t("manage-item.item-input-placeholder")}
+              onIonInput={(e) => {
                 if (item) {
                   setItem({ ...item, name: e.detail.value || "" });
                 }
@@ -436,65 +446,117 @@ const ManageItem = () => {
             <IonLabel className="section-title">
               {t("manage-item.change-is_origin")}
             </IonLabel>
-            <div className="flex gap-2">
-              <IonButton
+            <div className="flex gap-2 w-full justify-between items-center">
+                <IonButton
                 fill={item?.is_origin ? "solid" : "outline"}
-                color={item?.is_origin ? "success" : "medium"}
+                color={item?.is_origin ? "tertiary" : "medium"}
+                className={`w-1/2 ${item?.is_origin ? "text-[var(--ion-color-tertiary-contrast)]" : ""}`}
                 onClick={() => {
-                  console.log("Botón SÍ pulsado");
                   if (item && !item.is_origin) {
                     setItem({ ...item, is_origin: true });
-                    console.log("item.is_origin cambiado a true", {
-                      ...item,
-                      is_origin: true,
-                    });
+                    setSelectedOriginItems([]); // <-- Reset selected items al cambiar a origen
                   } else {
                     console.log("item ya era origen o no existe", item);
                   }
                 }}
-              >
+                >
                 {t("common.yes")}
-              </IonButton>
-              <IonButton
+                </IonButton>
+                <IonButton
                 fill={!item?.is_origin ? "solid" : "outline"}
-                color={!item?.is_origin ? "danger" : "medium"}
+                color={!item?.is_origin ? "tertiary" : "medium"}
+                className={`w-1/2 ${!item?.is_origin ? "text-[var(--ion-color-tertiary-contrast)]" : ""}`}
                 onClick={() => {
-                  console.log("Botón NO pulsado");
                   if (item && item.is_origin) {
                     setItem({ ...item, is_origin: false });
-                    console.log("item.is_origin cambiado a false", {
-                      ...item,
-                      is_origin: false,
-                    });
+                    setSelectedOriginItems([]); // <-- Reset selected items al cambiar a item
                   } else {
                     console.log("item ya no era origen o no existe", item);
                   }
                 }}
-              >
+                >
                 {t("common.no")}
-              </IonButton>
+                </IonButton>
             </div>
           </IonRow>
 
-          <IonRow className="flex gap-2 mx-5">
-            <IonLabel className="section-title">
-              {t("manage-item.item-origin")} {item?.name}
-            </IonLabel>
+          <IonRow className="flex flex-col gap-2 mx-5 justify-between">
+            <div className="flex gap-2 items-center justify-between">
+              <IonLabel className="section-title break-all">
+                {item?.is_origin
+                  ? t("manage-item.origin-item") + " " + item?.name
+                  : t("manage-item.item-origin")}
+              </IonLabel>
 
-            <IonButton
-              fill="solid"
-              color="secondary"
-              onClick={() => {
-                setItemsSelectorModalOpen(true);
-              }}
-            >
-              <Plus size={20} />
-            </IonButton>
-            <ItemsSelectorModal
-              isOpen={isItemsSelectorModalOpen}
-              onDismiss={() => setItemsSelectorModalOpen(false)}
-              isOrigin={item?.is_origin || false}
-            />
+                <IonButton
+                fill="solid"
+                color="secondary"
+                onClick={() => {
+                  setItemsSelectorModalOpen(true);
+                }}
+                >
+                {item?.is_origin ? <Plus size={20} /> : <Search size={20}/>}
+                </IonButton>
+              <ItemsSelectorModal
+                isOpen={isItemsSelectorModalOpen}
+                onDismiss={() => setItemsSelectorModalOpen(false)}
+                isOrigin={item?.is_origin || false}
+                itemsOfOrigin={selectedOriginItems}
+                onSave={(items) => setSelectedOriginItems(items)} // <-- Añadido
+              />
+            </div>
+
+            {selectedOriginItems.length === 0 ? (
+              <div className="text-center text-gray-500 py-4">
+                {t("manage-item.no-origin-items")}
+              </div>
+            ) : (
+              <IonList>
+              {selectedOriginItems.map((item: ItemFull) => {
+                return (
+                <IonItem key={item.id}>
+                  <div className="flex items-center gap-2">
+                  {item.image ? (
+                    <div className="flex relative items-center justify-center size-18 rounded-md overflow-hidden">
+                    <img
+                      src={Capacitor.convertFileSrc(item.image)}
+                      alt={item.name}
+                      className="object-cover w-full h-full"
+                    />
+                    <div
+                      className="absolute bottom-0 right-0 size-9 rounded-md flex items-center justify-center p-1"
+                      style={{
+                      backgroundColor:
+                        CategoryColors[item.category_color],
+                      }}
+                    >
+                      <FontAwesomeIcon
+                      icon={item.category_icon as IconName}
+                      className="fa-xl text-[var(--ion-color-primary-contrast)]"
+                      />
+                    </div>
+                    </div>
+                  ) : (
+                    <div
+                    className="flex items-center justify-center size-10 rounded-md p-2"
+                    style={{
+                      backgroundColor:
+                      CategoryColors[item.category_color],
+                    }}
+                    >
+                    <FontAwesomeIcon
+                      icon={item.category_icon as IconName}
+                      className="fa-xl text-[var(--ion-color-primary-contrast)]"
+                    />
+                    </div>
+                  )}
+                  {item.name}
+                  </div>
+                </IonItem>
+                );
+              })}
+              </IonList>
+            )}
           </IonRow>
         </IonGrid>
       </IonContent>
