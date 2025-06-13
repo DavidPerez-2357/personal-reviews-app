@@ -103,7 +103,7 @@ const ViewAllItems = () => {
             setItems([]);
         });
 
-    }, [window.location.pathname]);
+    }, [location.pathname]);
 
     useEffect(() => {
         const filters = {

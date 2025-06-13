@@ -30,6 +30,7 @@
     "apply": "Apply",
     "edit": "Edit",
     "create": "Create",
+    "search": "Search",
     "load-more": "Load more",
     "ascending": "Ascending",
     "descending": "Descending",
@@ -230,5 +231,10 @@
       "error-fetching-subcategories": "Error fetching subcategories",
       "error-fetching-parent-category": "Error fetching parent category"
     }
+  },
+
+  "view-all-categories": {
+    "create-category": "Create category",
+    "search-placeholder": "Search categories..."
   }
 }

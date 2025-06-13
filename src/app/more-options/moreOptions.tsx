@@ -1,5 +1,5 @@
-import { IonCol, IonContent, IonHeader, IonPage, IonTitle, IonToolbar } from "@ionic/react";
-import { Globe, Palette } from "lucide-react";
+import { IonCard, IonCol, IonContent, IonGrid, IonHeader, IonItem, IonPage, IonRow, IonTitle, IonToolbar } from "@ionic/react";
+import { Bookmark, Globe, Palette } from "lucide-react";
 import { useState, useRef } from "react"; // Importar useState y useRef
 import ChangeLanguageModal from "./components/ChangeLanguageModal"; // Importar el modal
 import ChangeThemeModal from "./components/ChangeThemeModal"; // Importar el modal
@@ -32,8 +32,6 @@ export const MoreOptions = () => {
         setIsThemeModalOpen(false);
     };
 
-    
-
     return (
         <IonPage className="safe-area-top p-5">
             <IonContent>
@@ -46,31 +44,40 @@ export const MoreOptions = () => {
                         </IonToolbar>
                     </IonHeader>
 
-                    <div className="flex flex-col gap-5">
-                        <div 
+                    <IonGrid className="flex flex-col gap-5">
+                        <IonRow
                             className="flex items-center gap-5 p-5 border-2 border-[var(--ion-color-secondary)] rounded-md cursor-pointer" // Añadir cursor-pointer para indicar que es clickeable
                             onClick={openLanguageModal}
                         >
                             <Globe size={30}></Globe>
                             <span className="text-2xl text-[var(--ion-text-color)]"> {t("more-options.language")}</span>
-                        </div>
-                        <div 
+                        </IonRow>
+                        <IonRow
                             className="flex items-center gap-5 p-5 border-2 border-[var(--ion-color-secondary)] rounded-md"
                             onClick={openThemeModal}
                         >
                             <Palette size={30}></Palette>
                             <span className="text-2xl text-[var(--ion-text-color)]"> {t("more-options.theme")}</span>
-                        </div>
-                    </div>
+                        </IonRow>
+                        <IonCard
+                            className=""
+                            routerLink="/app/more/categories"
+                        >
+                            <div className="flex items-center gap-5 p-5 border-2 border-[var(--ion-color-secondary)] rounded-md">
+                                <Bookmark size={30}></Bookmark>
+                                <span className="text-2xl text-[var(--ion-text-color)]"> {t("common.categories")}</span>
+                            </div>
+                        </IonCard>
+                    </IonGrid>
                 </div>
 
-                <ChangeLanguageModal 
-                    isOpen={isLanguageModalOpen} 
+                <ChangeLanguageModal
+                    isOpen={isLanguageModalOpen}
                     onDismiss={closeLanguageModal}
                 />
 
                 <ChangeThemeModal
-                    isOpen={isThemeModalOpen} 
+                    isOpen={isThemeModalOpen}
                     onDismiss={closeThemeModal}
                 />
 
