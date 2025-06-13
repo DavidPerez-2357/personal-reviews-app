@@ -57,30 +57,10 @@ export const ReviewPage: React.FC = () => {
   const { t } = useTranslation();
 
   useEffect(() => {
-    async function initializeData() {
-      try {
-        const reviewsFromDB = await getReviewsCards();
-        setReviews(reviewsFromDB);
-      } catch (err) {
-        console.error("Error initializing data:", err);
-      }
-    }
-    initializeData();
-
-    // Check for toast message in location state when component mounts or location changes
-
-    if (location.state?.toast) {
-      setToastMessage(location.state.toast);
-      setIsToastOpen(true);
-
-      if (location.pathname === "/app/reviews") {
-        (async () => {
-          const reviewsFromDB = await getReviewsCards();
-          setReviews(reviewsFromDB);
-        })();
-      }
-    }
-  }, [location.state, history, location.pathname]);
+      getReviewsCards().then((reviews) => {
+      setReviews(reviews);
+      });
+    }, [location.pathname]);
 
   const filteredReviews = useMemo(() => {
     const lowerSearchTerm = (searchTerm ?? "").toLowerCase().trim();
@@ -378,16 +358,6 @@ export const ReviewPage: React.FC = () => {
           applyFilters={handleApplyFilters}
         />
       </IonContent>
-
-      {/* Update IonToast to be controlled by state */}
-      <IonToast
-        className="safe-margin-top"
-        isOpen={isToastOpen}
-        message={toastMessage}
-        position="top"
-        onDidDismiss={() => setIsToastOpen(false)} // Hide toast when dismissed
-        duration={3000} // Set duration (e.g., 3 seconds)
-      />
     </IonPage>
   );
 };
