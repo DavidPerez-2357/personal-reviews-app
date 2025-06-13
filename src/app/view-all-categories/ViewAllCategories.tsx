@@ -59,7 +59,7 @@ const ViewAllCategories = () => {
     }, [location.pathname]);
 
     useEffect(() => {
-        countCategoriesFiltered(searchTerm)
+        countCategoriesFiltered(searchTerm.trim())
             .then((count) => {
                 setNumberOfCategoriesFiltered(count);
             })
@@ -67,7 +67,7 @@ const ViewAllCategories = () => {
                 console.error("Error counting categories:", error);
             });
 
-        fetchCategories(0, PAGE_SIZE, searchTerm)
+        fetchCategories(0, PAGE_SIZE, searchTerm.trim())
             .then((data) => {
                 setCategories(data);
             })

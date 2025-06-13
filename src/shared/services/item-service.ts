@@ -13,7 +13,7 @@ export const insertItem = async (item: Item): Promise<number | null> => {
 
     try {
         const query = `INSERT INTO item (name, image, category_id) VALUES (?, ?, ?)`;
-        const values = [item.name, item.image, item.category_id];
+        const values = [item.name.trim(), item.image, item.category_id];
 
         const result = await db!.run(query, values);
         return result.changes?.lastId as number;
@@ -189,7 +189,6 @@ export const getItemOptions = async (search: string): Promise<ItemOption[]> => {
         const values = [`%${search}%`];
         const result = await db!.query(query, values);
         return result.values as ItemOption[];
-        
     } catch (error) {
         console.error("❌ Error al obtener opciones de ítem");
         return [];
@@ -202,7 +201,7 @@ export const updateItem = async (item: Item): Promise<boolean> => {
 
     try {
         const query = `UPDATE item SET name = ?, image = ?, category_id = ? WHERE id = ?`;
-        const values = [item.name, item.image, item.category_id, item.id];
+        const values = [item.name.trim(), item.image, item.category_id, item.id];
 
         await db!.run(query, values);
         return true;
@@ -218,7 +217,7 @@ export const updateItemWithCategory = async (item: ItemWithCategory): Promise<bo
 
     try {
         const query = `UPDATE item SET name = ?, category_id = ? WHERE id = ?`;
-        const values = [item.name, item.category_id, item.id];
+        const values = [item.name.trim(), item.category_id, item.id];
 
         await db!.run(query, values);
         return true;
