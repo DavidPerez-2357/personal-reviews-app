@@ -51,7 +51,7 @@ export const insertCategoryRating = async (categoryRating: CategoryRating): Prom
 
     try {
         const query = `INSERT INTO category_rating (name, category_id) VALUES (?, ?)`;
-        const values = [categoryRating.name, categoryRating.category_id];
+        const values = [categoryRating.name.trim(), categoryRating.category_id];
 
         const result = await db!.run(query, values);
         return result.changes?.lastId || null;
