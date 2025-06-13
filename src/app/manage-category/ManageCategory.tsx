@@ -9,7 +9,7 @@ import { useTranslation } from "react-i18next";
 import { useHistory, useLocation, useParams } from "react-router";
 import SelectIconModal from "./components/SelectIconModal";
 import { Category, CategoryRating } from "@/shared/dto/Category";
-import { deleteCategoryById, deleteCategoryRating, getCategoryById, getCategoryRatingsByCategoryId, getChildrenCategories, insertCategory, insertCategoryRating, updateCategory } from "@/shared/services/category-service";
+import { deleteCategory, deleteCategoryRating, getCategoryById, getCategoryRatingsByCategoryId, getChildrenCategories, insertCategory, insertCategoryRating, updateCategory } from "@/shared/services/category-service";
 import ErrorAlert from "@/shared/components/ErrorAlert";
 import { trash } from 'ionicons/icons';
 import CreateRatingModal from "./components/CreateRatingModal";
@@ -47,6 +47,7 @@ const ManageCategory = () => {
   const [showErrorAlert, setShowErrorAlert] = useState(false);
   const [isCreateRatingModalOpen, setIsCreateRatingModalOpen] = useState(false);
   const [isDeleteAlertOpen, setIsDeleteAlertOpen] = useState(false);
+  const [categoryDeleted, setCategoryDeleted] = useState(false);
 
   useEffect(() => {
     if (icon) {
@@ -71,6 +72,8 @@ const ManageCategory = () => {
 
   useEffect(() => {
     setSaveButtonText(editMode ? t('common.save-changes') : t('manage-category.create-category'));
+    setIsSaveButtonDisabled(false);
+    setIsDeleteButtonDisabled(false);
     setDeleteButtonText(t('manage-category.delete-category'));
     setIcon("burger");
     setCategoryName('');
@@ -80,10 +83,14 @@ const ManageCategory = () => {
     setSubcategories([]);
     setParentCategoryId(null);
 
+    if (categoryDeleted) {
+      return;
+    }
+
     if ((editMode || isSubcategory) && id) {
       setEditData(parseInt(id));
     }
-  }, [editMode, id, isSubcategory]);
+  }, [location.pathname, editMode, isSubcategory, id]);
 
   const scrollToSelectedColor = () => {
     if (selectedColorElement.current) {
@@ -281,11 +288,12 @@ const ManageCategory = () => {
 
     try {
       if (id) {
-        const success = await deleteCategoryById(parseInt(id));
+        const success = await deleteCategory(parseInt(id));
         if (!success) {
           throw new Error();
         }
         console.log("Category deleted:", id);
+        setCategoryDeleted(true);
       }
 
       setDeleteButtonText(t('manage-category.deleting-category-success'));

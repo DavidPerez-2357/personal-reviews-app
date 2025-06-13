@@ -31,7 +31,7 @@ export const insertCategory = async (category: Category): Promise<number> => {
 
     try {
         const query = `INSERT INTO category (name, type, color, icon, parent_id) VALUES (?, ?, ?, ?, ?)`;
-        const values = [category.name, category.type, category.color, category.icon, category.parent_id];
+        const values = [category.name.trim(), category.type, category.color, category.icon, category.parent_id];
 
         const result = await db!.run(query, values);
         return result.changes?.lastId || 0;
@@ -144,6 +144,8 @@ export const getCategoryRatingValues = async (): Promise<CategoryRatingValue[]> 
 
 /**
  * Elimina una categoría de la base de datos.
+ * @param id
+ * @returns Promise<boolean>
  */
 export const deleteCategory = async (id: number): Promise<boolean> => {
     const db = await openDatabase();
@@ -181,9 +183,9 @@ export const deleteAllCategories = async (): Promise<boolean> => {
 
 /**
  * Actualiza una categoría en la base de datos.
- * 
- * @param category 
- * @returns 
+ *
+ * @param category
+ * @returns
  */
 export const updateCategory = async (category: Category): Promise<boolean> => {
     const db = await openDatabase();
@@ -191,7 +193,7 @@ export const updateCategory = async (category: Category): Promise<boolean> => {
 
     try {
         const query = `UPDATE category SET name = ?, type = ?, color = ?, icon = ?, parent_id = ? WHERE id = ?`;
-        const values = [category.name, category.type, category.color, category.icon, category.parent_id, category.id];
+        const values = [category.name.trim(), category.type, category.color, category.icon, category.parent_id, category.id];
 
         await db!.run(query, values);
         return true;
@@ -324,6 +326,11 @@ export const getChildrenCategories = async (categoryId: number): Promise<Categor
     }
 }
 
+/**
+ * Obtiene una categoría a partir de su ID.
+ * @param categoryId
+ * @returns Promise<Category | null>
+ */
 export const getCategoryById = async (categoryId: number): Promise<Category | null> => {
     const db = await openDatabase();
     if (!db) return null;
@@ -342,9 +349,9 @@ export const getCategoryById = async (categoryId: number): Promise<Category | nu
 
 /**
  * Elimina los valores de puntuación de categoría de una reseña a partir de su ID.
- * 
- * @param reviewId 
- * @returns 
+ *
+ * @param reviewId
+ * @returns
  */
 export const deleteRatingValuesFromReview = async (reviewId: number): Promise<boolean> => {
     const db = await openDatabase();
@@ -364,9 +371,9 @@ export const deleteRatingValuesFromReview = async (reviewId: number): Promise<bo
 
 /**
  * Obtiene los valores de puntuación de categoría de una reseña a partir de su ID.
- * 
- * @param reviewId 
- * @returns 
+ *
+ * @param reviewId
+ * @returns
  */
 export const getCategoryRatingMixByReviewId = async (reviewId: number): Promise<CategoryRatingMix[]> => {
     const db = await openDatabase();
@@ -382,47 +389,6 @@ export const getCategoryRatingMixByReviewId = async (reviewId: number): Promise<
         console.error("❌ Error al obtener valores de puntuación de categoría de la reseña");
         return [];
     }
-}
-
-export const deleteCategoryById = async (categoryId: number): Promise<boolean> => {
-    const db = await openDatabase();
-    if (!db) return false;
-
-    try {
-        await db.beginTransaction();
-
-        // Elimina los valores de puntuación de categoría asociados a la categoría
-        const deleteValuesQuery = `DELETE FROM category_rating_value WHERE category_rating_id IN (SELECT id FROM category_rating WHERE category_id = ?)`;
-        await db.run(deleteValuesQuery, [categoryId]);
-
-        // Elimina las puntuaciones de categoría asociadas a la categoría
-        const deleteRatingsQuery = `DELETE FROM category_rating WHERE category_id = ?`;
-        await db.run(deleteRatingsQuery, [categoryId]);
-
-        // Elimina las reseñas asociadas a los items de la categoría
-        const deleteReviewsQuery = `
-        DELETE FROM review
-        WHERE item_id IN (SELECT id FROM item WHERE category_id = ?)
-        `;
-        await db.run(deleteReviewsQuery, [categoryId]);
-
-        // Elimina los items asociados a la categoría
-        const deleteItemsQuery = `DELETE FROM item WHERE category_id = ?`;
-        await db.run(deleteItemsQuery, [categoryId]);
-
-        // Finalmente, elimina la categoría
-        const deleteCategoryQuery = `DELETE FROM category WHERE id = ?`;
-        await db.run(deleteCategoryQuery, [categoryId]);
-
-        await db.commitTransaction();
-    } catch (err) {
-        console.error("❌ Error al eliminar categoría:", err);
-        await db.rollbackTransaction();
-        return false;
-    }
-
-    console.log("✅ Categoría eliminada correctamente.");
-    return true;
 }
 
 export const insertDefaultCategories = async (db: any) => {
