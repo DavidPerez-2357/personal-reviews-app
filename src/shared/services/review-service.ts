@@ -16,7 +16,7 @@ export const insertReview = async (review: Review): Promise<number | null> => {
     try {
         const query = `INSERT INTO review (rating, comment, item_id)
                        VALUES (?, ?, ?)`;
-        const values = [review.rating, review.comment.trim() ?? null, review.item_id];
+        const values = [review.rating, review.comment?.trim() ?? null, review.item_id];
 
         const result = await db!.run(query, values);
         return result.changes?.lastId || null;
