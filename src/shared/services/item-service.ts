@@ -57,6 +57,41 @@ export const getItemFull = async (id: number): Promise<ItemFull | null> => {
     }
 }
 
+export const getItemDisplay = async (id: number): Promise<ItemDisplay | null> => {
+    const db = await openDatabase();
+    if (!db) return null;
+    try {
+        const query = `
+            SELECT i.id, i.name, i.image,
+                   COUNT(r.rating) AS number_of_reviews,
+                   c.icon AS category_icon,
+                   c.color AS category_color,
+                   i.is_origin,
+                   (
+                       SELECT r2.rating
+                       FROM review r2
+                       WHERE r2.item_id = i.id
+                       ORDER BY r2.created_at DESC
+                       LIMIT 1
+                   ) AS last_review
+            FROM item i
+            LEFT JOIN review r ON i.id = r.item_id
+            LEFT JOIN category c ON i.category_id = c.id
+            WHERE i.id = ?
+            GROUP BY i.id, i.name, c.icon, c.color;
+        `;
+        const result = await db!.query(query, [id]);
+        if (result.values && result.values[0]) {
+            const row = result.values[0];
+            return row as ItemDisplay;
+        }
+        return null;
+    } catch (error) {
+        console.error("❌ Error al obtener ítem por ID", error);
+        return null;
+    }
+}
+
 /**
  * Obtiene los items de un origen con la nueva estructura de ItemDisplay.
  * @param id
