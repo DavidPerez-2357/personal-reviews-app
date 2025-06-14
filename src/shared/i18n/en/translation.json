@@ -186,7 +186,9 @@
   "view-item": {
     "timeline": "Timeline",
     "add-review": "Add review",
-    "to-origin": "Convert to origin"
+    "to-origin": "Convert to origin",
+    "no-items-found": "No items found",
+    "no-review": "There are no reviews for this item"
   },
 
   "manage-category": {

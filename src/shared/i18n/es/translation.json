@@ -189,7 +189,9 @@
   "view-item": {
     "timeline": "Línea de tiempo",
     "add-review": "Agregar reseña",
-    "to-origin": "Convertir a origen"
+    "to-origin": "Convertir a origen",
+    "no-items-found": "No se encontraron elementos",
+    "no-review": "No hay reseñas para este elemento"
   },
 
   "manage-category": {
