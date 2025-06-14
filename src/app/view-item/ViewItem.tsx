@@ -259,7 +259,7 @@ export const ViewItem = () => {
                 )}
               </IonGrid>
             </div>
-          ): ''}
+          ): null}
         </div>
       </IonContent>
     </IonPage>
