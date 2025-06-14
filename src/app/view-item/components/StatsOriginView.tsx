@@ -25,7 +25,7 @@ const StatOriginView = ({ items }: { items: ItemDisplay[] }) => {
           {Number.isFinite(averageRating) ? averageRating.toFixed(1) : '0.0'} <Star size={35} color="var(--ion-color-primary-step-500)" className="inline" fill="var(--ion-color-primary-step-500)" />
         </span>
         <span className="text-lg text-[var(--ion-text-color)]">
-          {numberOfItems} {t("common.item")}
+          {numberOfItems} {numberOfItems === 1 ? t("common.item") : t("common.items")}
         </span>
       </div>
 
