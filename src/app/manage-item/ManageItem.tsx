@@ -322,6 +322,8 @@ const ManageItem = () => {
 
     // Validar que el item tenga un nombre
     if (!item.name.trim()) {
+      setCreateButtonDisabled(false);
+      setDeleteButtonDisabled(false);
       showToast(t("manage-item.error-missing-name"));
       console.error("❌ El item debe tener un nombre");
       return;
@@ -329,6 +331,8 @@ const ManageItem = () => {
 
     // Validar que el item tenga una categoría seleccionada
     if (!selectedCategory) {
+      setCreateButtonDisabled(false);
+      setDeleteButtonDisabled(false);
       showToast(t("manage-item.error-missing-category"));
       console.error("❌ El item debe tener una categoría");
       return;
