@@ -7,9 +7,7 @@
     "dev": "vite",
     "build": "tsc && vite build",
     "preview": "vite preview",
-    "test.e2e": "cypress run",
-    "test.unit": "vitest",
-    "lint": "eslint"
+    "test.unit": "vitest"
   },
   "dependencies": {
     "@capacitor-community/safe-area": "^7.0.0-alpha.1",
@@ -66,5 +64,5 @@
     "vite": "~5.2.0",
     "vitest": "^0.34.6"
   },
-  "description": "An Ionic project"
+  "description": "It's an app where you can save your reviews of products, services, experiences... or anything! You can rate an item in different aspects depending on the category they're associated with, for example for videogames you can rate plot, gameplay and graphics separately. Since your opinion can change over time, you can add multiple reviews to a single product and later see them in a timeline. Items can have an origin, which is where the item came from, for example, for a car its origin can be its brand."
 }
