@@ -194,7 +194,9 @@
     "to-origin": "Convertir a origen",
     "to-item": "Convertir a elemento",
     "to-item-success": "Elemento convertido con éxito",
-    "to-origin-success": "Origen creado con éxito"
+    "to-origin-success": "Origen creado con éxito",
+    "no-items-found": "No se encontraron elementos",
+    "no-reviews": "No se encontraron reseñas"
   },
   "manage-item": {
     "save-item-success": "Elemento guardado con éxito",
@@ -204,7 +206,7 @@
     "delete-item": "Eliminar elemento",
     "delete-item-confirm": "¿Estás seguro de que deseas eliminar este elemento? SE ELIMINARÁN TODAS LAS RESEÑAS ASOCIADAS",
     "delete-item-success": "Elemento eliminado con éxito",
-    "change-is_origin": "¿Quieres añadir elementos?",
+    "change-is-origin": "¿Quieres que sea un origen?",
     "item-origin": "¿A qué origen pertenece?",
     "origin-items": "Añadir elemento a",
     "no-origin-items": "No se seleccionaron elementos",
