@@ -214,7 +214,7 @@ export const getItemsByOrigin = async (id: number): Promise<ItemDisplay[]> => {
     try {
         const query = `
             SELECT i.id, i.name, i.image,
-               COUNT(r.rating) AS number_of_rewviews,
+               COUNT(r.rating) AS number_of_reviews,
                c.icon AS category_icon,
                c.color AS category_color,
                i.is_origin,
@@ -225,7 +225,7 @@ export const getItemsByOrigin = async (id: number): Promise<ItemDisplay[]> => {
                WHERE r2.item_id = i.id
                ORDER BY r2.created_at DESC
                LIMIT 1
-               ) AS last_review
+               ) AS last_rating
             FROM item i
             LEFT JOIN review r ON i.id = r.item_id
             LEFT JOIN category c ON i.category_id = c.id
@@ -235,17 +235,7 @@ export const getItemsByOrigin = async (id: number): Promise<ItemDisplay[]> => {
         `;
         const result = await db!.query(query, [id]);
         // Map fields to match ItemDisplay interface
-        return (result.values || []).map((row: ItemDisplay) => ({
-            id: row.id,
-            name: row.name,
-            image: row.image || null,
-            is_origin: row.is_origin || false,
-            origin_id: row.origin_id || undefined,
-            last_review: row.last_rating ? Number(new Date(row.last_rating)) : 0,
-            number_of_reviews: row.number_of_reviews,
-            category_icon: row.category_icon,
-            category_color: row.category_color
-        })) as ItemDisplay[];
+        return result.values as ItemDisplay[];
     } catch (error) {
         console.error("❌ Error al obtener ítems por origen", error);
         return [];
