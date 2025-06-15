@@ -2,7 +2,6 @@
   "config": {
     "date-format": "en-US"
   },
-
   "common": {
     "appName": "Personal reviews",
     "welcome": "Welcome to my app",
@@ -34,7 +33,6 @@
     "load-more": "Load more",
     "ascending": "Ascending",
     "descending": "Descending",
-
     "preview": "Preview",
     "reviews": "Reviews",
     "review": "Review",
@@ -50,22 +48,18 @@
     "subcategory": "Subcategory",
     "rating": "Rating",
     "ratings": "Ratings",
-
     "image": "Image",
     "images": "Images",
     "color": "Color",
-
     "select-category": "Select category",
     "select-item": "Select item",
     "no-categories-found": "No categories found",
     "no-items-found": "No items found",
     "no-reviews-found": "No reviews found",
-
     "by-name": "By name",
     "by-date": "By date",
     "by-rating": "By rating"
   },
-
   "manage-item-review": {
     "create-review": "Create review",
     "saving-review": "Saving review",
@@ -113,14 +107,12 @@
     "apply": "Apply",
     "no-reviews": "No reviews available"
   },
-
   "view-all-items": {
     "create-item": "Create item",
     "only-items": "Only items",
     "only-origins": "Only origins",
     "search-placeholder": "Search items..."
   },
-
   "more-options": {
     "more-options": "More options",
     "language": "Language",
@@ -132,7 +124,6 @@
     "spanish": "Spanish",
     "english": "English"
   },
-
   "categories": {
     "food": "Food",
     "electronics": "Electronics",
@@ -144,7 +135,6 @@
     "sports": "Sports",
     "hostelery": "Hostelry"
   },
-
   "category-rating": {
     "taste": "Taste",
     "quality": "Quality",
@@ -183,7 +173,6 @@
     "drink_quality": "Drink quality",
     "music": "Music"
   },
-
   "view-item": {
     "timeline": "Timeline",
     "add-review": "Add review",
@@ -191,7 +180,8 @@
     "to-origin": "Convert to origin",
     "to-item": "Convert to item",
     "to-origin-success": "Origin created successfully",
-    "to-item-success": "Item created successfully"
+    "to-item-success": "Item created successfully",
+    "add-item-inside": "Add item inside"
   },
   "manage-item": {
     "save-item-success": "Item saved successfully",
@@ -203,7 +193,8 @@
     "delete-item-success": "Item deleted successfully",
     "change-is_origin": "Which origin does it belong to?",
     "item-origin": "Which item does it belong to?",
-    "origin-item": "Add item to",
+    "add-items-to-origin": "Add items to origin",
+    "origin-items": "Add items inside ",
     "no-origin-items": "No selected items found",
     "no-items": "No items found",
     "search-items": "Search items...",
@@ -211,9 +202,12 @@
     "error-missing-name": "Item name is required",
     "error-missing-category": "Category is required",
     "select-items": "Select items",
-    "select-origin": "Select origin"
+    "select-origin": "Select origin",
+    "save-selected-items": "Save selected items",
+    "save-selected-origin": "Save selected origin"
   },
-    "manage-category": {
+
+  "manage-category": {
     "select-icon": "Select icon",
     "search-icon-placeholder": "Search icon...",
     "all-icons-are-from-fontawesome": "All icons are from FontAwesome",
@@ -240,7 +234,6 @@
     "rating-name-empty": "Rating name cannot be empty",
     "no-subcategories": "No subcategories found",
     "unknown-parent-category": "Unknown parent category",
-
     "error-message": {
       "error-creating-category": "Error creating category",
       "error-saving-category": "Error saving category",
@@ -256,7 +249,6 @@
       "error-fetching-parent-category": "Error fetching parent category"
     }
   },
-
   "view-all-categories": {
     "create-category": "Create category",
     "search-placeholder": "Search categories..."

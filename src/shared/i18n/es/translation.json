@@ -1,8 +1,7 @@
 {
- "config": {
+  "config": {
     "date-format": "es-ES"
   },
-
   "common": {
     "appName": "Personal reviews",
     "welcome": "Bienvenido a mi aplicación",
@@ -34,9 +33,7 @@
     "load-more": "Cargar más",
     "ascending": "Ascendente",
     "descending": "Descendente",
-
     "preview": "Vista previa",
-
     "reviews": "Reseñas",
     "review": "Reseña",
     "items": "Elementos",
@@ -51,21 +48,17 @@
     "subcategory": "Subcategoría",
     "rating": "Calificación",
     "ratings": "Calificaciones",
-
     "image": "Imagen",
     "images": "Imágenes",
-
     "select-category": "Selecciona una categoría",
     "select-item": "Selecciona un elemento",
     "no-categories-found": "No se encontraron categorías",
     "no-items-found": "No se encontraron elementos",
     "no-reviews-found": "No se encontraron reseñas",
-
     "by-name": "Por nombre",
     "by-date": "Por fecha",
     "by-rating": "Por calificación"
   },
-
   "manage-item-review": {
     "create-review": "Crear reseña",
     "saving-review": "Guardando reseña",
@@ -78,30 +71,28 @@
     "delete-review-confirm": "¿Estás seguro de que deseas eliminar esta reseña?",
     "delete-review-success": "Reseña eliminada con éxito",
     "deleting-review": "Eliminando reseña",
-
-        "error-message": {
-            "empty-title": "El título no puede estar vacío",
-            "error-creating-review": "Error al crear la reseña",
-            "error-saving-review": "Error al guardar la reseña",
-            "error-creating-item": "Error al crear el elemento",
-            "error-saving-item": "Error al guardar el elemento",
-            "error-saving-review-ratings": "Error al guardar las calificaciones de la reseña",
-            "error-saving-review-images": "Error al guardar las imágenes de la reseña",
-            "error-updating-item": "Error al actualizar el elemento",
-            "error-updating-review": "Error al actualizar la reseña",
-            "review-not-found": "Reseña no encontrada",
-            "item-not-found": "Elemento no encontrado",
-            "category-not-found": "Categoría no encontrada",
-            "category-ratings-not-found": "Calificaciones de categoría no encontradas",
-            "review-images-not-found": "Imágenes de reseña no encontradas",
-            "error-deleting-review": "Error al eliminar la reseña",
-            "error-deleting-item": "Error al eliminar el elemento",
-            "error-deleting-category": "Error al eliminar la categoría",
-            "error-deleting-review-ratings": "Error al eliminar las calificaciones de la reseña",
-            "error-deleting-review-images": "Error al eliminar las imágenes de la reseña"
-        }
+    "error-message": {
+      "empty-title": "El título no puede estar vacío",
+      "error-creating-review": "Error al crear la reseña",
+      "error-saving-review": "Error al guardar la reseña",
+      "error-creating-item": "Error al crear el elemento",
+      "error-saving-item": "Error al guardar el elemento",
+      "error-saving-review-ratings": "Error al guardar las calificaciones de la reseña",
+      "error-saving-review-images": "Error al guardar las imágenes de la reseña",
+      "error-updating-item": "Error al actualizar el elemento",
+      "error-updating-review": "Error al actualizar la reseña",
+      "review-not-found": "Reseña no encontrada",
+      "item-not-found": "Elemento no encontrado",
+      "category-not-found": "Categoría no encontrada",
+      "category-ratings-not-found": "Calificaciones de categoría no encontradas",
+      "review-images-not-found": "Imágenes de reseña no encontradas",
+      "error-deleting-review": "Error al eliminar la reseña",
+      "error-deleting-item": "Error al eliminar el elemento",
+      "error-deleting-category": "Error al eliminar la categoría",
+      "error-deleting-review-ratings": "Error al eliminar las calificaciones de la reseña",
+      "error-deleting-review-images": "Error al eliminar las imágenes de la reseña"
+    }
   },
-
   "review-page": {
     "search": "Buscar",
     "search-placeholder": "Buscar reseñas...",
@@ -114,28 +105,23 @@
     "apply": "Aplicar",
     "no-reviews": "No hay reseñas disponibles"
   },
-
   "view-all-items": {
     "create-item": "Crear elemento",
     "only-items": "Solo elementos",
     "only-origins": "Solo orígenes",
     "search-placeholder": "Buscar elementos..."
   },
-
   "more-options": {
     "more-options": "Más opciones",
     "language": "Idioma",
     "theme": "Tema",
-
     "change-theme": "Cambiar tema",
     "dark-mode": "Modo oscuro",
     "light-mode": "Modo claro",
-
     "change-language": "Cambiar idioma",
     "spanish": "Español",
     "english": "Inglés"
   },
-
   "categories": {
     "food": "Comida",
     "electronics": "Electrónica",
@@ -147,7 +133,6 @@
     "sports": "Deportes",
     "hostelery": "Hostelería"
   },
-
   "category-rating": {
     "taste": "Sabor",
     "quality": "Calidad",
@@ -186,7 +171,6 @@
     "drink_quality": "Calidad de las bebidas",
     "music": "Música"
   },
-
   "view-item": {
     "timeline": "Línea de tiempo",
     "add-review": "Agregar reseña",
@@ -194,7 +178,8 @@
     "to-origin": "Convertir a origen",
     "to-item": "Convertir a elemento",
     "to-item-success": "Elemento convertido con éxito",
-    "to-origin-success": "Origen creado con éxito"
+    "to-origin-success": "Origen creado con éxito",
+    "add-item-inside": "Agregar elemento dentro"
   },
   "manage-item": {
     "save-item-success": "Elemento guardado con éxito",
@@ -206,7 +191,8 @@
     "delete-item-success": "Elemento eliminado con éxito",
     "change-is_origin": "¿Quieres añadir elementos?",
     "item-origin": "¿A qué origen pertenece?",
-    "origin-items": "Añadir elemento a",
+    "add-items-to-origin": "Añadir elementos dentro de ",
+    "origin-items": "Añadir elementos a",
     "no-origin-items": "No se seleccionaron elementos",
     "no-items": "No se encontraron elementos",
     "search-items": "Buscar elementos...",
@@ -214,9 +200,11 @@
     "error-missing-name": "El elemento debe tener un nombre",
     "error-missing-category": "El elemento debe tener una categoría",
     "select-items": "Seleccionar elementos",
-    "select-origin": "Seleccionar origen"
+    "select-origin": "Seleccionar origen",
+    "save-selected-items": "Guardar elementos seleccionados",
+    "save-selected-origin": "Guardar origen seleccionado"
   },
-    "manage-category": {
+  "manage-category": {
     "select-icon": "Seleccionar icono",
     "search-icon-placeholder": "Buscar icono...",
     "all-icons-are-from-fontawesome": "Todos los iconos son de FontAwesome",
@@ -243,7 +231,6 @@
     "rating-name-empty": "El nombre de la calificación no puede estar vacío",
     "no-subcategories": "No se han encontrado subcategorías",
     "unknown-parent-category": "Categoría principal desconocida",
-
     "error-message": {
       "error-creating-category": "Error al crear la categoría",
       "error-saving-category": "Error al guardar la categoría",
@@ -258,7 +245,6 @@
       "error-fetching-parent-category": "Error al obtener la categoría principal"
     }
   },
-
   "view-all-categories": {
     "create-category": "Crear categoría",
     "search-placeholder": "Buscar categorías..."
