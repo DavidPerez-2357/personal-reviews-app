@@ -269,6 +269,14 @@ const ManageItemReview = () => {
       });
   }, [selectedCategory]);
 
+  useEffect(() => {
+  if (isDeleteAlertOpen) {
+    setIsDeleteButtonDisabled(true);
+  }else {
+    setIsDeleteButtonDisabled(false);
+  }
+}, [isDeleteAlertOpen]);
+
   const handleTakePhoto = async () => {
     const newPhoto = await takePhoto();
     if (!newPhoto) return;
@@ -630,9 +638,9 @@ const ManageItemReview = () => {
   };
 
   const handleDeleteReview = async () => {
-    if (!editMode) return;
     setIsSaveButtonDisabled(true);
     setIsDeleteButtonDisabled(true);
+    if (!editMode) return;
     setDeleteButtonText(t("manage-item-review.deleting-review"));
 
     const reviewId = parseInt(id);
@@ -809,8 +817,8 @@ const ManageItemReview = () => {
                     className="large"
                     color="danger"
                     expand="full"
-                    onClick={() => setIsDeleteAlertOpen(true)}
                     disabled={isDeleteButtonDisabled}
+                    onClick={() => setIsDeleteAlertOpen(true)}
                   >
                     {deleteButtonText}
                   </IonButton>

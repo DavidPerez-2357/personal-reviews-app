@@ -37,7 +37,7 @@ import {
   IonRow,
 } from "@ionic/react";
 import { Box, Building2, Camera, Images, Plus, Search } from "lucide-react";
-import { useEffect, useState } from "react";
+import { use, useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useHistory, useLocation, useParams } from "react-router";
 import ItemsSelectorModal from "./components/ItemsSelectorModal";
@@ -89,6 +89,14 @@ const ManageItem = () => {
   const [showErrorAlert, setShowErrorAlert] = useState(false);
   const [createButtonDisabled, setCreateButtonDisabled] = useState(false);
   const [deleteButtonDisabled, setDeleteButtonDisabled] = useState(false);
+
+  useEffect(() => {
+    if (isDeleteAlertOpen) {
+      setDeleteButtonDisabled(true);
+    } else {
+      setDeleteButtonDisabled(false);
+    }
+  }, [isDeleteAlertOpen]);
 
   // Photo preview state
   const [previewPhoto, setPreviewPhoto] = useState<UserPhoto | null>(null);
@@ -292,6 +300,7 @@ const ManageItem = () => {
 
   const handleSaveNewItem = async () => {
     setCreateButtonDisabled(true);
+    setDeleteButtonDisabled(true);
     if (!item) {
       console.error("❌ No hay item para guardar");
       return;
@@ -355,6 +364,7 @@ const ManageItem = () => {
   };
 
   const handleDeleteItem = async () => {
+    setCreateButtonDisabled(true);
     setDeleteButtonDisabled(true);
     try {
       const reviews = await getReviewsByItemId(Number(id));
@@ -401,13 +411,15 @@ const ManageItem = () => {
 
       // 4. Eliminar el ítem
       if (!item) {
-        setShowErrorAlert(true);
+        showToast(t("manage-item.item-not-found"));
+        setCreateButtonDisabled(true);
         setDeleteButtonDisabled(true);
         return;
       }
       const success = await deleteItem(item.id);
       if (!success) {
-        setShowErrorAlert(true);
+        showToast(t("manage-item.item-not-found"));
+        setCreateButtonDisabled(true);
         setDeleteButtonDisabled(true);
         return;
       }
@@ -460,6 +472,8 @@ const ManageItem = () => {
         });
       setIsInitialLoad(false);
     }
+    setCreateButtonDisabled(false);
+    setDeleteButtonDisabled(false);
   }, [location.pathname, id, editMode]);
 
   /**
