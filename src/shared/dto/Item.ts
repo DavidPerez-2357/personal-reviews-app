@@ -28,6 +28,7 @@ export interface ItemFull {
     id: number;
     name: string;
     image: string | null;
+    is_origin: boolean;
     created_at: string;
     updated_at: string;
     category_id: number;
@@ -44,7 +45,6 @@ export interface ItemDisplay {
     number_of_reviews: number;
     is_origin: boolean;
     origin_id?: number;
-
     category_icon: string;
     category_color: string;
 }

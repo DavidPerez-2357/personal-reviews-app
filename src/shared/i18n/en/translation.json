@@ -56,6 +56,7 @@
     "color": "Color",
 
     "select-category": "Select category",
+    "select-item": "Select item",
     "no-categories-found": "No categories found",
     "no-items-found": "No items found",
     "no-reviews-found": "No reviews found",
@@ -186,12 +187,33 @@
   "view-item": {
     "timeline": "Timeline",
     "add-review": "Add review",
+    "delete-item-success": "Item deleted successfully",
     "to-origin": "Convert to origin",
-    "no-items-found": "No items found",
-    "no-review": "There are no reviews for this item"
+    "to-item": "Convert to item",
+    "to-origin-success": "Origin created successfully",
+    "to-item-success": "Item created successfully"
   },
-
-  "manage-category": {
+  "manage-item": {
+    "save-item-success": "Item saved successfully",
+    "save-item-error": "Error saving item",
+    "item-input-placeholder": "Write the item name...",
+    "item-name-empty": "Item name cannot be empty",
+    "delete-item": "Delete item",
+    "delete-item-confirm": "Are you sure you want to delete this item? ALL LINKED REVIEWS WILL BE DELETED",
+    "delete-item-success": "Item deleted successfully",
+    "change-is_origin": "Which origin does it belong to?",
+    "item-origin": "Which item does it belong to?",
+    "origin-item": "Add item to",
+    "no-origin-items": "No selected items found",
+    "no-items": "No items found",
+    "search-items": "Search items...",
+    "search-origin": "Search origins...",
+    "error-missing-name": "Item name is required",
+    "error-missing-category": "Category is required",
+    "select-items": "Select items",
+    "select-origin": "Select origin"
+  },
+    "manage-category": {
     "select-icon": "Select icon",
     "search-icon-placeholder": "Search icon...",
     "all-icons-are-from-fontawesome": "All icons are from FontAwesome",

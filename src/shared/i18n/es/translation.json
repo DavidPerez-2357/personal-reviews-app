@@ -56,6 +56,7 @@
     "images": "Imágenes",
 
     "select-category": "Selecciona una categoría",
+    "select-item": "Selecciona un elemento",
     "no-categories-found": "No se encontraron categorías",
     "no-items-found": "No se encontraron elementos",
     "no-reviews-found": "No se encontraron reseñas",
@@ -189,12 +190,33 @@
   "view-item": {
     "timeline": "Línea de tiempo",
     "add-review": "Agregar reseña",
+    "delete-item-success": "Elemento eliminado con éxito",
     "to-origin": "Convertir a origen",
-    "no-items-found": "No se encontraron elementos",
-    "no-review": "No hay reseñas para este elemento"
+    "to-item": "Convertir a elemento",
+    "to-item-success": "Elemento convertido con éxito",
+    "to-origin-success": "Origen creado con éxito"
   },
-
-  "manage-category": {
+  "manage-item": {
+    "save-item-success": "Elemento guardado con éxito",
+    "save-item-error": "Error al guardar el elemento",
+    "item-input-placeholder": "Escribe el nombre del elemento...",
+    "item-name-empty": "El nombre del elemento no puede estar vacío",
+    "delete-item": "Eliminar elemento",
+    "delete-item-confirm": "¿Estás seguro de que deseas eliminar este elemento? SE ELIMINARÁN TODAS LAS RESEÑAS ASOCIADAS",
+    "delete-item-success": "Elemento eliminado con éxito",
+    "change-is_origin": "¿Quieres añadir elementos?",
+    "item-origin": "¿A qué origen pertenece?",
+    "origin-items": "Añadir elemento a",
+    "no-origin-items": "No se seleccionaron elementos",
+    "no-items": "No se encontraron elementos",
+    "search-items": "Buscar elementos...",
+    "search-origin": "Buscar origen...",
+    "error-missing-name": "El elemento debe tener un nombre",
+    "error-missing-category": "El elemento debe tener una categoría",
+    "select-items": "Seleccionar elementos",
+    "select-origin": "Seleccionar origen"
+  },
+    "manage-category": {
     "select-icon": "Seleccionar icono",
     "search-icon-placeholder": "Buscar icono...",
     "all-icons-are-from-fontawesome": "Todos los iconos son de FontAwesome",

@@ -111,3 +111,10 @@ ion-card {
     box-shadow: none!important;
     --color: var(--ion-text-color)!important;
 }
+
+ion-button.large::part(native) {
+    font-weight: 600;
+    padding: 1rem 1.2rem;
+    border-radius: 0.5rem;
+    font-size: 1.2rem;
+}

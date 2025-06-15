@@ -273,9 +273,9 @@ export const getParentCategories = async (): Promise<Category[]> => {
 
 /**
  * Obtiene la categoría padre de una categoría a partir de su ID, si esa categoria es padre, la devuelve. En cambio, si no lo es, devuelve la categoría padre.
- * 
- * @param categoryId 
- * @returns 
+ *
+ * @param categoryId
+ * @returns
  */
 export const getParentCategory = async (categoryId: number): Promise<Category | null> => {
     const db = await openDatabase();

@@ -9,8 +9,9 @@ import '@styles/FooterTabBar.css';
 import { useTranslation } from 'react-i18next';
 import ManageItemReview from '@/app/manage-review/ManageItemReview';
 import ViewAllReviews from '@/app/view-all-reviews/ViewAllReviews';
-import { MoreOptions } from './more-options/moreOptions';
-import ViewItem from './view-item/ViewItem';
+import { MoreOptions } from '@/app/more-options/moreOptions';
+import ViewItem from '@/app/view-item/ViewItem';
+import ManageItem from '@/app/manage-item/ManageItem';
 import ViewAllItems from './view-all-items/ViewAllItems';
 import ManageCategory from './manage-category/ManageCategory';
 import ViewAllCategories from './view-all-categories/ViewAllCategories';
@@ -42,6 +43,8 @@ const FooterTabBar = () => {
           <Route path="/app/reviews/create/item/:itemId" component={ManageItemReview} exact={true} />
 
           <Route path="/app/items/:id/viewItem" component={ViewItem} exact={true} />
+          <Route path="/app/items/create" component={ManageItem} exact={true} />
+          <Route path="/app/items/:id/edit" component={ManageItem} exact={true} />
 
           <Route path="/app/more/categories" component={ViewAllCategories} exact={true} />
           <Route path="/app/more/categories/create" component={ManageCategory} exact={true} />

@@ -48,6 +48,8 @@ const ReviewFilterModal: React.FC<FilterModalProps> = ({
   const { t } = useTranslation();
 
   useEffect(() => {
+
+    // Comentado: llamada real a la base de datos
     const fetchCategories = async () => {
       try {
         const categories = await getCategories();
@@ -118,7 +120,7 @@ const ReviewFilterModal: React.FC<FilterModalProps> = ({
         console.warn(`Modo de subcategoría no reconocido: ${subcategoryMode}`);
         return [selectedCategory.id];
     }
-  };  
+  };
 
   // Handle reset button click
   const handleResetFilter = () => {

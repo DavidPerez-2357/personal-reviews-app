@@ -512,9 +512,8 @@ const ManageCategory = () => {
 
           <div className="flex flex-col gap-4">
             <IonButton
-              className="z-[1000] bottom-0 right-0 mt-10 mb-5 ml-5 mr-5 fixed"
+              className="z-[1000] bottom-0 right-0 mt-10 mb-5 ml-5 mr-5 fixed large"
               ref={saveButtonRef}
-              id="save-review"
               color="tertiary"
               expand="full"
               disabled={isSaveButtonDisabled}
@@ -524,9 +523,9 @@ const ManageCategory = () => {
             </IonButton>
 
             <IonButton
-              id="save-review"
               color="tertiary"
               expand="full"
+              className="large"
               disabled={isSaveButtonDisabled}
               onClick={handleSavecategory}
             >
@@ -535,9 +534,9 @@ const ManageCategory = () => {
 
             {editMode && (
               <IonButton
-                id="delete-review"
                 color="danger"
                 expand="full"
+                className="large"
                 onClick={() => setIsDeleteAlertOpen(true)}
                 disabled={isDeleteButtonDisabled}
               >
