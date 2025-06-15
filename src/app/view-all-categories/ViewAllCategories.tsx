@@ -74,7 +74,7 @@ const ViewAllCategories = () => {
             .catch((error) => {
                 console.error("Error fetching initial categories:", error);
             });
-    }, [searchTerm]);
+    }, [searchTerm, location.pathname]);
 
     return (
         <IonPage className="safe-area-top">

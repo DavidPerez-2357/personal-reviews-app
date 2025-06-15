@@ -1,3 +1,4 @@
+import { useEffect, useState } from "react";
 import React, { use, useEffect, useState, useRef } from "react";
 import {
   IonContent,
@@ -27,7 +28,6 @@ import { CategoryColors } from "@/shared/enums/colors";
 import StarRating from "@/shared/components/StarRating";
 import { Review } from "@/shared/dto/Review";
 import TimelineEntry from "./components/TimeLineEntry";
-import ItemCard from "../../shared/components/ItemCard";
 import StatOriginView from "./components/StatsOriginView";
 import {
   deleteItem,
@@ -117,7 +117,7 @@ export const ViewItem = () => {
   };
   useEffect(() => {
     initializeData();
-  }, [id]);
+  }, [id, location.pathname]);
 
   useEffect(() => {
     // Reset image error state when item changes
@@ -261,9 +261,8 @@ export const ViewItem = () => {
           <div className="flex flex-col gap-7">
             {/* Mostrar el contenedor solo si hay imagen y no hay error, y quitar h-48 si no hay imagen o hay error */}
             <div
-              className={`bg-cover bg-center flex items-center justify-center ${
-                item.image && !imageError ? " h-56" : ""
-              }`}
+              className={`bg-cover bg-center flex items-center justify-center ${item?.image && !imageError ? " h-56" : ""
+                }`}
               style={
                 item.image && !imageError
                   ? {
@@ -274,7 +273,7 @@ export const ViewItem = () => {
                   : {}
               }
             >
-              {item.image && !imageError && (
+              {item?.image && !imageError && (
                 <img
                   src={Capacitor.convertFileSrc(item.image)}
                   alt=""
@@ -286,17 +285,17 @@ export const ViewItem = () => {
                 <div
                   className={`p-5 rounded-lg w-16 h-16 flex items-center justify-center`}
                   style={{
-                    backgroundColor: CategoryColors[item.category_color],
+                    backgroundColor: CategoryColors[item?.category_color || "default"],
                   }}
                 >
                   <FontAwesomeIcon
-                    icon={item.category_icon as IconName}
+                    icon={item?.category_icon as IconName}
                     className="fa-2xl text-[var(--ion-color-primary-contrast)]"
                   />
                 </div>
                 <div className="flex flex-col gap-2">
                   <span className="text-2xl font-bold w-full break-words whitespace-normal text-[var(--ion-color-primary-contrast)] max-w-full">
-                    {item.name}
+                    {item?.name}
                   </span>
                   {item.is_origin ? (
                     <span className="text-sm text-[var(--ion-color-primary-contrast)] flex items-center gap-1">
@@ -310,18 +309,22 @@ export const ViewItem = () => {
               </IonCol>
             </div>
             <div className="ion-padding flex flex-col gap-3 justify-center items-center">
-              {reviews.length > 0 && (
-                <>
-                  <StarRating
-                    size={60}
-                    rating={reviews[0].rating}
-                    setRating={() => {}}
-                  />
+              <>
+                <StarRating
+                  size={60}
+                  rating={reviews[0]?.rating || 0}
+                  setRating={() => { }}
+                />
+                {reviews.length > 0 ? (
                   <span className="text-[var(--ion-text-color)] text-lg">
-                    {reviews[0].comment}
+                    {reviews[0]?.comment}
                   </span>
-                </>
-              )}
+                ) : (
+                  <span className="text-[var(--ion-color-secondary)] text-lg">
+                    {t("view-item.no-review")}
+                  </span>
+                )}
+              </>
             </div>
           </div>
           <IonButton
@@ -350,18 +353,16 @@ export const ViewItem = () => {
                       {reviews.length}
                     </span>
                     <ChevronDown
-                      className={`transition-transform ${
-                        showTimeline ? "rotate-180" : ""
-                      }`}
+                      className={`transition-transform ${showTimeline ? "rotate-180" : ""
+                        }`}
                     />
                   </div>
                 )}
               </div>
               {showTimeline && (
                 <div
-                  className={`overflow-hidden transition-all duration-1000 ease-in-out ${
-                    showTimeline ? "max-h-screen" : "max-h-0"
-                  }`}
+                  className={`overflow-hidden transition-all duration-1000 ease-in-out ${showTimeline ? "max-h-screen" : "max-h-0"
+                    }`}
                 >
                   <div className="relative flex flex-col justify-center mx-10 pt-4">
                     {reviews.map((entry) => (
@@ -381,22 +382,28 @@ export const ViewItem = () => {
               )}
             </div>
           )}
-          {/* Mostrar la lista de elementos solo si hay itemsOfOrigin */}
-          {itemsOfOrigin.length > 0 && (
+
+          {item?.is_origin ? (
             <div className="px-5 flex flex-col gap-4">
               <span className="font-bold text-[var(--ion-text-color)] text-3xl">
                 {t("common.items")}
               </span>
               <StatOriginView items={itemsOfOrigin} />
               <IonGrid className="gap-4 mt-2">
-                <div className="flex flex-col gap-7">
-                  {itemsOfOrigin.map((item) => (
-                    <ItemOrOrigin key={item.id} item={item} />
-                  ))}
-                </div>
+                {itemsOfOrigin.length > 0 ? (
+                  <div className="flex flex-col gap-7">
+                    {itemsOfOrigin.map((item) => (
+                      <ItemOrOrigin key={item.id} item={item} />
+                    ))}
+                  </div>
+                ) : (
+                  <div className="text-center text-gray-500">
+                    {t("view-item.no-items-found")}
+                  </div>
+                )}
               </IonGrid>
             </div>
-          )}
+          ): null}
         </div>
       </IonContent>
 
