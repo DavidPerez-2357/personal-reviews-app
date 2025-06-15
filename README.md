@@ -51,55 +51,100 @@ npx cap open android
 <br>
 
 ### 📱 Splash screen configurations
-Modify file `/android/capacitor-android/res/values/colors.xml` and add this color:
+Modify file `/android/capacitor-android/res/values/colors.xml` in android studio and add this color:
 
 ```xml
 <color name="my_launch_background">#222831</color>
 ```
 <br>
 
-Create file `splash_background.xml` in `/android/app/res/drawable` with this content:
+## 🧠 Application Overview
 
-```xml
-<?xml version="1.0" encoding="utf-8"?>
-<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
-    <!-- Background color -->
-    <item android:drawable="@color/my_launch_background" />
+The app is organized into three main sections: **Reviews**, **Items & Origins**, and **Categories**. Below is a detailed breakdown of all routes and their functionalities.
 
-    <!-- Splash image, centered without stretching -->
-    <item>
-        <bitmap
-            android:gravity="center"
-            android:src="@drawable/splash" />
-    </item>
-</layer-list>
-```
+---
+
+### 1. **Reviews** (`/app/reviews/`)
+
+- `/app/reviews/`
+  Main review page. Features:
+  - View all reviews.
+  - Search by name.
+  - Filter and sort.
+
+  <br>
+
+- `/app/reviews/create`
+  Create a new review with:
+  - Ratings.
+  - Comments.
+  - Images.
+
+  <br>
+
+- `/app/reviews/:id/edit`
+  Edit or delete an existing review. Fields are the same as in creation.
+
+  <br>
+
+- `/app/reviews/create/item/:itemId`
+  Create a review for a specific item, with that item preselected.
+
+---
+
+### 2. **Items & Origins** (`/app/items/`)
+
+- `/app/items/`
+  View all items. Features:
+  - Search by name.
+  - Filter and sort.
+  - Group by origins (hides items that are part of an origin).
+
 <br>
 
-Modify file `/android/app/res/values/styles.xml`:
+- `/app/items/:id/viewItem`
+  View item or origin details:
+  - Timeline of reviews.
+  - Item contents and images.
+  - Toggle between item and origin view.
+  - Delete the element.
 
-```xml
-<?xml version="1.0" encoding="utf-8"?>
-<resources>
-    <!-- Base application theme. -->
-    <style name="AppTheme" parent="Theme.AppCompat.NoActionBar">
-        <item name="colorPrimary">@color/colorPrimary</item>
-        <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
-        <item name="colorAccent">@color/colorAccent</item>
+<br>
 
-        <!-- Window background -->
-        <item name="android:windowBackground">@color/my_launch_background</item>
-        <item name="android:windowNoTitle">true</item>
-        <item name="android:windowFullscreen">true</item>
-    </style>
+- `/app/items/create`
+  Create a new item or origin:
+  - If it's an origin: add items inside.
+  - If it's an item: assign it to an origin.
 
-    <style name="AppTheme.NoActionBarLaunch" parent="Theme.AppCompat.NoActionBar">
-        <!-- Splash screen styles -->
-        <item name="android:windowBackground">@drawable/splash_background</item>
-        <item name="android:windowNoTitle">true</item>
-        <item name="android:windowFullscreen">true</item>
-        <item name="android:windowActionBar">false</item>
-        <item name="android:windowContentOverlay">@null</item>
-    </style>
-</resources>
-```
+  <br>
+
+- `/app/items/:id/edit`
+  Edit an item or origin:
+  - Toggle between item/origin types.
+  - Same options as the create view.
+
+---
+
+### 3. **Categories** (`/app/more/categories/`)
+
+- `/app/more/categories/`
+  View all categories. Allows searching by name.
+
+  <br>
+
+- `/app/more/categories/create`
+  Create a new category with:
+  - Subcategories.
+  - Associated ratings.
+
+  <br>
+
+- `/app/more/categories/:id/subcategories/create`
+  Create a subcategory under a specific category.
+
+  <br>
+
+- `/app/more/categories/:id/edit`
+  Edit a category or any of its subcategories.
+
+---
