@@ -71,7 +71,6 @@ const ItemCard = ({ item }: { item: ItemDisplay }) => {
             routerLink={`/app/items/${item.id}/edit`}
             onClick={(e) => {
               e.stopPropagation();
-              e.preventDefault();
             }}
           >
             <SquarePen size={17}></SquarePen>
