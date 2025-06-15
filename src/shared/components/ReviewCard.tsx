@@ -19,15 +19,14 @@ const ReviewCard = ({ review }: { review: ReviewFull }) => {
 
   return (
     <div className="flex flex-col gap-3 border-2 border-[var(--ion-color-secondary)] rounded-md p-2">
-      <IonCard className="pb-4 pt-2">
+      <IonCard className="pb-4 pt-2 relative">
         <div className="flex flex-col px-3 gap-4">
-          <div className="grid grid-cols-[1fr_auto] items-center">
             <div className="flex flex-row items-center gap-3">
               <FontAwesomeIcon icon={review.icon as IconName} className="fa-xl" />
               <IonButton
                 fill="clear"
                 color="primary"
-                className="font-semibold text-md w-full break-words whitespace-normal text-start"
+                className="font-semibold text-md w-full break-words whitespace-normal text-start overflow-hidden pr-5"
                 routerLink={`/app/items/${review.item_id}/viewItem`}
               >
                 {review.item}
@@ -35,12 +34,11 @@ const ReviewCard = ({ review }: { review: ReviewFull }) => {
             </div>
             <IonButton
               color={"tertiary"}
-              className="aspect-square edit-button"
+              className="aspect-square edit-button absolute right-2 top-2 z-10"
               routerLink={`/app/reviews/${review.id}/edit`}
             >
               <SquarePen size={17}></SquarePen>
             </IonButton>
-          </div>
 
           {review.images.length > 0 && (
             <div className="flex flex-row gap-2 overflow-x-auto">
