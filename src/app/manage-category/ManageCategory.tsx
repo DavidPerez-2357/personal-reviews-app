@@ -299,7 +299,7 @@ const ManageCategory = () => {
         setCategoryDeleted(true);
       }
 
-      setDeleteButtonText(t('manage-category.deleting-category-success'));
+      setDeleteButtonText(t('manage-category.delete-category-success'));
       if (isSubcategory && parentCategoryId) {
         setTimeout(() => {
           history.goBack();
@@ -307,7 +307,7 @@ const ManageCategory = () => {
       } else {
         setTimeout(() => {
           history.push('/app/more/categories');
-          showToast(t('manage-category.deleting-category-success'));
+          showToast(t('manage-category.delete-category-success'));
         }, 500);
       }
     } catch (error) {

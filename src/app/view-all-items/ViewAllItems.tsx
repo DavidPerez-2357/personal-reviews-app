@@ -125,7 +125,7 @@ const ViewAllItems = () => {
             setItems([]);
         });
 
-    }, [sortType, sortOrder, itemTypeFilter, categoriesVisible, areItemsGrouped, searchTerm]);
+    }, [sortType, sortOrder, itemTypeFilter, categoriesVisible, areItemsGrouped, searchTerm, location.pathname]);
 
     const applyFilters = (filters: { category?: number[]; type: ItemType }) => {
         if (filters) {
