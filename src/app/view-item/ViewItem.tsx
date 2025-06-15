@@ -31,6 +31,8 @@ import ItemCard from "../../shared/components/ItemCard";
 import StatOriginView from "./components/StatsOriginView";
 import {
   deleteItem,
+  deleteItemRelations,
+  deleteOriginRelations,
   getItemFull,
   getItemsByOrigin,
   itemToOrigin,
@@ -46,6 +48,9 @@ import { useTranslation } from "react-i18next";
 import "./styles/viewItem.css";
 import ItemOrOrigin from "@/shared/components/ItemOrOrigin";
 import { Capacitor } from "@capacitor/core";
+import { useToast } from "../ToastContext";
+import ErrorAlert from "@/shared/components/ErrorAlert";
+import { usePhotoGallery } from "@/hooks/usePhotoGallery";
 
 export const ViewItem = () => {
   const { id } = useParams<{ id: string }>();
@@ -71,73 +76,19 @@ export const ViewItem = () => {
   const [imageError, setImageError] = useState(false);
 
   const { t } = useTranslation();
+  const { showToast } = useToast();
   const selectRef = useRef<HTMLIonSelectElement>(null);
+
+  const [isDeleteAlertOpen, setIsDeleteAlertOpen] = useState(false);
+  const [showErrorAlert, setShowErrorAlert] = useState(false);
+  const [buttomDisabled, setButtomDisabled] = useState(false);
+  const { deletePhoto } = usePhotoGallery();
+  const [errorMessage, setErrorMessage] = useState("");
+  const [isToastOpen, setIsToastOpen] = useState(false);
+  const [toastMessage, setToastMessage] = useState("");
 
   const initializeData = async () => {
     try {
-      // Datos de prueba estáticos
-      // const mainItemDetailsFromDB: ItemFull = {
-      //   id: 1,
-      //   name: "iPhone 13 Pro",
-      //   is_origin: true,
-      //   image: "https://example.com/items/iphone13pro.jpg",
-      //   created_at: "2024-08-10T14:23:00Z",
-      //   updated_at: "2024-08-10T14:23:00Z",
-      //   category_id: 3,
-      //   category_name: "Móviles",
-      //   category_icon: "mobile",
-      //   category_color: "green",
-      // };
-      // const itemReviews: Review[] = [
-      //   {
-      //     id: 201,
-      //     rating: 4,
-      //     comment: "Muy buen móvil, pero caro.",
-      //     item_id: 1,
-      //     created_at: "2024-08-10T14:23:00Z",
-      //     updated_at: "2024-08-10T14:23:00Z",
-      //   },
-      //   {
-      //     id: 202,
-      //     rating: 5,
-      //     comment: "Excelente cámara y batería.",
-      //     item_id: 1,
-      //     created_at: "2024-08-12T10:00:00Z",
-      //     updated_at: "2024-08-12T10:00:00Z",
-      //   },
-      // ];
-      // const itemsOfOrigin: ItemDisplay[] = [
-      //   {
-      //     id: 1,
-      //     name: "iPhone 13 Pro",
-      //     last_rating: 4,
-      //     number_of_reviews: 1,
-      //     is_origin: true,
-      //     category_icon: "mobile",
-      //     category_color: "green",
-      //   },
-      //   {
-      //     id: 2,
-      //     name: "Samsung Galaxy S22",
-      //     last_rating: 2,
-      //     number_of_reviews: 1,
-      //     is_origin: false,
-      //     origin_id: 1,
-      //     category_icon: "mobile",
-      //     category_color: "green",
-      //   },
-      //   {
-      //     id: 3,
-      //     name: "MacBook Air M2",
-      //     last_rating: 5,
-      //     number_of_reviews: 1,
-      //     is_origin: true,
-      //     category_icon: "laptop",
-      //     category_color: "blue",
-      //   },
-      // ];
-
-      // Comentado: llamadas reales a la base de datos
       const mainItemDetailsFromDB = await getItemFull(Number(id));
       const itemReviews = await getReviewsByItemId(Number(id));
       const itemsOfOrigin = await getItemsByOrigin(Number(id));
@@ -156,7 +107,10 @@ export const ViewItem = () => {
       if (itemsOfOrigin.length === 0) {
         setShowTimeline(true);
       }
-      console.log("Data initialized successfully");
+      console.log(
+        "Data initialized successfully Item:",
+        JSON.stringify(mainItemDetailsFromDB, null, 2)
+      );
     } catch (err) {
       console.error("Error initializing data:", err);
     }
@@ -170,7 +124,6 @@ export const ViewItem = () => {
     setImageError(false);
   }, [item]);
 
-
   //según el value del IonSelect, redirigir a la página correspondiente
   const handleSelectChange = (event: CustomEvent) => {
     const value = event.detail.value;
@@ -181,13 +134,13 @@ export const ViewItem = () => {
         break;
       case "origin":
         itemToOrigin(Number(id));
+        console.log("Item to origin:", id);
         setToastMessage(t("view-item.to-origin-success"));
-        setIsToastOpen(true);
         break;
       case "item":
         originToItem(Number(id));
+        console.log("Origin to item:", id);
         setToastMessage(t("view-item.to-item-success"));
-        setIsToastOpen(true);
         break;
       case "delete":
         setIsDeleteAlertOpen(true);
@@ -198,23 +151,110 @@ export const ViewItem = () => {
     }
   };
 
+  useEffect(() => {
+    if (toastMessage) {
+      showToast(toastMessage);
+      initializeData();
+    }
+    console.log("isToastOpen changed:", isToastOpen);
+  }, [toastMessage]);
+
+  const handleDeleteItem = async () => {
+    setButtomDisabled(true);
+    try {
+      // 1. Eliminar imágenes y reseñas asociadas
+      for (const review of reviews) {
+        // Obtener imágenes de la reseña
+        const reviewImages = await getReviewImagesbyId(review.id);
+        // Eliminar cada imagen del sistema de archivos
+        for (const img of reviewImages) {
+          try {
+            await deletePhoto({ filepath: img.image });
+          } catch (e) {
+            console.warn(
+              "No se pudo eliminar la imagen del sistema de archivos:",
+              img.image,
+              e
+            );
+          }
+        }
+        // Eliminar imágenes de la base de datos
+        await deleteReviewImages(review.id);
+        // Eliminar la reseña
+        await deleteReview(review.id);
+      }
+      // 2. Eliminar imagen del ítem si existe
+      if (item.image) {
+        try {
+          await deletePhoto({ filepath: item.image });
+        } catch (e) {
+          console.warn(
+            "No se pudo eliminar la imagen del ítem:",
+            item.image,
+            e
+          );
+        }
+      }
+
+      // 3. Eliminar relaciones de origen si el ítem es de origen
+      if (item && item.is_origin) {
+        await deleteOriginRelations(item.id);
+      } else if (item) {
+        await deleteItemRelations(item.id);
+      }
+
+      // 4. Eliminar el ítem
+      const success = await deleteItem(item.id);
+      if (!success) {
+        setShowErrorAlert(true);
+        setButtomDisabled(true);
+        return;
+      }
+      setIsDeleteAlertOpen(false);
+      showToast(t("manage-item.delete-item-success"),)
+    } catch (error) {
+      console.error("Error deleting item:", error);
+      setShowErrorAlert(true);
+      setButtomDisabled(true);
+    }
+  };
+
   return (
     <IonPage className="safe-area-top">
       <IonContent>
         <IonRow className="flex justify-between items-center ion-padding">
           <IonBackButton defaultHref="/app/items" />
           <div className="relative">
-            <EllipsisVertical color="var(--ion-text-color)" className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 pointer-events-none z-10"/>
-          <IonSelect
-            interface="popover"
-            className="pr-10 w-full [&::part(icon)]:hidden" 
-            style={{ minWidth: 0, width: "2.5rem" }}
-            onIonChange={handleSelectChange}
-          >
-            <IonSelectOption value="edit">{t("common.edit")}</IonSelectOption>
-            <IonSelectOption value="origin">{t("view-item.to-origin")}</IonSelectOption>
-            <IonSelectOption value="delete">{t("common.delete")}</IonSelectOption>
-          </IonSelect>
+            <EllipsisVertical
+              color="var(--ion-text-color)"
+              className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 pointer-events-none z-10"
+            />
+            <EllipsisVertical
+              color="var(--ion-text-color)"
+              className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 pointer-events-none z-10"
+            />
+            <IonSelect
+              interface="popover"
+              className="pr-10 w-full [&::part(icon)]:hidden"
+              style={{ minWidth: 0, width: "2.5rem" }}
+              onIonChange={handleSelectChange}
+              disabled={buttomDisabled}
+            >
+              <IonSelectOption value="edit">{t("common.edit")}</IonSelectOption>
+              {!item.is_origin && (
+                <IonSelectOption value="origin">
+                  {t("view-item.to-origin")}
+                </IonSelectOption>
+              )}
+              {item.is_origin && (
+                <IonSelectOption value="item">
+                  {t("view-item.to-item")}
+                </IonSelectOption>
+              )}
+              <IonSelectOption value="delete">
+                {t("common.delete")}
+              </IonSelectOption>
+            </IonSelect>
           </div>
         </IonRow>
         <div className="flex flex-col gap-12 pb-10">
@@ -226,7 +266,11 @@ export const ViewItem = () => {
               }`}
               style={
                 item.image && !imageError
-                  ? { backgroundImage: `url(${Capacitor.convertFileSrc(item.image)}` }
+                  ? {
+                      backgroundImage: `url(${Capacitor.convertFileSrc(
+                        item.image
+                      )}`,
+                    }
                   : {}
               }
             >
@@ -259,7 +303,9 @@ export const ViewItem = () => {
                       <Building2 size={20} className="inline-block mr-1" />
                       {t("common.origin")}
                     </span>
-                  ) : ''}
+                  ) : (
+                    ""
+                  )}
                 </div>
               </IonCol>
             </div>
@@ -344,9 +390,9 @@ export const ViewItem = () => {
               <StatOriginView items={itemsOfOrigin} />
               <IonGrid className="gap-4 mt-2">
                 <div className="flex flex-col gap-7">
-                    {itemsOfOrigin.map((item) => (
-                      <ItemOrOrigin key={item.id} item={item} />
-                    ))}
+                  {itemsOfOrigin.map((item) => (
+                    <ItemOrOrigin key={item.id} item={item} />
+                  ))}
                 </div>
               </IonGrid>
             </div>
@@ -366,7 +412,7 @@ export const ViewItem = () => {
         isOpen={isDeleteAlertOpen}
         onDidDismiss={() => setIsDeleteAlertOpen(false)}
         header={t("common.delete")}
-        message={t("manage-item-review.delete-review-confirm")}
+        message={t("manage-item.delete-item-confirm")}
         buttons={[
           {
             text: t("common.cancel"),
@@ -384,14 +430,6 @@ export const ViewItem = () => {
             },
           },
         ]}
-      />
-      <IonToast
-        className="safe-margin-top"
-        isOpen={isToastOpen}
-        message={toastMessage}
-        position="top"
-        onDidDismiss={() => setIsToastOpen(false)} // Hide toast when dismissed
-        duration={3000} // Set duration (e.g., 3 seconds)
       />
     </IonPage>
   );
