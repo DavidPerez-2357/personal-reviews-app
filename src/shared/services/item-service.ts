@@ -121,10 +121,9 @@ export const originToItem = async (id: number): Promise<boolean> => {
     const query = `UPDATE item SET is_origin = 0 WHERE id = ?`;
     const values = [id];
     await db!.run(query, values);
-    -(
-      // Eliminar relaciones de origen después de actualizar el item
-      (await deleteOriginRelations(id))
-    );
+
+    // Eliminar relaciones de origen después de actualizar el item
+    (await deleteOriginRelations(id))
 
     return true;
   } catch (error) {
