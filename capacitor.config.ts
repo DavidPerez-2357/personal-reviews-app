@@ -1,7 +1,7 @@
 import type {CapacitorConfig} from '@capacitor/cli';
 
 const config: CapacitorConfig = {
-    appId: 'com.personalreview.app',
+    appId: 'com.personal-reviews.app',
     appName: 'Personal Reviews',
     webDir: 'dist',
     plugins: {
