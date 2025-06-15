@@ -86,7 +86,16 @@ const ManageItem = () => {
   const [isItemsSelectorModalOpen, setItemsSelectorModalOpen] = useState(false);
   const [isDeleteAlertOpen, setIsDeleteAlertOpen] = useState(false);
   const [showErrorAlert, setShowErrorAlert] = useState(false);
-  const [buttomDisabled, setButtomDisabled] = useState(false);
+  const [createButtonDisabled, setCreateButtonDisabled] = useState(false);
+  const [deleteButtonDisabled, setDeleteButtonDisabled] = useState(false);
+
+  useEffect(() => {
+    if (isDeleteAlertOpen) {
+      setDeleteButtonDisabled(true);
+    } else {
+      setDeleteButtonDisabled(false);
+    }
+  }, [isDeleteAlertOpen]);
 
   // Photo preview state
   const [previewPhoto, setPreviewPhoto] = useState<UserPhoto | null>(null);
@@ -304,7 +313,8 @@ const ManageItem = () => {
   );
 
   const handleSaveNewItem = async () => {
-    console.log("🔵 handleSaveNewItem called");
+    setCreateButtonDisabled(true);
+    setDeleteButtonDisabled(true);
     if (!item) {
       console.error("❌ No hay item para guardar");
       return;
@@ -368,7 +378,8 @@ const ManageItem = () => {
   };
 
   const handleDeleteItem = async () => {
-    setButtomDisabled(true);
+    setCreateButtonDisabled(true);
+    setDeleteButtonDisabled(true);
     try {
       const reviews = await getReviewsByItemId(Number(id));
       // 1. Eliminar imágenes y reseñas asociadas
@@ -414,14 +425,16 @@ const ManageItem = () => {
 
       // 4. Eliminar el ítem
       if (!item) {
-        setShowErrorAlert(true);
-        setButtomDisabled(true);
+        showToast(t("manage-item.item-not-found"));
+        setCreateButtonDisabled(true);
+        setDeleteButtonDisabled(true);
         return;
       }
       const success = await deleteItem(item.id);
       if (!success) {
-        setShowErrorAlert(true);
-        setButtomDisabled(true);
+        showToast(t("manage-item.item-not-found"));
+        setCreateButtonDisabled(true);
+        setDeleteButtonDisabled(true);
         return;
       }
       setIsDeleteAlertOpen(false);
@@ -430,7 +443,7 @@ const ManageItem = () => {
     } catch (error) {
       console.error("Error deleting item:", error);
       setShowErrorAlert(true);
-      setButtomDisabled(true);
+      setDeleteButtonDisabled(true);
     }
   };
 
@@ -480,6 +493,8 @@ const ManageItem = () => {
         history.replace("/app/items");
       });
     }
+    setCreateButtonDisabled(false);
+    setDeleteButtonDisabled(false);
   }, [location.pathname, id, editMode]);
 
   /**
@@ -771,6 +786,7 @@ const ManageItem = () => {
               className="large"
               expand="block"
               color="tertiary"
+              disabled={createButtonDisabled}
               onClick={handleSaveNewItem}
             >
               {editMode
@@ -783,7 +799,7 @@ const ManageItem = () => {
                 expand="block"
                 color="danger"
                 onClick={() => setIsDeleteAlertOpen(true)}
-                disabled={buttomDisabled}
+                disabled={deleteButtonDisabled}
               >
                 {t("manage-item.delete-item")}
               </IonButton>
