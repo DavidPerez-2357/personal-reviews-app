@@ -626,7 +626,7 @@ const ManageItem = () => {
 
           <IonRow className="flex flex-col gap-2 mx-5">
             <IonLabel className="section-title">
-              {t("manage-item.change-is_origin")}
+              {t("manage-item.change-is-origin")}
             </IonLabel>
             <div className="flex gap-2 w-full justify-between items-center">
               <IonButton
