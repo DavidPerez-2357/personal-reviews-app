@@ -2,7 +2,7 @@ import { usePhotoGallery } from "@/hooks/usePhotoGallery";
 import CategorySelectorHeader from "@/shared/components/CategorySelectorHeader";
 import PreviewPhotoModal from "@/shared/components/PreviewPhotoModal";
 import { Category } from "@/shared/dto/Category";
-import { Item, ItemFull, ItemOption } from "@/shared/dto/Item";
+import { Item, ItemFull, Origin } from "@/shared/dto/Item";
 import { UserPhoto } from "@/shared/dto/Photo";
 import {
   getCategoryById,
@@ -10,9 +10,21 @@ import {
   getFirstCategory,
   getParentCategory,
 } from "@/shared/services/category-service";
-import { getItemById } from "@/shared/services/item-service";
+import {
+  deleteItem,
+  deleteItemRelations,
+  deleteOriginRelations,
+  editItem,
+  getItemById,
+  getItemFull,
+  getItemsByOriginId,
+  getOriginByItemId,
+  insertItem,
+  insertOrigin,
+} from "@/shared/services/item-service";
 import { Capacitor } from "@capacitor/core";
 import {
+  IonAlert,
   IonBackButton,
   IonButton,
   IonContent,
@@ -32,10 +44,62 @@ import ItemsSelectorModal from "./components/ItemsSelectorModal";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { IconName } from "@fortawesome/fontawesome-svg-core";
 import { CategoryColors } from "@/shared/enums/colors";
+import {
+  deleteReview,
+  deleteReviewImages,
+  getReviewImagesbyId,
+  getReviewsByItemId,
+} from "@/shared/services/review-service";
+import { useToast } from "../ToastContext";
 
 const ManageItem = () => {
   // Estado para saber si es la primera carga del componente
   const [isInitialLoad, setIsInitialLoad] = useState(true);
+
+  // i18n translation
+  const { t } = useTranslation();
+
+  const { showToast } = useToast();
+
+  // Default category if none found
+  const notFoundAnyCategories: Category = {
+    id: 0,
+    name: t("common.no-categories-found"),
+    type: 1,
+    color: "darkgray",
+    icon: "circle-exclamation",
+    parent_id: null,
+  };
+
+  // Category and item state
+  const [item, setItem] = useState<Item | null>(null);
+  const [oldItem, setOldItem] = useState<Item | null>(null);
+  const [parentCategory, setParentCategory] = useState<Category>(
+    notFoundAnyCategories
+  );
+  const [childrenCategories, setChildrenCategories] = useState<Category[]>([]);
+  const [selectedCategory, setSelectedCategory] = useState<Category | null>(
+    null
+  );
+  const [selectedSubcategory, setSelectedSubcategory] =
+    useState<Category | null>(null);
+  // Modal state
+  const [isItemsSelectorModalOpen, setItemsSelectorModalOpen] = useState(false);
+  const [isDeleteAlertOpen, setIsDeleteAlertOpen] = useState(false);
+  const [showErrorAlert, setShowErrorAlert] = useState(false);
+  const [buttomDisabled, setButtomDisabled] = useState(false);
+
+  // Photo preview state
+  const [previewPhoto, setPreviewPhoto] = useState<UserPhoto | null>(null);
+  const [isPreviewOpen, setIsPreviewOpen] = useState(false);
+  const handlePreviewClose = () => {
+    setIsPreviewOpen(false);
+    setPreviewPhoto(null);
+  };
+  const handlePreviewOpen = (photo: UserPhoto) => {
+    setPreviewPhoto(photo);
+    setIsPreviewOpen(true);
+  };
 
   // Hooks para la galería de fotos (tomar, importar, guardar, eliminar fotos)
   const {
@@ -56,6 +120,7 @@ const ManageItem = () => {
     const savedPhoto = await savePhoto(newPhoto);
     if (!savedPhoto) return;
     setSavedPhotos([...savedPhotos, savedPhoto]);
+    if (item) setItem({ ...item, image: savedPhoto.filepath }); // <-- Añadido
   };
 
   /**
@@ -66,7 +131,12 @@ const ManageItem = () => {
     if (!newPhoto) return;
     const savedPhoto = await savePhoto(newPhoto);
     if (!savedPhoto) return;
-    setSavedPhotos([...savedPhotos, savedPhoto]);
+    if (savedPhotos.length > 0) {
+      setSavedPhotos([savedPhoto]);
+    } else {
+      setSavedPhotos([...savedPhotos, savedPhoto]);
+    }
+    if (item) setItem({ ...item, image: savedPhoto.filepath }); // <-- Añadido
   };
 
   /**
@@ -100,46 +170,6 @@ const ManageItem = () => {
   const history = useHistory();
   const location = useLocation();
 
-  // i18n translation
-  const { t } = useTranslation();
-
-  // Default category if none found
-  const notFoundAnyCategories: Category = {
-    id: 0,
-    name: t("common.no-categories-found"),
-    type: 1,
-    color: "darkgray",
-    icon: "circle-exclamation",
-    parent_id: null,
-  };
-
-  // Category and item state
-  const [item, setItem] = useState<Item | null>(null);
-  const [parentCategory, setParentCategory] = useState<Category>(
-    notFoundAnyCategories
-  );
-  const [childrenCategories, setChildrenCategories] = useState<Category[]>([]);
-  const [selectedCategory, setSelectedCategory] = useState<Category | null>(
-    null
-  );
-  const [selectedSubcategory, setSelectedSubcategory] =
-    useState<Category | null>(null);
-  const [itemOptions, setItemOptions] = useState<ItemOption[]>([]);
-  // Modal state
-  const [isItemsSelectorModalOpen, setItemsSelectorModalOpen] = useState(false);
-
-  // Photo preview state
-  const [previewPhoto, setPreviewPhoto] = useState<UserPhoto | null>(null);
-  const [isPreviewOpen, setIsPreviewOpen] = useState(false);
-  const handlePreviewClose = () => {
-    setIsPreviewOpen(false);
-    setPreviewPhoto(null);
-  };
-  const handlePreviewOpen = (photo: UserPhoto) => {
-    setPreviewPhoto(photo);
-    setIsPreviewOpen(true);
-  };
-
   // Edit mode flag
   const editMode = Boolean(id);
 
@@ -167,6 +197,7 @@ const ManageItem = () => {
   const setEditData = async (itemId: number) => {
     try {
       const item: Item | null = await getItemById(itemId);
+      if (item) setOldItem(item); // Guardar el item original para comparaciones
       setItem(item);
       if (!item) throw new Error(t("manage-item.error-message.item-not-found"));
       const category: Category | null = await getCategoryById(item.category_id);
@@ -185,6 +216,22 @@ const ManageItem = () => {
       if (parentCategory) {
         const children = await getChildrenCategories(parentCategory.id);
         setChildrenCategories(children);
+      }
+      if (item.is_origin) {
+        // Si es un item de origen, obtenemos los items relacionados
+        const originItems = await getItemsByOriginId(item.id);
+        console.log("originItems1:", JSON.stringify(originItems, null, 2));
+        setSelectedOriginItems(Array.isArray(originItems) ? originItems : []);
+      } else {
+        const origin = await getOriginByItemId(item.id);
+        console.log("origin:", JSON.stringify(origin, null, 2));
+        const originItem = await getItemFull(origin?.origin_id || 0);
+        console.log("originItem2:", JSON.stringify(originItem, null, 2));
+        if (originItem) {
+          setSelectedOriginItems([originItem]);
+        } else {
+          setSelectedOriginItems([]);
+        }
       }
 
       // Manejar categorías padre e hija
@@ -234,12 +281,144 @@ const ManageItem = () => {
     setSavedPhotos(
       savedPhotos.map((p) => (p.filepath === photo.filepath ? savedPhoto : p))
     );
+    if (item) setItem({ ...item, image: savedPhoto.filepath }); // <-- Añadido
   };
 
   // Estado para los items seleccionados en el modal
   const [selectedOriginItems, setSelectedOriginItems] = useState<ItemFull[]>(
     []
   );
+
+  const handleSaveNewItem = async () => {
+    console.log("🔵 handleSaveNewItem called");
+    if (!item) {
+      console.error("❌ No hay item para guardar");
+      return;
+    }
+
+    // Validar que el item tenga un nombre
+    if (!item.name.trim()) {
+      showToast(t("manage-item.error-missing-name"));
+      console.error("❌ El item debe tener un nombre");
+      return;
+    }
+
+    // Validar que el item tenga una categoría seleccionada
+    if (!selectedCategory) {
+      showToast(t("manage-item.error-missing-category"));
+      console.error("❌ El item debe tener una categoría");
+      return;
+    }
+
+    const newItem: Item = {
+      id: item.id,
+      name: item.name,
+      category_id: selectedCategory.id,
+      is_origin: item.is_origin,
+      image: savedPhotos[0]?.filepath,
+    };
+
+    try {
+      console.log("modo edición:", editMode);
+      let currentItemId = item.id;
+      if (editMode) {
+        await editItem(newItem);
+      } else {
+        const insertedId = await insertItem(newItem);
+        if (insertedId === null) {
+          throw new Error("Failed to insert item: insertItem returned null");
+        }
+        currentItemId = insertedId;
+      }
+
+      if (oldItem && oldItem.is_origin) {
+        await deleteOriginRelations(currentItemId);
+      } else if (oldItem) {
+        await deleteItemRelations(currentItemId);
+      }
+
+      const originItems: Origin[] = selectedOriginItems.map((originItem) => ({
+        origin_id: item.is_origin ? currentItemId : originItem.id,
+        item_id: item.is_origin ? originItem.id : currentItemId,
+      }));
+
+      for (const originItem of originItems) {
+        await insertOrigin(originItem);
+      }
+      showToast(t("manage-item.save-item-success"));
+      history.push("/app/items");
+    } catch (error) {
+      console.error("❌ Error al guardar el item:", error);
+      return;
+    }
+  };
+
+  const handleDeleteItem = async () => {
+    setButtomDisabled(true);
+    try {
+      const reviews = await getReviewsByItemId(Number(id));
+      // 1. Eliminar imágenes y reseñas asociadas
+      for (const review of reviews) {
+        // Obtener imágenes de la reseña
+        const reviewImages = await getReviewImagesbyId(review.id);
+        // Eliminar cada imagen del sistema de archivos
+        for (const img of reviewImages) {
+          try {
+            await deletePhoto({ filepath: img.image });
+          } catch (e) {
+            console.warn(
+              "No se pudo eliminar la imagen del sistema de archivos:",
+              img.image,
+              e
+            );
+          }
+        }
+        // Eliminar imágenes de la base de datos
+        await deleteReviewImages(review.id);
+        // Eliminar la reseña
+        await deleteReview(review.id);
+      }
+      // 2. Eliminar imagen del ítem si existe
+      if (item && item.image) {
+        try {
+          await deletePhoto({ filepath: item.image });
+        } catch (e) {
+          console.warn(
+            "No se pudo eliminar la imagen del ítem:",
+            item.image,
+            e
+          );
+        }
+      }
+
+      // 3. Eliminar relaciones de origen si el ítem es de origen
+      if (item && item.is_origin) {
+        await deleteOriginRelations(item.id);
+      } else if (item) {
+        await deleteItemRelations(item.id);
+      }
+
+      // 4. Eliminar el ítem
+      if (!item) {
+        setShowErrorAlert(true);
+        setButtomDisabled(true);
+        return;
+      }
+      const success = await deleteItem(item.id);
+      if (!success) {
+        setShowErrorAlert(true);
+        setButtomDisabled(true);
+        return;
+      }
+      setIsDeleteAlertOpen(false);
+      showToast(t("manage-item.delete-item-success"));
+      history.push("/app/items");
+    } catch (error) {
+      console.error("Error deleting item:", error);
+      setShowErrorAlert(true);
+      setButtomDisabled(true);
+    }
+  };
 
   /**
    * useEffect principal:
@@ -253,22 +432,10 @@ const ManageItem = () => {
         history.replace("/app/items");
       });
     } else {
-      getFirstCategory()
-        .then((category) => {
-          if (!category) {
-            console.error("❌ No se encontró ninguna categoría");
-            setSelectedCategory(notFoundAnyCategories);
-            return;
-          }
-
-          setSelectedCategoryById(category.id);
-        })
-        .catch((error) => {
-          console.error("❌ Error al obtener la primera categoría:", error);
-          setSelectedCategory(notFoundAnyCategories);
-        });
-      setIsInitialLoad(false);
-
+      // Limpiar los items seleccionados de origen y de item en origen
+      setSelectedOriginItems([]);
+      // Limpiar las imagenes guardadas
+      setSavedPhotos([]);
       // Iniciamos el item por defecto
       setItem({
         id: 0,
@@ -277,8 +444,22 @@ const ManageItem = () => {
         is_origin: false,
         image: "",
       });
+      getFirstCategory()
+        .then((category) => {
+          if (!category) {
+            console.error("❌ No se encontró ninguna categoría");
+            setSelectedCategory(notFoundAnyCategories);
+            return;
+          }
+          setSelectedCategoryById(category.id);
+        })
+        .catch((error) => {
+          console.error("❌ Error al obtener la primera categoría:", error);
+          setSelectedCategory(notFoundAnyCategories);
+        });
+      setIsInitialLoad(false);
     }
-  }, [editMode, id, history]);
+  }, [location.pathname, id, editMode]);
 
   /**
    * useEffect para actualizar la categoría padre y subcategoría
@@ -350,7 +531,7 @@ const ManageItem = () => {
   return (
     <IonPage>
       <IonContent>
-        <IonGrid className="flex flex-col gap-12">
+        <IonGrid className="flex flex-col gap-12 pb-10">
           <IonRow>
             <CategorySelectorHeader
               selectedCategory={selectedCategory}
@@ -391,8 +572,8 @@ const ManageItem = () => {
           <IonRow className="flex flex-col gap-2 mx-5">
             <IonLabel className="section-title">{t("common.image")}</IonLabel>
 
-            {!savedPhotos.length ? (
-              // Si no hay foto, mostrar botón para agregar
+            {!savedPhotos.length || !item?.image || item?.image == "" ? (
+              // Si no hay foto guardada ni en el item, mostrar botones para tomar o importar
               <div className="w-full h-25 flex gap-2">
                 <div
                   className="flex-1 rounded-l-lg bg-[var(--ion-color-secondary)] flex items-center justify-center"
@@ -432,7 +613,7 @@ const ManageItem = () => {
                   <div
                     className="w-25 h-10 rounded-lg bg-[var(--ion-color-secondary)] flex items-center justify-center"
                     onClick={async () => {
-                      handleTakePhoto();
+                      handleReplacePhoto(savedPhotos[0]);
                     }}
                   >
                     <Camera size={30} />
@@ -447,10 +628,14 @@ const ManageItem = () => {
               {t("manage-item.change-is_origin")}
             </IonLabel>
             <div className="flex gap-2 w-full justify-between items-center">
-                <IonButton
+              <IonButton
                 fill={item?.is_origin ? "solid" : "outline"}
                 color={item?.is_origin ? "tertiary" : "medium"}
-                className={`w-1/2 ${item?.is_origin ? "text-[var(--ion-color-tertiary-contrast)]" : ""}`}
+                className={`w-1/2 ${
+                  item?.is_origin
+                    ? "text-[var(--ion-color-tertiary-contrast)]"
+                    : ""
+                }`}
                 onClick={() => {
                   if (item && !item.is_origin) {
                     setItem({ ...item, is_origin: true });
@@ -459,14 +644,18 @@ const ManageItem = () => {
                     console.log("item ya era origen o no existe", item);
                   }
                 }}
-                >
+              >
                 {t("common.yes")}
-                </IonButton>
-                <IonButton
+              </IonButton>
+              <IonButton
                 fill={!item?.is_origin ? "solid" : "outline"}
                 color={!item?.is_origin ? "tertiary" : "medium"}
-                className={`w-1/2 ${!item?.is_origin ? "text-[var(--ion-color-tertiary-contrast)]" : ""}`}
-                onClick={() => {
+                className={`w-1/2 ${
+                  !item?.is_origin
+                    ? "text-[var(--ion-color-tertiary-contrast)]"
+                    : ""
+                }`}
+                onClick={ () => {
                   if (item && item.is_origin) {
                     setItem({ ...item, is_origin: false });
                     setSelectedOriginItems([]); // <-- Reset selected items al cambiar a item
@@ -474,36 +663,36 @@ const ManageItem = () => {
                     console.log("item ya no era origen o no existe", item);
                   }
                 }}
-                >
+              >
                 {t("common.no")}
-                </IonButton>
+              </IonButton>
             </div>
           </IonRow>
 
           <IonRow className="flex flex-col gap-2 mx-5 justify-between">
             <div className="flex gap-2 items-center justify-between">
-              <IonLabel className="section-title break-all">
-                {item?.is_origin
-                  ? t("manage-item.origin-item") + " " + item?.name
-                  : t("manage-item.item-origin")}
+              <IonLabel className="section-title break-normal">
+                {item?.is_origin ? (
+                  <>
+                    {t("manage-item.origin-item") + " "}
+                    <span className="text-[var(--ion-color-primary)]">
+                      {item?.name.trim() ? item.name : "..."}
+                    </span>
+                  </>
+                ) : (
+                  t("manage-item.item-origin")
+                )}
               </IonLabel>
 
-                <IonButton
+              <IonButton
                 fill="solid"
                 color="secondary"
                 onClick={() => {
                   setItemsSelectorModalOpen(true);
                 }}
-                >
-                {item?.is_origin ? <Plus size={20} /> : <Search size={20}/>}
-                </IonButton>
-              <ItemsSelectorModal
-                isOpen={isItemsSelectorModalOpen}
-                onDismiss={() => setItemsSelectorModalOpen(false)}
-                isOrigin={item?.is_origin || false}
-                itemsOfOrigin={selectedOriginItems}
-                onSave={(items) => setSelectedOriginItems(items)} // <-- Añadido
-              />
+              >
+                {item?.is_origin ? <Plus size={20} /> : <Search size={20} />}
+              </IonButton>
             </div>
 
             {selectedOriginItems.length === 0 ? (
@@ -511,51 +700,74 @@ const ManageItem = () => {
                 {t("manage-item.no-origin-items")}
               </div>
             ) : (
-              <IonList>
-              {selectedOriginItems.map((item: ItemFull) => {
-                return (
-                <IonItem key={item.id}>
-                  <div className="flex items-center gap-2">
-                  {item.image ? (
-                    <div className="flex relative items-center justify-center size-18 rounded-md overflow-hidden">
-                    <img
-                      src={Capacitor.convertFileSrc(item.image)}
-                      alt={item.name}
-                      className="object-cover w-full h-full"
-                    />
-                    <div
-                      className="absolute bottom-0 right-0 size-9 rounded-md flex items-center justify-center p-1"
-                      style={{
-                      backgroundColor:
-                        CategoryColors[item.category_color],
-                      }}
-                    >
-                      <FontAwesomeIcon
-                      icon={item.category_icon as IconName}
-                      className="fa-xl text-[var(--ion-color-primary-contrast)]"
-                      />
-                    </div>
-                    </div>
-                  ) : (
-                    <div
-                    className="flex items-center justify-center size-10 rounded-md p-2"
-                    style={{
-                      backgroundColor:
-                      CategoryColors[item.category_color],
-                    }}
-                    >
-                    <FontAwesomeIcon
-                      icon={item.category_icon as IconName}
-                      className="fa-xl text-[var(--ion-color-primary-contrast)]"
-                    />
-                    </div>
-                  )}
-                  {item.name}
-                  </div>
-                </IonItem>
-                );
-              })}
+              <IonList lines="none">
+                {selectedOriginItems.map((item: ItemFull) => {
+                  return (
+                    <IonItem key={item.id}>
+                      <div className="flex items-center gap-2">
+                        {item.image ? (
+                          <div className="flex relative items-center justify-center size-10 rounded-md overflow-hidden">
+                            <img
+                              src={Capacitor.convertFileSrc(item.image)}
+                              alt={item.name}
+                              className="object-cover w-full h-full"
+                            />
+                            <div
+                              className="absolute bottom-0 right-0 size-4 rounded-md flex items-center justify-center p-1"
+                              style={{
+                                backgroundColor:
+                                  CategoryColors[item.category_color],
+                              }}
+                            >
+                              <FontAwesomeIcon
+                                icon={item.category_icon as IconName}
+                                className="fa-xs text-[var(--ion-color-primary-contrast)]"
+                              />
+                            </div>
+                          </div>
+                        ) : (
+                          <div
+                            className="flex items-center justify-center size-10 rounded-md p-2"
+                            style={{
+                              backgroundColor:
+                                CategoryColors[item.category_color],
+                            }}
+                          >
+                            <FontAwesomeIcon
+                              icon={item.category_icon as IconName}
+                              className="fa-xl text-[var(--ion-color-primary-contrast)]"
+                            />
+                          </div>
+                        )}
+                        {item.name}
+                      </div>
+                    </IonItem>
+                  );
+                })}
               </IonList>
+            )}
+          </IonRow>
+          <IonRow className="flex flex-col gap-4 mx-5">
+            <IonButton
+              className="large"
+              expand="block"
+              color="tertiary"
+              onClick={handleSaveNewItem}
+            >
+              {editMode
+                ? t("common.save-changes")
+                : t("view-all-items.create-item")}
+            </IonButton>
+            {editMode && (
+              <IonButton
+                className="large"
+                expand="block"
+                color="danger"
+                onClick={() => setIsDeleteAlertOpen(true)}
+                disabled={buttomDisabled}
+              >
+                {t("manage-item.delete-item")}
+              </IonButton>
             )}
           </IonRow>
         </IonGrid>
@@ -568,6 +780,39 @@ const ManageItem = () => {
         showActions={true}
         onReplace={() => handleReplacePhoto(previewPhoto!)} // Pass the photo to replace
         onDelete={() => handleDeletePhoto(previewPhoto!)} // Pass the photo to delete
+      />
+
+      <IonAlert
+        isOpen={isDeleteAlertOpen}
+        onDidDismiss={() => setIsDeleteAlertOpen(false)}
+        header={t("common.delete")}
+        message={t("manage-item.delete-item-confirm")}
+        buttons={[
+          {
+            text: t("common.cancel"),
+            role: "cancel",
+            cssClass: "secondary",
+            handler: () => {
+              setShowErrorAlert(false);
+            },
+          },
+          {
+            text: t("common.delete"),
+            cssClass: "danger",
+            handler: () => {
+              handleDeleteItem();
+            },
+          },
+        ]}
+      />
+
+      <ItemsSelectorModal
+        isOpen={isItemsSelectorModalOpen}
+        onDismiss={() => setItemsSelectorModalOpen(false)}
+        isOrigin={item?.is_origin || false}
+        itemId={item?.id || 0}
+        itemsOfOrigin={selectedOriginItems}
+        onSave={(items) => setSelectedOriginItems(items)}
       />
     </IonPage>
   );
