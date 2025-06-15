@@ -194,17 +194,24 @@
     "to-item-success": "Item created successfully"
   },
   "manage-item": {
-    "saving-item-success": "Item saved successfully",
-    "saving-item-error": "Error saving item",
+    "save-item-success": "Item saved successfully",
+    "save-item-error": "Error saving item",
     "item-input-placeholder": "Write the item name...",
     "item-name-empty": "Item name cannot be empty",
     "delete-item": "Delete item",
     "delete-item-confirm": "Are you sure you want to delete this item? ALL LINKED REVIEWS WILL BE DELETED",
     "delete-item-success": "Item deleted successfully",
-    "change-is_origin": "Do you want to add items?",
-    "item-origin": "Add items to",
-    "origin-item": "Which item does it belong to?",
-    "no-origin-items": "No selected items found"
+    "change-is_origin": "Which origin does it belong to?",
+    "item-origin": "Which item does it belong to?",
+    "origin-item": "Add item to",
+    "no-origin-items": "No selected items found",
+    "no-items": "No items found",
+    "search-items": "Search items...",
+    "search-origin": "Search origins...",
+    "error-missing-name": "Item name is required",
+    "error-missing-category": "Category is required",
+    "select-items": "Select items",
+    "select-origin": "Select origin"
   },
     "manage-category": {
     "select-icon": "Select icon",

@@ -197,17 +197,24 @@
     "to-origin-success": "Origen creado con éxito"
   },
   "manage-item": {
-    "saving-item-success": "Elemento guardado con éxito",
-    "saving-item-error": "Error al guardar el elemento",
+    "save-item-success": "Elemento guardado con éxito",
+    "save-item-error": "Error al guardar el elemento",
     "item-input-placeholder": "Escribe el nombre del elemento...",
     "item-name-empty": "El nombre del elemento no puede estar vacío",
     "delete-item": "Eliminar elemento",
     "delete-item-confirm": "¿Estás seguro de que deseas eliminar este elemento? SE ELIMINARÁN TODAS LAS RESEÑAS ASOCIADAS",
     "delete-item-success": "Elemento eliminado con éxito",
     "change-is_origin": "¿Quieres añadir elementos?",
-    "item-origin":"Añadir elementos a",
-    "origin-items": "¿A que elemento pertenece?",
-    "no-origin-items": "No se seleccionaron elementos"
+    "item-origin": "¿A qué origen pertenece?",
+    "origin-items": "Añadir elemento a",
+    "no-origin-items": "No se seleccionaron elementos",
+    "no-items": "No se encontraron elementos",
+    "search-items": "Buscar elementos...",
+    "search-origin": "Buscar origen...",
+    "error-missing-name": "El elemento debe tener un nombre",
+    "error-missing-category": "El elemento debe tener una categoría",
+    "select-items": "Seleccionar elementos",
+    "select-origin": "Seleccionar origen"
   },
     "manage-category": {
     "select-icon": "Seleccionar icono",
