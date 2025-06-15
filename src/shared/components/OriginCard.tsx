@@ -144,7 +144,6 @@ const OriginCard = ({ item }: OriginCardProps) => {
               routerLink={`/app/items/${item.id}/edit`}
               onClick={(e) => {
                 e.stopPropagation();
-                e.preventDefault();
               }}
             >
               <SquarePen size={20}></SquarePen>
