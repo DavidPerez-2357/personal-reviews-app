@@ -116,7 +116,7 @@ const ItemsSelectorModal = ({
 
   return (
     <IonModal isOpen={isOpen} onDidDismiss={onDismiss} ref={modal}>
-      <IonHeader className="ion-no-border ion-padding-top">
+      <IonHeader className="ion-no-border ion-padding-top mt-5">
         <IonToolbar>
           <IonTitle className="text-2xl font-bold text-start p-5">
             {isOrigin
@@ -138,21 +138,21 @@ const ItemsSelectorModal = ({
       </IonHeader>
       <IonContent className="ion-padding ">
         <IonGrid>
-            <IonCol>
+          <IonCol>
             <IonInput
               placeholder={
-              isOrigin
-                ? t("manage-item.search-items")
-                : t("manage-item.search-origin")
+                isOrigin
+                  ? t("manage-item.search-items")
+                  : t("manage-item.search-origin")
               }
               type="text"
               fill="solid"
               onIonInput={(e: any) => {
-              setSearchTerm(e.target.value);
+                setSearchTerm(e.target.value);
               }}
               value={searchTerm}
             />
-            </IonCol>
+          </IonCol>
           <IonCol>
             {/* Render list of items con Ionic */}
             {items.length === 0 ? (
@@ -247,6 +247,21 @@ const ItemsSelectorModal = ({
                 onClick={handleLoadMore}
               >
                 {t("common.load-more")}
+              </IonButton>
+            )}
+            {selectedItems.length > 0 && (
+              <IonButton
+                expand="block"
+                color="tertiary"
+                className="mt-4"
+                onClick={() => {
+                  if (onSave) onSave(selectedItems);
+                  onDismiss();
+                }}
+              >
+                {isOrigin
+                  ? t("manage-item.save-selected-items")
+                  : t("manage-item.save-selected-origin")}
               </IonButton>
             )}
           </IonCol>

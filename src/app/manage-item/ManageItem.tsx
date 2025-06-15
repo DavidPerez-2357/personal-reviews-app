@@ -81,8 +81,7 @@ const ManageItem = () => {
   const [selectedCategory, setSelectedCategory] = useState<Category | null>(
     null
   );
-  const [selectedSubcategory, setSelectedSubcategory] =
-    useState<Category | null>(null);
+  const [selectedSubcategory, setSelectedSubcategory] =useState<Category | null>(null);
   // Modal state
   const [isItemsSelectorModalOpen, setItemsSelectorModalOpen] = useState(false);
   const [isDeleteAlertOpen, setIsDeleteAlertOpen] = useState(false);
@@ -176,6 +175,7 @@ const ManageItem = () => {
 
   // React Router hooks
   let { id } = useParams<{ id: string }>();
+  const { idOrigin } = useParams<{ idOrigin: string }>();
   const history = useHistory();
   const location = useLocation();
 
@@ -199,6 +199,20 @@ const ManageItem = () => {
       console.error("❌ Error al obtener la categoría:", error);
     }
   };
+
+  const setOrigin = async (originId: number) => {
+    if (!originId) {
+      console.error("❌ Error: Origin ID is required");
+      return;
+    }
+
+    const origin = await getItemFull(originId);
+    if (!origin) {
+      console.error("❌ Error: Origin not found for ID", originId);
+      return;
+    }
+    setSelectedOriginItems([origin]);
+  }
 
   /**
    * Carga los datos del item a editar, incluyendo su categoría y foto.
@@ -472,6 +486,13 @@ const ManageItem = () => {
         });
       setIsInitialLoad(false);
     }
+
+    if (idOrigin) {
+      setOrigin(parseInt(idOrigin)).catch((error) => {
+        console.error("Error al cargar el origen:", error);
+        history.replace("/app/items");
+      });
+    }
     setCreateButtonDisabled(false);
     setDeleteButtonDisabled(false);
   }, [location.pathname, id, editMode]);
@@ -646,11 +667,10 @@ const ManageItem = () => {
               <IonButton
                 fill={item?.is_origin ? "solid" : "outline"}
                 color={item?.is_origin ? "tertiary" : "medium"}
-                className={`w-1/2 ${
-                  item?.is_origin
+                className={`w-1/2 ${item?.is_origin
                     ? "text-[var(--ion-color-tertiary-contrast)]"
                     : ""
-                }`}
+                  }`}
                 onClick={() => {
                   if (item && !item.is_origin) {
                     setItem({ ...item, is_origin: true });
@@ -665,12 +685,11 @@ const ManageItem = () => {
               <IonButton
                 fill={!item?.is_origin ? "solid" : "outline"}
                 color={!item?.is_origin ? "tertiary" : "medium"}
-                className={`w-1/2 ${
-                  !item?.is_origin
+                className={`w-1/2 ${!item?.is_origin
                     ? "text-[var(--ion-color-tertiary-contrast)]"
                     : ""
-                }`}
-                onClick={ () => {
+                  }`}
+                onClick={() => {
                   if (item && item.is_origin) {
                     setItem({ ...item, is_origin: false });
                     setSelectedOriginItems([]); // <-- Reset selected items al cambiar a item
@@ -689,7 +708,7 @@ const ManageItem = () => {
               <IonLabel className="section-title break-normal">
                 {item?.is_origin ? (
                   <>
-                    {t("manage-item.origin-item") + " "}
+                    {t("manage-item.origin-items") + " "}
                     <span className="text-[var(--ion-color-primary)]">
                       {item?.name.trim() ? item.name : "..."}
                     </span>
