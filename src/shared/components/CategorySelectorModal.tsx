@@ -27,7 +27,7 @@ const CategorySelectorModal = ({ modal, selectedCategory, setSelectedCategory }:
                 console.error("Error fetching categories:", error);
             });
     }
-    , []);
+    , [location.pathname]);
 
     return (
         <IonModal ref={modal} initialBreakpoint={0.5} breakpoints={[0, 0.25, 0.5, 1]}>

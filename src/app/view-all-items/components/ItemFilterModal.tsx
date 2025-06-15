@@ -55,10 +55,10 @@ const ItemFilterModal = ({
       }
     };
     fetchCategories();
-  }, []);
+  }, [location.pathname]);
 
-    // Handle parent category selection
-    const filteredChildCategories = selectedCategory
+  // Handle parent category selection
+  const filteredChildCategories = selectedCategory
     ? allCategories.filter((c) => c.parent_id === selectedCategory.id)
     : [];
 
@@ -131,7 +131,7 @@ const ItemFilterModal = ({
 
   // Handle reset button click
   const handleResetFilter = () => {
-    const resetFilters: {category?: number[] | null, type: ItemType} = {
+    const resetFilters: { category?: number[] | null, type: ItemType } = {
       category: null,
       type: 'all'
     };
@@ -207,9 +207,8 @@ const ItemFilterModal = ({
                 onClick={() => handleSelectParent(null)}
               >
                 <div
-                  className={`size-23 rounded-2xl flex items-center bg-[var(--ion-color-secondary)] justify-center ${
-                    !selectedCategory ? "selected" : ""
-                  }`}
+                  className={`size-23 rounded-2xl flex items-center bg-[var(--ion-color-secondary)] justify-center ${!selectedCategory ? "selected" : ""
+                    }`}
                 >
                   <FontAwesomeIcon icon="boxes-stacked" className="fa-xl" />
                 </div>
@@ -224,9 +223,8 @@ const ItemFilterModal = ({
                     onClick={() => handleSelectParent(cat)}
                   >
                     <div
-                      className={`size-23 rounded-2xl flex items-center justify-center ${
-                        selectedCategory?.id === cat.id ? "selected" : ""
-                      }`}
+                      className={`size-23 rounded-2xl flex items-center justify-center ${selectedCategory?.id === cat.id ? "selected" : ""
+                        }`}
                       style={{ backgroundColor: CategoryColors[cat.color] }}
                     >
                       <FontAwesomeIcon icon={cat.icon as IconName} className="fa-xl" color="var(--ion-color-primary-contrast)" />
@@ -239,9 +237,8 @@ const ItemFilterModal = ({
             </div>
 
             <div
-              className={`subcategories flex gap-x-4 items-center overflow-x-auto whitespace-nowrap pb-3 pt-2 ps-2 ${
-                filteredChildCategories.length > 0 ? "show" : ""
-              }`}
+              className={`subcategories flex gap-x-4 items-center overflow-x-auto whitespace-nowrap pb-3 pt-2 ps-2 ${filteredChildCategories.length > 0 ? "show" : ""
+                }`}
             >
               {filteredChildCategories.length > 0 && (
                 <>
@@ -250,19 +247,18 @@ const ItemFilterModal = ({
                     onClick={() => setSubcategoryMode("all")}
                   >
                     <div
-                      className={`size-23 rounded-2xl flex items-center justify-center ${
-                        (subcategoryMode === "all" ||
+                      className={`size-23 rounded-2xl flex items-center justify-center ${(subcategoryMode === "all" ||
                           (selectedCategory && subcategoryMode === "auto")) &&
-                        filteredChildCategories.length > 0
+                          filteredChildCategories.length > 0
                           ? "selected"
                           : ""
-                      }`}
+                        }`}
                       style={{ backgroundColor: "var(--ion-color-secondary)" }}
                     >
                       <FontAwesomeIcon icon="boxes-stacked" className="fa-xl" />
                     </div>
                     <IonLabel className="truncate max-w-full text-xs">
-                    {t('common.all')}
+                      {t('common.all')}
                     </IonLabel>
                   </div>
 
@@ -271,9 +267,8 @@ const ItemFilterModal = ({
                     onClick={() => setSubcategoryMode("none")}
                   >
                     <div
-                      className={`size-23 rounded-2xl flex items-center justify-center ${
-                        subcategoryMode === "none" ? "selected" : ""
-                      }`}
+                      className={`size-23 rounded-2xl flex items-center justify-center ${subcategoryMode === "none" ? "selected" : ""
+                        }`}
                       style={{ backgroundColor: "var(--ion-color-secondary)" }}
                     >
                       <FontAwesomeIcon icon="ban" className="fa-xl" />
@@ -292,11 +287,10 @@ const ItemFilterModal = ({
                   onClick={() => handleSelectSub(subcategory)}
                 >
                   <div
-                    className={`size-23 rounded-2xl flex items-center justify-center ${
-                      subcategoryMode === "specific" && selectedCategories[0]?.id === subcategory.id
+                    className={`size-23 rounded-2xl flex items-center justify-center ${subcategoryMode === "specific" && selectedCategories[0]?.id === subcategory.id
                         ? "selected"
                         : ""
-                    }`}
+                      }`}
                     style={{ backgroundColor: CategoryColors[subcategory.color] }}
                   >
                     <FontAwesomeIcon icon={subcategory.icon as IconName} className="fa-xl" color="var(--ion-color-primary-contrast)" />
