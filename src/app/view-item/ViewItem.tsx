@@ -261,10 +261,10 @@ export const ViewItem = () => {
               style={
                 item.image && !imageError
                   ? {
-                      backgroundImage: `url(${Capacitor.convertFileSrc(
-                        item.image
-                      )}`,
-                    }
+                    backgroundImage: `url(${Capacitor.convertFileSrc(
+                      item.image
+                    )}`,
+                  }
                   : {}
               }
             >
@@ -322,14 +322,27 @@ export const ViewItem = () => {
               </>
             </div>
           </div>
-          <IonButton
-            color="tertiary"
-            expand="block"
-            className="bg-primary mx-5 mb-5 text-lg"
-            routerLink={`/app/reviews/create/item/${id}`}
-          >
-            {t("view-item.add-review")}
-          </IonButton>
+          <div className="mx-5 mb-5 flex flex-col gap-4">
+            <IonButton
+              color="tertiary"
+              expand="block"
+              className="bg-primary text-lg"
+              routerLink={`/app/reviews/create/item/${id}`}
+            >
+              {t("view-item.add-review")}
+            </IonButton>
+            {item.is_origin ? (
+              <IonButton
+                color="tertiary"
+                expand="block"
+                className="bg-primary text-lg"
+                routerLink={`/app/items/create/to-origin/${id}`}
+              >
+                {t("view-item.add-item-inside")}
+              </IonButton>
+            ): null}
+          </div>
+
           {reviews.length > 1 && (
             <div className="px-5 flex flex-col gap-4">
               <div
@@ -398,7 +411,7 @@ export const ViewItem = () => {
                 )}
               </IonGrid>
             </div>
-          ): null}
+          ) : null}
         </div>
       </IonContent>
 
