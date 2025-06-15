@@ -404,7 +404,7 @@ export const updateItem = async (item: Item): Promise<boolean> => {
 
   try {
     const query = `UPDATE item SET name = ?, image = ?, category_id = ? WHERE id = ?`;
-    const values = [item.name, item.image, item.category_id, item.id];
+    const values = [item.name.trim(), item.image, item.category_id, item.id];
 
     await db!.run(query, values);
     return true;
