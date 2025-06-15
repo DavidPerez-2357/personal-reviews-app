@@ -37,7 +37,7 @@ import {
   IonRow,
 } from "@ionic/react";
 import { Box, Building2, Camera, Images, Plus, Search } from "lucide-react";
-import { use, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useHistory, useLocation, useParams } from "react-router";
 import ItemsSelectorModal from "./components/ItemsSelectorModal";
