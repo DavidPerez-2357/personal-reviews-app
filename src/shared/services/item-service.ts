@@ -18,8 +18,8 @@ export const insertItem = async (item: Item): Promise<number | null> => {
   if (!db) return null;
 
     try {
-        const query = `INSERT INTO item (name, image, category_id) VALUES (?, ?, ?)`;
-        const values = [item.name.trim(), item.image, item.category_id];
+        const query = `INSERT INTO item (name, image, category_id, is_origin) VALUES (?, ?, ?, ?)`;
+        const values = [item.name.trim(), item.image, item.category_id, item.is_origin ? 1 : 0];
 
     const result = await db!.run(query, values);
     return result.changes?.lastId as number;
@@ -28,6 +28,27 @@ export const insertItem = async (item: Item): Promise<number | null> => {
     return null;
   }
 };
+
+/**
+ * Edita un ítem en la base de datos.
+ * @param item
+ * @returns Promise<boolean>
+ */
+export const editItem = async (item: Item): Promise<boolean> => {
+  const db = await openDatabase();
+  if (!db) return false;
+
+  try {
+    const query = `UPDATE item SET name = ?, image = ?, category_id = ?, is_origin = ? WHERE id = ?`;
+    const values = [item.name.trim(), item.image, item.category_id, item.is_origin ? 1 : 0, item.id];
+
+    await db!.run(query, values);
+    return true;
+  } catch (error) {
+    console.error("❌ Error al editar ítem", error);
+    return false;
+  }
+}
 
 /**
  * Convertir un ítem a un origen.
@@ -69,6 +90,26 @@ export const deleteOriginRelations = async (id: number): Promise<boolean> => {
 };
 
 /**
+ * Elimina las relaciones de item de un origen.
+ * @param id
+ * @return Promise<boolean>
+ */
+export const deleteItemRelations = async (id: number): Promise<boolean> => {
+  const db = await openDatabase();
+  if (!db) return false;
+
+  try {
+    const query = `DELETE FROM origin_item WHERE item_id = ?`;
+    const values = [id];
+    await db!.run(query, values);
+    return true;
+  } catch (error) {
+    console.error("❌ Error al eliminar relaciones de ítem", error);
+    return false;
+  }
+}
+
+/**
  * Convierte un origen a un ítem.
  * @param id
  * @return Promise<boolean>
@@ -103,21 +144,22 @@ export const getItemFull = async (id: number): Promise<ItemFull | null> => {
 
   try {
     const query = `select
-                            i.id,
-                            i.name,
-                            i.image,
-                            round(avg(r.rating), 2) as average_rating,
-                            count(r.id) as number_of_ratings,
-                            max(r.created_at) as date_last_review,
-                            c.name as category_name,
-                            c.icon as category_icon,
-                            c.color as category_color
-                        from item i
-                        join category c on i.category_id = c.id
-                        left join review r on i.id = r.item_id
-                        where i.id = ?
-                        group by i.id, i.name, c.name, c.icon, c.color
-                        order by i.id;`;
+                        i.id,
+                        i.name,
+                        i.image,
+                        i.is_origin,
+                        round(avg(r.rating), 2) as average_rating,
+                        count(r.id) as number_of_ratings,
+                        max(r.created_at) as date_last_review,
+                        c.name as category_name,
+                        c.icon as category_icon,
+                        c.color as category_color
+                    from item i
+                    join category c on i.category_id = c.id
+                    left join review r on i.id = r.item_id
+                    where i.id = ?
+                    group by i.id, i.name, c.name, c.icon, c.color
+                    order by i.id;`;
     const result = await db!.query(query, [id]);
     return (result.values && (result.values[0] as ItemFull)) || null;
   } catch (error) {
@@ -174,6 +216,60 @@ export const getItemsByOrigin = async (id: number): Promise<ItemDisplay[]> => {
         console.error("❌ Error al obtener ítems por origen", error);
         return [];
     }
+}
+
+/**
+ * Obtiene el origen de un ítem.
+ * @param item_id
+ * @returns Promise<Origin | null>
+ */
+export const getOriginByItemId = async (item_id: number): Promise<Origin | null> => {
+  const db = await openDatabase();
+  if (!db) return null;
+
+  try {
+    const query = `SELECT * FROM origin_item WHERE item_id = ?`;
+    const result = await db!.query(query, [item_id]);
+    return (result.values && (result.values[0] as Origin)) || null;
+  } catch (error) {
+    console.error("❌ Error al obtener origen por ID de ítem", error);
+    return null;
+  }
+}
+
+/**
+ * Obtiene los items de un origen.
+ * @param item_id
+ * @returns Promise<ItemFull | null>
+ */
+export const getItemsByOriginId = async (item_id: number): Promise<ItemFull[] | null> => {
+  const db = await openDatabase();
+  if (!db) return null;
+
+  try {
+    const query = `
+      SELECT
+        i.id,
+        i.name,
+        i.image,
+        i.is_origin,
+        i.created_at,
+        i.updated_at,
+        i.category_id,
+        c.name AS category_name,
+        c.icon AS category_icon,
+        c.color AS category_color
+      FROM item i
+      JOIN category c ON i.category_id = c.id
+      JOIN origin_item oi ON i.id = oi.item_id
+      WHERE oi.origin_id = ?
+    `;
+    const result = await db!.query(query, [item_id]);
+    return (result.values && (result.values)) || null;
+  } catch (error) {
+    console.error("❌ Error al obtener ítems por origen", error);
+    return null;
+  }
 }
 
 /**
@@ -237,7 +333,7 @@ export const insertOrigin = async (origin: Origin): Promise<boolean> => {
   if (!db) return false;
 
   try {
-    const query = `INSERT INTO origin_item (item1_id, item2_id) VALUES (?, ?)`;
+    const query = `INSERT INTO origin_item (origin_id, item_id) VALUES (?, ?)`;
     const values = [origin.origin_id, origin.item_id];
 
     await db!.run(query, values);
@@ -291,7 +387,7 @@ export const updateItemWithCategory = async (
 
     try {
         const query = `UPDATE item SET name = ?, category_id = ? WHERE id = ?`;
-        const values = [item.name.trim, item.category_id, item.id];
+        const values = [item.name.trim(), item.category_id, item.id];
 
     await db!.run(query, values);
     return true;
@@ -334,22 +430,20 @@ export const deleteItem = async (id: number): Promise<boolean> => {
 };
 
 /**
- * Devuelve una lista paginada de ítems o orígenes que pueden ser seleccionados para relacionarlos.
- * Si `isOrigin` es true, se filtran los ítems que no estén relacionados con más de un origen.
- * Si `isOrigin` es false, se devuelven todos los orígenes posibles (sin restricción de relación).
- * Además, permite filtrar por nombre mediante búsqueda parcial.
+ * Devuelve ítems u orígenes para relacionar, excluyendo el propio ítem si es origen.
  *
- * @param isOrigin - Indica si se buscan orígenes (`true`) o ítems (`false`)
- * @param limit - Número de resultados por página (por defecto: 10)
- * @param offset - Desplazamiento para la paginación (por defecto: 0)
- * @param searchTerm - (Opcional) Texto para filtrar por nombre del ítem/origen
- * @returns Lista de ítems u orígenes disponibles para relación
+ * @param isOrigin - Si true, se buscan ítems para un origen; si false, orígenes para un ítem.
+ * @param limit - Resultados por página.
+ * @param offset - Desplazamiento para paginación.
+ * @param searchTerm - (Opcional) Búsqueda parcial por nombre.
+ * @param currentItemId - (Opcional) ID del ítem que se está editando para excluirlo de los resultados.
  */
 export const getSelectableItemsForRelation = async (
   isOrigin: boolean,
   limit: number = 10,
   offset: number = 0,
-  searchTerm?: string
+  searchTerm?: string,
+  currentItemId?: number
 ): Promise<ItemFull[]> => {
   const db = await openDatabase();
   if (!db) return [];
@@ -374,32 +468,35 @@ export const getSelectableItemsForRelation = async (
     const filters: string[] = [];
     const params: any[] = [];
 
-    // Filtro por tipo
-    filters.push(`i.is_origin = ?`);
-    params.push(isOrigin ? 0 : 1);
+    // Excluir el propio ítem si estamos seleccionando ítems para un origen
+    if (currentItemId !== undefined) {
+      filters.push(`i.id != ?`);
+      params.push(currentItemId);
+    }
 
-    // Filtro por relación si es un origen
+    // Si buscamos ítems (para un origen), filtrar los que no tengan más de una relación
     if (isOrigin) {
       filters.push(`
         (
           SELECT COUNT(*) FROM origin_item io WHERE io.item_id = i.id
-        ) <= 1
+        ) < 1
       `);
+    } else {
+      filters.push(`i.is_origin = ?`);
+      params.push(isOrigin ? 0 : 1);
     }
 
-    // Filtro por término de búsqueda (si se proporciona)
+    // Filtro por búsqueda (si hay)
     if (searchTerm && searchTerm.trim() !== "") {
       filters.push(`i.name LIKE ?`);
       params.push(`%${searchTerm.trim()}%`);
     }
 
     const whereClause = filters.length > 0 ? `WHERE ${filters.join(" AND ")}` : "";
-
     const pagination = `LIMIT ? OFFSET ?`;
     params.push(limit, offset);
 
     const fullQuery = `${baseSelect} ${whereClause} ${pagination}`;
-
     const result = await db.query(fullQuery, params);
     return result.values as ItemFull[];
   } catch (error) {
