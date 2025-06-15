@@ -45,6 +45,7 @@ const FooterTabBar = () => {
           <Route path="/app/items/:id/viewItem" component={ViewItem} exact={true} />
           <Route path="/app/items/create" component={ManageItem} exact={true} />
           <Route path="/app/items/:id/edit" component={ManageItem} exact={true} />
+          <Route path="/app/items/create/to-origin/:idOrigin" component={ManageItem} exact={true} />
 
           <Route path="/app/more/categories" component={ViewAllCategories} exact={true} />
           <Route path="/app/more/categories/create" component={ManageCategory} exact={true} />

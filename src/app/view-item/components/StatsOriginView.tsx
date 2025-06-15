@@ -4,18 +4,19 @@ import { useTranslation } from "react-i18next";
 
 const StatOriginView = ({ items }: { items: ItemDisplay[] }) => {
   const { t } = useTranslation();
-  const averageRating: number = items.reduce((acc, item) => acc + item.last_rating, 0) / items.length;
+  const ratedItems = items.filter(item => item.last_rating > 0);
+  const averageRating: number = ratedItems.length > 0
+    ? ratedItems.reduce((acc, item) => acc + item.last_rating, 0) / ratedItems.length
+    : 0;
   const numberOfItems: number = items.length;
 
   const numberStarMap: Map<number, number> = new Map<number, number>(
     Array.from({ length: 5 }, (_, i) => [i + 1, 0])
   );
 
-  items.forEach((item) => {
+  ratedItems.forEach((item) => {
     const roundedRating = Math.round(item.last_rating);
-    if (roundedRating >= 1 && roundedRating <= 5) {
-      numberStarMap.set(roundedRating, (numberStarMap.get(roundedRating) || 0) + 1);
-    }
+    numberStarMap.set(roundedRating, (numberStarMap.get(roundedRating) || 0) + 1);
   });
 
   return (
