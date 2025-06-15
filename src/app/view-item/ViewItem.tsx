@@ -1,5 +1,4 @@
-import { useEffect, useState } from "react";
-import React, { use, useEffect, useState, useRef } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import {
   IonContent,
   IonPage,
@@ -229,10 +228,6 @@ export const ViewItem = () => {
               color="var(--ion-text-color)"
               className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 pointer-events-none z-10"
             />
-            <EllipsisVertical
-              color="var(--ion-text-color)"
-              className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 pointer-events-none z-10"
-            />
             <IonSelect
               interface="popover"
               className="pr-10 w-full [&::part(icon)]:hidden"
@@ -376,7 +371,7 @@ export const ViewItem = () => {
                       />
                     ))}
                     {/* Extending the timeline line to the bottom */}
-                    <div className="absolute left-0 top-0 w-0.5 h-full bg-[var(--ion-color-tertiary]"></div>
+                    <div className="absolute left-0 top-0 w-0.5 h-full bg-[var(--ion-color-tertiary)]"></div>
                   </div>
                 </div>
               )}
