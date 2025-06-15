@@ -53,7 +53,7 @@ const SelectIconModal = ({ isOpen, setIsOpen, selectedIcon, setSelectedIcon }: S
 
     return (
         <IonModal isOpen={isOpen}>
-            <IonHeader className="ion-no-border ion-padding-top">
+            <IonHeader className="ion-no-border ion-padding-top mt-5">
                 <IonToolbar>
                     <IonTitle className="ion-padding text-2xl text-start font-bold">{t('manage-category.select-icon')}</IonTitle>
                     <IonButton
