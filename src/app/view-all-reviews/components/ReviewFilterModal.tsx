@@ -48,14 +48,6 @@ const ReviewFilterModal: React.FC<FilterModalProps> = ({
   const { t } = useTranslation();
 
   useEffect(() => {
-    // Datos de prueba estáticos
-    // const categories: Category[] = [
-    //   { id: 1, name: "Tecnología", icon: "laptop", color: "blue", type: 1, parent_id: null },
-    //   { id: 2, name: "Móviles", icon: "mobile", color: "green", type: 1, parent_id: 1 },
-    //   { id: 3, name: "Portátiles", icon: "laptop", color: "purple", type: 1, parent_id: 1 },
-    //   { id: 4, name: "Electrodomésticos", icon: "blender", color: "orange", type: 1, parent_id: null },
-    //   { id: 5, name: "Cocina", icon: "utensils", color: "red", type: 1, parent_id: 4 },
-    // ];
 
     // Comentado: llamada real a la base de datos
     const fetchCategories = async () => {
