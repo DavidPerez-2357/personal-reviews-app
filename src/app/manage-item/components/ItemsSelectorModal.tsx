@@ -116,7 +116,7 @@ const ItemsSelectorModal = ({
 
   return (
     <IonModal isOpen={isOpen} onDidDismiss={onDismiss} ref={modal}>
-      <IonHeader className="ion-no-border ion-padding-top">
+      <IonHeader className="ion-no-border ion-padding-top mt-5">
         <IonToolbar>
           <IonTitle className="text-2xl font-bold text-start p-5">
             {isOrigin

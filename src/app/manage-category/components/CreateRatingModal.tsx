@@ -18,6 +18,8 @@ const CreateRatingModal = ({ isOpen, setIsOpen, onSubmit }: CreateRatingModalPro
         <IonModal
             isOpen={isOpen}
             onDidDismiss={() => setIsOpen(false)}
+            breakpoints={[0, 0.3, 0.5]}
+            initialBreakpoint={0.5}
         >
             <IonHeader className="ion-no-border ion-padding-top">
                 <IonToolbar>
