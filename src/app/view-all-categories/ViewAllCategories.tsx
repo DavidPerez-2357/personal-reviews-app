@@ -79,7 +79,16 @@ const ViewAllCategories = () => {
     return (
         <IonPage className="safe-area-top">
             <IonContent>
-                <IonGrid className="p-5 pb-10 flex flex-col gap-12">
+                <IonButton
+                    color="tertiary"
+                    expand="block"
+                    className="bg-primary fixed bottom-5 left-5 right-5 z-50"
+                    routerLink="/app/more/categories/create"
+                >
+                    {t('view-all-categories.create-category')}
+                </IonButton>
+
+                <IonGrid className="p-5 pb-20 flex flex-col gap-12">
                     <IonRow>
                         <IonCol className="gap-5 flex flex-col">
                             <div className="flex gap-4 w-full">
@@ -92,15 +101,6 @@ const ViewAllCategories = () => {
                                     </IonLabel>
                                 </div>
                             </div>
-
-                            <IonButton
-                                color="tertiary"
-                                expand="block"
-                                className="bg-primary"
-                                routerLink="/app/more/categories/create"
-                            >
-                                {t('view-all-categories.create-category')}
-                            </IonButton>
                         </IonCol>
                     </IonRow>
 
