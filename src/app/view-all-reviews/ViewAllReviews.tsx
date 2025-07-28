@@ -179,7 +179,15 @@ export const ReviewPage: React.FC = () => {
   return (
     <IonPage className="safe-area-top">
       <IonContent>
-        <IonGrid className="p-5 pb-10 flex flex-col gap-12">
+        <IonButton
+          color="tertiary"
+          expand="block"
+          className="bg-primary fixed bottom-5 left-5 right-5 z-50"
+          routerLink="/app/reviews/create"
+        >
+          {t("review-page.add-review")}
+        </IonButton>
+        <IonGrid className="p-5 pb-20 flex flex-col gap-12">
           {/* Section: General information and button for new review */}
           <IonRow>
             <IonCol className="gap-5 flex flex-col">
@@ -193,14 +201,6 @@ export const ReviewPage: React.FC = () => {
                     : t("common.reviews")}
                 </IonLabel>
               </div>
-              <IonButton
-                color="tertiary"
-                expand="block"
-                className="bg-primary"
-                routerLink="/app/reviews/create"
-              >
-                {t("review-page.add-review")}
-              </IonButton>
             </IonCol>
           </IonRow>
 

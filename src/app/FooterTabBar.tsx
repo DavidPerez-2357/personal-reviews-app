@@ -58,15 +58,15 @@ const FooterTabBar = () => {
         </IonRouterOutlet>
 
         <IonTabBar slot="bottom" className='tab-bar'>
-          <IonTabButton tab="home" href="/app/reviews" onClick={() => setSelectedTab('reviews')} className='ion-activatable ripple-parent circle'>
-            <Star size={selectedTab === 'reviews' ? 40 : 35} />
-            {selectedTab !== 'reviews' && <IonLabel>{t('common.reviews')}</IonLabel>}
-            <IonRippleEffect></IonRippleEffect>
-          </IonTabButton>
-
           <IonTabButton tab="items" href="/app/items" onClick={() => setSelectedTab('items')} className='ion-activatable ripple-parent circle'>
             <Box size={selectedTab === 'items' ? 40 : 35} />
             {selectedTab !== 'items' && <IonLabel>{t('common.items')}</IonLabel>}
+            <IonRippleEffect></IonRippleEffect>
+          </IonTabButton>
+
+          <IonTabButton tab="home" href="/app/reviews" onClick={() => setSelectedTab('reviews')} className='ion-activatable ripple-parent circle'>
+            <Star size={selectedTab === 'reviews' ? 40 : 35} />
+            {selectedTab !== 'reviews' && <IonLabel>{t('common.reviews')}</IonLabel>}
             <IonRippleEffect></IonRippleEffect>
           </IonTabButton>
 
