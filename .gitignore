@@ -16,7 +16,6 @@ pnpm-debug.log
 
 # Dependencias de Capacitor
 ios/
-android/
 capacitor.config.json
 
 # Build y cache

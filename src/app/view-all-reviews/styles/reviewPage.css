@@ -1,0 +1,40 @@
+.modal-filter {
+  --border-radius: 20px;
+}
+
+.selected {
+  outline: 0.15rem solid var(--ion-color-tertiary);
+  outline-offset: -0.15rem;
+}
+
+ion-range {
+  --bar-height: 10px;
+  --bar-width: 100%;
+  --knob-size: 35px;
+  --bar-background: var(--ion-color-secondary);
+}
+
+ion-range::part(tick) {
+  z-index: 100;
+  background: var(--ion-color-secondary-step-200);
+  width: 4px;
+  height: 14px;
+  top: 14px;
+}
+
+ion-range::part(label) {
+  margin: 0;
+  font-size: 1.3rem;
+  font-weight: 600;
+}
+
+.subcategories {
+  opacity: 0;
+  transform: translateY(-10px);
+  transition: opacity 0.3s ease, transform 0.3s ease;
+}
+
+.subcategories.show {
+  opacity: 1;
+  transform: translateY(0);
+}
